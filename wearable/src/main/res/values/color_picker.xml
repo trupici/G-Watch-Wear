@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!--
+    Standard dimensions for the color wheel
+ -->
+    <dimen name="color_wheel_radius">130dp</dimen>
+    <dimen name="color_wheel_thickness">9dp</dimen>
+    <dimen name="color_center_halo_radius">50dp</dimen>
+    <dimen name="color_center_radius">40dp</dimen>
+    <dimen name="color_pointer_halo_radius">18dp</dimen>
+    <dimen name="color_pointer_radius">14dp</dimen>
+
+    <!--
+        Standard dimensions for color bars
+     -->
+    <dimen name="bar_thickness">4dp</dimen>
+    <dimen name="bar_length">240dp</dimen>
+    <dimen name="bar_pointer_radius">6dp</dimen>
+    <dimen name="bar_pointer_halo_radius">10dp</dimen>
+    <dimen name="bar_transparency_square_size">4dp</dimen>
+
+    <color name="bar_pointer_halo_color">#A0202020</color>
+    <color name="bar_pointer_default_color">#ff81ff00</color>
+
+</resources>

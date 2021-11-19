@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "sk.trupici.gwatch.wear"
+        minSdk 26
+        targetSdk 30
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    wearApp project(':wearable')
+
+    // Standard Wear OS libraries
+    implementation "androidx.wear:wear:1.1.0"
+    implementation "androidx.wear:wear-input:1.1.0"
+
+    implementation 'com.google.android.gms:play-services-wearable:17.1.0'
+    implementation 'com.google.android.gms:play-services-base:17.6.0'
+
+    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'com.google.android.support:wearable:2.8.1'
+    compileOnly 'com.google.android.wearable:wearable:2.8.1'
+
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    // color picker lib
+//    implementation 'com.larswerkman:HoloColorPicker:1.5'
+    implementation files('libs/holocolorpicker-2.0.aar')
+
+    // chart lib
+//    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+//    implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
+
+}

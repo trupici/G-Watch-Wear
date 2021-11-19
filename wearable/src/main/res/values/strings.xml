@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <string name="app_name">G-Watch Wear App</string>
+    <string name="message">Watch face tapped</string>
+
+    <string name="standard_analog_name">G-Watch</string>
+    <string name="standard_analog_config_name">G-Watch Config</string>
+    <string name="color_config_name">G-Watch Color Config</string>
+
+    <string name="standard_analog_complication_preferences_key">sk.trupici.gwatch.wear.STANDARD_ANALOG_COMPLICATION_PREFERENCES_KEY</string>
+
+    <string name="add_complication">Add Complication</string>
+    <string name="edit_complication">Edit Complication</string>
+
+    <string name="config_page_title_bkg">Palette</string>
+    <string name="config_page_title_hands">Hands</string>
+    <string name="config_page_title_comp_bottom">Glucose</string>
+    <string name="config_page_title_comp_center">Trend</string>
+    <string name="config_page_title_comp_left">Left</string>
+    <string name="config_page_title_comp_right">Right</string>
+
+    <string name="config_item_border_shape_label">Border shape</string>
+    <string name="config_item_border_color_label">Border color</string>
+    <string name="config_item_text_color_label">Data color</string>
+    <string name="config_item_bkg_color_label">Background color</string>
+
+    <string name="border_type_none">No border</string>
+    <string name="border_type_rect">Rect</string>
+    <string name="border_type_round_rect">Rounded rect</string>
+    <string name="border_type_ring">Ring</string>
+    <string name="border_type_dashed_rect">Dashed rect</string>
+    <string name="border_type_dashed_round_rect">Dashed round rect</string>
+    <string name="border_type_dashed_ring">Dashed ring</string>
+    <string name="border_type_dotted_rect">Dotted rect</string>
+    <string name="border_type_dotted_round_rect">Dotted round rect</string>
+    <string name="border_type_dotted_ring">Dotted ring</string>
+</resources>

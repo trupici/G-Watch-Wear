@@ -57,6 +57,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import javax.security.auth.login.LoginException;
+
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.bgchart.SimpleBgChart;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
@@ -773,9 +775,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                         x, bounds.top + bounds.height() / 2f, textPaint);
                 textPaint.setTextSize(bounds.height() / 3f);
                 textPaint.setFakeBoldText(false);
-                canvas.drawText(complicationData.getShortText() == null ? ComplicationConfig.NO_DATA_TEXT
-                                : complicationData.getShortTitle().getText(getApplicationContext(), currentTimeMillis).toString(),
-                        x, bounds.bottom - bounds.height() / 10f, textPaint);
+                try {
+                    canvas.drawText(
+                            complicationData.getShortTitle().getText(getApplicationContext(), currentTimeMillis).toString(),
+                            x, bounds.bottom - bounds.height() / 10f, textPaint);
+                } catch (NullPointerException e) {
+                    Log.e(LOG_TAG, "drawBGComplication: null object reference");
+                }
             }
         }
 

@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -261,10 +262,13 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         private void updateComplicationView(ComplicationProviderInfo complicationProviderInfo) {
+            complication.setImageIcon(null);
             if (complicationProviderInfo != null) {
                 try {
+                    Log.d(LOG_TAG, "updateComplicationView: " + complicationId + ", " + complicationProviderInfo.providerIcon.getResPackage());
                     complication.setImageIcon(complicationProviderInfo.providerIcon);
-                } catch(Exception e) {
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "updateComplicationView: " + e.getLocalizedMessage());
                 }
                 complication.setContentDescription(context.getString(R.string.edit_complication));
             } else {
@@ -282,9 +286,10 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     new ProviderInfoRetriever.OnProviderInfoReceivedCallback() {
                         @Override
                         public void onProviderInfoReceived(int watchFaceComplicationId, @Nullable ComplicationProviderInfo complicationProviderInfo) {
-                            Log.d(LOG_TAG, "onProviderInfoReceived: " + complicationProviderInfo);
-
-                            updateComplicationView(complicationProviderInfo);
+                            Log.d(LOG_TAG, "onProviderInfoReceived: " + watchFaceComplicationId + ", " + complicationProviderInfo);
+                            if (complicationId.ordinal() == watchFaceComplicationId) {
+                                updateComplicationView(complicationProviderInfo);
+                            }
                         }
                     },
                     componentName,

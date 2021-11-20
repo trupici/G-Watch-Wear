@@ -42,7 +42,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
             new ConfigPageData(
                     ConfigPageData.ConfigType.BACKGROUND,
                     new ConfigPageData.ConfigItemData[] {
-                            new ConfigPageData.ConfigItemData(0, "Standard" , R.drawable.background_default)
+                            new ConfigPageData.ConfigItemData(0, "Standard" , R.drawable.background_default),
                             new ConfigPageData.ConfigItemData(1, "Green", R.drawable.analog_bkg_green),
                             new ConfigPageData.ConfigItemData(2, "Blue", R.drawable.analog_bkg_blue),
                             new ConfigPageData.ConfigItemData(3, "Red", R.drawable.analog_bkg_red)
@@ -52,10 +52,10 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
             new ConfigPageData(
                     ConfigPageData.ConfigType.HANDS,
                     new ConfigPageData.ConfigItemData[] {
-                            new ConfigPageData.HandsConfigData(0, "", R.drawable.analog_hands_preview_default
-                                    R.drawable.minutes_default, R.drawable.minutes_shadow_default
-                                    R.drawable.hours_default, R.drawable.hours_shadow_default
-                                    R.drawable.seconds_default, R.drawable.seconds_shadow_default)
+                            new ConfigPageData.HandsConfigData(0, "", R.drawable.analog_hands_preview_default,
+                                    R.drawable.minutes_default, R.drawable.minutes_shadow_default,
+                                    R.drawable.hours_default, R.drawable.hours_shadow_default,
+                                    R.drawable.seconds_default, R.drawable.seconds_shadow_default),
                             new ConfigPageData.HandsConfigData(1, "", R.drawable.analog_hands_preview_1,
                                     R.drawable.analog_hour_1, R.drawable.analog_hour_1_shadow,
                                     R.drawable.analog_minute_1, R.drawable.analog_minute_1_shadow,

@@ -175,10 +175,10 @@ public class SimpleBgChart {
         backgroundColor = prefs.getInt("graph_color_warn", Color.TRANSPARENT);
         criticalColor = prefs.getInt("graph_color_critical", Color.RED/*ContextCompat.getColor(context, R.color.def_red)*/);
         warColor = prefs.getInt("graph_color_warn", Color.YELLOW/*ContextCompat.getColor(context, R.color.def_orange)*/);
-        inRangeColor = prefs.getInt("graph_color_in_range", Color.GREEN/*ContextCompat.getColor(context, R.color.def_green)*/);
+        inRangeColor = prefs.getInt("graph_color_in_range", Color.WHITE/*ContextCompat.getColor(context, R.color.def_green)*/);
 
         // lines
-        vertLineColor = prefs.getInt("graph_color_vert_line", Color.GRAY);
+        vertLineColor = prefs.getInt("graph_color_vert_line", Color.TRANSPARENT);
         lowLineColor = prefs.getInt("graph_color_low_line", Color.RED);
         highLineColor = prefs.getInt("graph_color_high_line", Color.YELLOW);
         criticalLineColor = prefs.getInt("graph_color_critical_line", Color.RED);

@@ -565,7 +565,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             // left complication
             int left = (int) (62.5 * width / 450f);
-            int top = (int) (220 * height / 450f);
+            int top = (int) (219 * height / 450f);
             int cWidth = (int) (100 * width / 450f);
             int cHeight = (int) (100 * height / 450f);
 
@@ -574,8 +574,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     .getComplicationDrawable().setBounds(bounds);
 
             // right complication
-            left = (int) (290 * width / 450f);
-            top = (int) (220 * height / 450f);
+            left = (int) (289 * width / 450f);
+            top = (int) (219 * height / 450f);
             cWidth = (int) (100 * width / 450f);
             cHeight = (int) (100 * height / 450f);
             bounds = new Rect(left, top,left + cWidth,top + cHeight);

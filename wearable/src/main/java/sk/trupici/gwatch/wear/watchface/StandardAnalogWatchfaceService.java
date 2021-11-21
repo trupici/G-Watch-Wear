@@ -564,7 +564,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
              */
 
             // left complication
-            int left = (int) (62.5 * width / 450f);
+            int left = (int) (61 * width / 450f);
             int top = (int) (219 * height / 450f);
             int cWidth = (int) (100 * width / 450f);
             int cHeight = (int) (100 * height / 450f);
@@ -587,7 +587,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             // center complication
             left = (int) (190 * width / 450f);
-            top = (int) (235 * height / 450f);
+            top = (int) (233 * height / 450f);
             cWidth = (int) (70 * width / 450f);
             cHeight = (int) (70 * height / 450f);
 
@@ -598,7 +598,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             // bottom complication
             left = (int) (188 * width / 450f);
-            top = (int) (320 * height / 450f);
+            top = (int) (318 * height / 450f);
             cWidth = (int) (70 * width / 450f);
             cHeight = (int) (90 * height / 450f);
 

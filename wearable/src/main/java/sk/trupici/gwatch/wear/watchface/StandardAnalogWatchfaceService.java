@@ -564,10 +564,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
              */
 
             // left complication
-            int left = width / 8; // 3/24
-            int top = height / 2; // 12/24
-            int cWidth = width * 5/24;   // 5/24
-            int cHeight = height * 5/24; // 5/24
+            int left = (int) (62.5 * width / 450f);
+            int top = (int) (220 * height / 450f);
+            int cWidth = (int) (100 * width / 450f);
+            int cHeight = (int) (100 * height / 450f);
 
             Rect bounds = new Rect(left, top,left + cWidth,top + cHeight);
             Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)

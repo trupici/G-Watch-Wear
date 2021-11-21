@@ -229,13 +229,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             Point size = new Point();
             display.getSize(size);
 
-            int left = size.x / 5;
-            int top = size.y / 6;
+            int left = (int) (100 * size.x / 450f);
+            int top = (int) (85 * size.y / 450f);
+            int width = (int) (250 * size.x / 450f);
+            int height = (int) (110 * size.y / 450f);
             chart = new SimpleBgChart(
                     left, top,
-                    size.x - left - left, size.y/2 - top - CHART_BOTTOM_MARGIN,
+                    width, height,
                     sharedPrefs);
-
         }
 
 

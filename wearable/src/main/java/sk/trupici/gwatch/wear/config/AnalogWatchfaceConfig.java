@@ -42,7 +42,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
             new ConfigPageData(
                     ConfigPageData.ConfigType.BACKGROUND,
                     new ConfigPageData.ConfigItemData[] {
-                            new ConfigPageData.ConfigItemData(0, "Standard" , R.drawable.background_default),
+                            new ConfigPageData.ConfigItemData(0, "Standard" , R.drawable.analog_background_default),
                             new ConfigPageData.ConfigItemData(1, "Green", R.drawable.analog_bkg_green),
                             new ConfigPageData.ConfigItemData(2, "Blue", R.drawable.analog_bkg_blue),
                             new ConfigPageData.ConfigItemData(3, "Red", R.drawable.analog_bkg_red)

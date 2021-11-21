@@ -570,6 +570,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             int cHeight = (int) (100 * height / 450f);
 
             Rect bounds = new Rect(left, top,left + cWidth,top + cHeight);
+
             Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)
                     .getComplicationDrawable().setBounds(bounds);
 
@@ -578,27 +579,31 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             top = (int) (219 * height / 450f);
             cWidth = (int) (100 * width / 450f);
             cHeight = (int) (100 * height / 450f);
+
             bounds = new Rect(left, top,left + cWidth,top + cHeight);
 
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
                     .getComplicationDrawable().setBounds(bounds);
 
             // center complication
-            left = (int) (192.5 * width / 450f);
+            left = (int) (190 * width / 450f);
             top = (int) (235 * height / 450f);
             cWidth = (int) (70 * width / 450f);
             cHeight = (int) (70 * height / 450f);
+
             bounds = new Rect(left, top,left + cWidth,top + cHeight);
 
             Config.getComplicationConfig(ComplicationId.CENTER_COMPLICATION_ID)
                     .getComplicationDrawable().setBounds(bounds);
 
             // bottom complication
-//            left = width / 3;     // 8/24
-            top = height * 15/24; // 15/24
-//            cWidth = width / 3;      // 8/24
-            cHeight = height * 5/24; // 5/24
+            left = (int) (188 * width / 450f);
+            top = (int) (320 * height / 450f);
+            cWidth = (int) (70 * width / 450f);
+            cHeight = (int) (90 * height / 450f);
+
             bounds = new Rect(left, top,left + cWidth,top + cHeight);
+
             Config.getComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID)
                     .getComplicationDrawable().setBounds(bounds);
 

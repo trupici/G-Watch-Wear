@@ -24,11 +24,13 @@ public class ComplicationConfigItem implements ConfigItem {
     final private int defaultComplicationResourceId;
     final private ComplicationLocation location;
     final private int layoutId;
+    final private int complicationLayoutId;
 
-    public ComplicationConfigItem(ComplicationLocation location, int defaultComplicationResourceId, int layoutId) {
+    public ComplicationConfigItem(ComplicationLocation location, int defaultComplicationResourceId, int layoutId, int complicationLayoutId) {
         this.defaultComplicationResourceId = defaultComplicationResourceId;
         this.location = location;
         this.layoutId = layoutId;
+        this.complicationLayoutId = complicationLayoutId;
     }
 
     public int getDefaultComplicationResourceId() {
@@ -41,6 +43,10 @@ public class ComplicationConfigItem implements ConfigItem {
 
     public int getLayoutId() {
         return layoutId;
+    }
+
+    public int getComplicationLayoutId() {
+        return complicationLayoutId;
     }
 
     @Override

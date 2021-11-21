@@ -39,6 +39,7 @@ import sk.trupici.gwatch.wear.R;
 public class ColorPickerActivity extends Activity implements ColorPicker.OnColorChangedListener {
 
     public static final String EXTRA_ITEM_ID = "itemId";
+    public static final String EXTRA_ITEM_TYPE = "itemType";
     public static final String EXTRA_COLOR = "color";
 
     private ColorPicker picker;
@@ -46,6 +47,7 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
     private OpacityBar opacityBar;
     private EditText text;
     private Integer itemId;
+    private Integer itemType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
         Intent data = getIntent();
         if (data != null) {
             itemId = data.getExtras().getInt(EXTRA_ITEM_ID);
+            itemType = data.getExtras().getInt(EXTRA_ITEM_TYPE);
             startColor = data.getIntExtra(EXTRA_COLOR, startColor);
         }
 
@@ -139,9 +142,8 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
     private void closeAndReturnResult() {
         Intent data = new Intent();
         data.putExtra(EXTRA_COLOR, picker.getColor());
-        if (itemId != null) {
-            data.putExtra(EXTRA_ITEM_ID, itemId);
-        }
+        data.putExtra(EXTRA_ITEM_ID, itemId);
+        data.putExtra(EXTRA_ITEM_TYPE, itemType);
         setResult(RESULT_OK, data);
         finish();
     }

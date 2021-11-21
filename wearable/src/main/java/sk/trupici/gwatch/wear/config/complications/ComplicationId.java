@@ -16,6 +16,8 @@
 
 package sk.trupici.gwatch.wear.config.complications;
 
+import java.util.Arrays;
+
 /**
  * Enumeration of unique IDs for each complication.
  * The settings activity that supports allowing users to select their complication data provider
@@ -25,9 +27,11 @@ package sk.trupici.gwatch.wear.config.complications;
 public enum ComplicationId {
     LEFT_COMPLICATION_ID,
     RIGHT_COMPLICATION_ID,
-    CENTER_COMPLICATION_ID, // not really central, a bit below the center
+    CENTER_COMPLICATION_ID,
     BOTTOM_COMPLICATION_ID, // GLUCOSE ?
-    TOP_COMPLICATION_ID, // GRAPH ?
-    BACKGROUND_COMPLICATION_ID,
-    CALENDAR_COMPLICATION_ID
+    ;
+
+    public static ComplicationId valueOf(int ordinal) {
+        return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElseThrow(IllegalArgumentException::new);
+    }
 }

@@ -39,12 +39,10 @@ import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.complications.ComplicationAdapter;
-import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfigItem;
-import sk.trupici.gwatch.wear.config.complications.ComplicationId;
-import sk.trupici.gwatch.wear.config.complications.ComplicationLocation;
 import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
 import sk.trupici.gwatch.wear.config.complications.PaddingConfigItem;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.watchface.StandardAnalogWatchfaceService;
 
 public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
@@ -205,58 +203,16 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         holder.getTitle().setText(pageData.getTitleId());
 
         ComplicationAdapter adapter;
-        if (position == 2) {
-            adapter = new ComplicationAdapter(context, pageData, componentName,
-                    ComplicationId.BOTTOM_COMPLICATION_ID,
-                    Arrays.asList(
-                            new ComplicationConfigItem(ComplicationLocation.BOTTOM, R.drawable.config_add_complication, R.layout.config_list_complication_item_bottom),
-                            holder.createBorderTypeItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX),
-                            holder.createBorderColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX),
-                            holder.createDataColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX),
-                            holder.createBkgColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX),
-                            new PaddingConfigItem()
-                    ),
-                    config, prefs);
-        } else if (position == 3) {
-            adapter = new ComplicationAdapter(context, pageData, componentName,
-                    ComplicationId.CENTER_COMPLICATION_ID,
-                    Arrays.asList(
-                            new ComplicationConfigItem(ComplicationLocation.CENTER, R.drawable.config_add_complication, R.layout.config_list_complication_item_center),
-                            holder.createBorderTypeItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.CENTER_PREFIX),
-                            holder.createBorderColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.CENTER_PREFIX),
-                            holder.createDataColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.CENTER_PREFIX),
-                            holder.createBkgColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.CENTER_PREFIX),
-                            new PaddingConfigItem()
-                    ),
-                    config, prefs);
-        } else if (position == 4) {
-            adapter = new ComplicationAdapter(context, pageData, componentName,
-                    ComplicationId.LEFT_COMPLICATION_ID,
-                    Arrays.asList(
-                            new ComplicationConfigItem(ComplicationLocation.LEFT, R.drawable.config_add_complication, R.layout.config_list_complication_item_left),
-                            holder.createBorderTypeItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.LEFT_PREFIX),
-                            holder.createBorderColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.LEFT_PREFIX),
-                            holder.createDataColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.LEFT_PREFIX),
-                            holder.createBkgColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.LEFT_PREFIX),
-                            new PaddingConfigItem()
-                    ),
-                    config, prefs);
-        } else if (position == 5) {
-            adapter = new ComplicationAdapter(context, pageData, componentName,
-                    ComplicationId.RIGHT_COMPLICATION_ID,
-                    Arrays.asList(
-                            new ComplicationConfigItem(ComplicationLocation.RIGHT, R.drawable.config_add_complication, R.layout.config_list_complication_item_right),
-                            holder.createBorderTypeItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX),
-                            holder.createBorderColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX),
-                            holder.createDataColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX),
-                            holder.createBkgColorItem(context, AnalogWatchfaceConfig.PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX),
-                            new PaddingConfigItem()
-                    ),
-                    config, prefs);
-        } else {
-            throw new IllegalArgumentException();
-        }
-
+        adapter = new ComplicationAdapter(context, pageData, componentName,
+                Arrays.asList(
+                        new ComplicationConfigItem(null, -1, R.layout.config_list_complications_preview_item, -1),
+                        holder.createBorderTypeItem(context, StringUtils.EMPTY_STRING),
+                        holder.createBorderColorItem(context, StringUtils.EMPTY_STRING),
+                        holder.createDataColorItem(context, StringUtils.EMPTY_STRING),
+                        holder.createBkgColorItem(context, StringUtils.EMPTY_STRING),
+                        new PaddingConfigItem()
+                ),
+                config, prefs);
 
         // Aligns the first and last items on the list vertically centered on the screen.
 //        holder.getRecyclerView().setEdgeItemsCenteringEnabled(true);

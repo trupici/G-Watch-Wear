@@ -25,7 +25,4 @@ public enum ComplicationLocation {
     RIGHT,
     CENTER,
     BOTTOM,
-    TOP,
-    BACKGROUND,
-    CALENDAR,
 }

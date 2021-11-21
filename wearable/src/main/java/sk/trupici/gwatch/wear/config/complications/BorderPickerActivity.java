@@ -66,11 +66,13 @@ public class BorderPickerActivity extends Activity {
     };
 
     public static final String EXTRA_ITEM_ID = "itemId";
+    public static final String EXTRA_ITEM_TYPE = "itemType";
     public static final String EXTRA_BORDER_TYPE = "borderType";
 
     private WearableRecyclerView recyclerView;
     private BorderType borderType;
     private Integer itemId;
+    private Integer itemType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class BorderPickerActivity extends Activity {
         Intent data = getIntent();
         if (data != null) {
             itemId = data.getExtras().getInt(EXTRA_ITEM_ID);
+            itemType = data.getExtras().getInt(EXTRA_ITEM_TYPE);
             borderType = (BorderType) data.getExtras().get(EXTRA_BORDER_TYPE);
         }
 
@@ -115,6 +118,7 @@ public class BorderPickerActivity extends Activity {
     void closeAndReturnResult(BorderType borderType) {
         Intent data = new Intent();
         data.putExtra(EXTRA_ITEM_ID, itemId);
+        data.putExtra(EXTRA_ITEM_TYPE, itemType);
         data.putExtra(EXTRA_BORDER_TYPE, borderType);
         setResult(RESULT_OK, data);
         finish();

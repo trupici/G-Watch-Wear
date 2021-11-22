@@ -74,6 +74,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
         if (selected != null) {
             View selector = getComplicationViews(selected).selector;
             if (selector != null) {
+                Log.d(LOG_TAG, "ComplicationsViewHolder: selecting " + selected);
                 selector.setVisibility(View.VISIBLE);
             }
         }
@@ -89,7 +90,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void selectComplication(ComplicationId complicationId) {
-        Log.d(LOG_TAG, "selectComplication: " + complicationId.name());
+        Log.d(LOG_TAG, "selectComplication: " + complicationId);
         ComplicationId prevComplicationId = complicationAdapter.getSelectedComplicationId();
         if (prevComplicationId == complicationId) {
             return;
@@ -97,6 +98,8 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             unselectComplication(prevComplicationId);
         }
 
+        complicationAdapter.setSelectedComplicationId(complicationId);
+        
         View selector = getComplicationViews(complicationId).selector;
         if (selector != null) {
             selector.setVisibility(View.VISIBLE);

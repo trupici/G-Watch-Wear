@@ -102,6 +102,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
         providerInfoRetriever.init();
 
+        Log.d(LOG_TAG, "ComplicationAdapter: pre-selecting LEFT_COMPLICATION_ID");
         selectedComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
     }
 

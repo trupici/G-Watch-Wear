@@ -29,10 +29,7 @@
 
     <string name="config_page_title_bkg">Palette</string>
     <string name="config_page_title_hands">Hands</string>
-    <string name="config_page_title_comp_bottom">Glucose</string>
-    <string name="config_page_title_comp_center">Trend</string>
-    <string name="config_page_title_comp_left">Left</string>
-    <string name="config_page_title_comp_right">Right</string>
+    <string name="config_page_title_complications">Complications</string>
 
     <string name="config_item_border_shape_label">Border shape</string>
     <string name="config_item_border_color_label">Border color</string>

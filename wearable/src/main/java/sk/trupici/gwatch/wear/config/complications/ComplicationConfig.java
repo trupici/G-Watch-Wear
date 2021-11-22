@@ -26,7 +26,6 @@ public class ComplicationConfig {
     final public static String RIGHT_PREFIX = "right_";
     final public static String CENTER_PREFIX = "center_";
     final public static String BOTTOM_PREFIX = "bottom_";
-    final public static String TOP_PREFIX = "top_";
 
     final public static String NO_DATA_TEXT = "--";
 
@@ -34,6 +33,22 @@ public class ComplicationConfig {
     private final ComplicationLocation location;
     private final int[] supportedTypes;
     private ComplicationDrawable complicationDrawable;
+
+
+    public static String getComplicationPrefix(ComplicationId complicationId) {
+        switch (complicationId) {
+            case LEFT_COMPLICATION_ID:
+                return LEFT_PREFIX;
+            case RIGHT_COMPLICATION_ID:
+                return RIGHT_PREFIX;
+            case CENTER_COMPLICATION_ID:
+                return CENTER_PREFIX;
+            case BOTTOM_COMPLICATION_ID:
+                return BOTTOM_PREFIX;
+            default:
+                return "";
+        }
+    }
 
     public ComplicationConfig(ComplicationId id, ComplicationLocation location, @NotNull int[] supportedTypes) {
         this.id = id;

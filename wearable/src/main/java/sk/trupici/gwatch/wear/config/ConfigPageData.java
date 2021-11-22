@@ -29,7 +29,6 @@ public class ConfigPageData {
         ;
 
         public static ConfigType valueOf(int ordinal) {
-            Log.i("!!!!!", "ordinal : " + ordinal);
             return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElseThrow(IllegalArgumentException::new);
         }
     }

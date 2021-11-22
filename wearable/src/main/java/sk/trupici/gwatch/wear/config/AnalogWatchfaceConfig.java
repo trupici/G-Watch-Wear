@@ -70,22 +70,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
             new ConfigPageData(
                     ConfigPageData.ConfigType.COMPLICATION,
                     new ConfigPageData.ConfigItemData[] {},
-                    R.string.config_page_title_comp_bottom
-            ),
-            new ConfigPageData(
-                    ConfigPageData.ConfigType.COMPLICATION,
-                    new ConfigPageData.ConfigItemData[] {},
-                    R.string.config_page_title_comp_center
-            ),
-            new ConfigPageData(
-                    ConfigPageData.ConfigType.COMPLICATION,
-                    new ConfigPageData.ConfigItemData[] {},
-                    R.string.config_page_title_comp_left
-            ),
-            new ConfigPageData(
-                    ConfigPageData.ConfigType.COMPLICATION,
-                    new ConfigPageData.ConfigItemData[] {},
-                    R.string.config_page_title_comp_right
+                    R.string.config_page_title_complications
             ),
     };
 

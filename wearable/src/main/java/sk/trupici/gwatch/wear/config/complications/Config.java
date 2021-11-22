@@ -104,6 +104,4 @@ public class Config {
         ComplicationConfig config = getComplicationConfig(location);
         return config != null ? config.getId() : -1;
     }
-
-
 }

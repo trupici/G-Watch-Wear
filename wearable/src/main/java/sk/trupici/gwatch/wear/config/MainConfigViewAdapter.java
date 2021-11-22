@@ -42,7 +42,6 @@ import sk.trupici.gwatch.wear.config.complications.ComplicationAdapter;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfigItem;
 import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
 import sk.trupici.gwatch.wear.config.complications.PaddingConfigItem;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.watchface.StandardAnalogWatchfaceService;
 
 public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
@@ -183,14 +182,6 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         if (pageData.getType() != ConfigPageData.ConfigType.BACKGROUND) {
             holder.onBackgroundChanged();
         }
-//
-//        holder.getVerticalPager().setOnGenericMotionListener(new View.OnGenericMotionListener() {
-//            @Override
-//            public boolean onGenericMotion(View view, MotionEvent motionEvent) {
-//                Log.d(LOG_TAG, "child.onGenericMotion: " + motionEvent);
-//                return true;
-//            }
-//        });
 
         holder.getVerticalPager().setCurrentItem(prefs.getInt(config.getPrefName(pageData.getType()), 0));
         holder.getVerticalPager().setTag(TAG_VERTICAL_SCROLLABLE + position);
@@ -205,17 +196,14 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         ComplicationAdapter adapter;
         adapter = new ComplicationAdapter(context, pageData, componentName,
                 Arrays.asList(
-                        new ComplicationConfigItem(null, -1, R.layout.config_list_complications_preview_item, -1),
-                        holder.createBorderTypeItem(context, StringUtils.EMPTY_STRING),
-                        holder.createBorderColorItem(context, StringUtils.EMPTY_STRING),
-                        holder.createDataColorItem(context, StringUtils.EMPTY_STRING),
-                        holder.createBkgColorItem(context, StringUtils.EMPTY_STRING),
+                        new ComplicationConfigItem(R.layout.config_list_complications_preview_item),
+                        holder.createBorderTypeItem(context, null),
+                        holder.createBorderColorItem(context, null),
+                        holder.createDataColorItem(context, null),
+                        holder.createBkgColorItem(context, null),
                         new PaddingConfigItem()
                 ),
                 config, prefs);
-
-        // Aligns the first and last items on the list vertically centered on the screen.
-//        holder.getRecyclerView().setEdgeItemsCenteringEnabled(true);
 
         holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
         holder.getRecyclerView().setHasFixedSize(true);
@@ -258,8 +246,5 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         }
         return ids;
     }
-
-
-    ///
 
 }

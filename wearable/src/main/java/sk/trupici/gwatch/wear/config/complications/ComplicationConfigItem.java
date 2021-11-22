@@ -21,32 +21,14 @@ package sk.trupici.gwatch.wear.config.complications;
  */
 public class ComplicationConfigItem implements ConfigItem {
 
-    final private int defaultComplicationResourceId;
-    final private ComplicationLocation location;
     final private int layoutId;
-    final private int complicationLayoutId;
 
-    public ComplicationConfigItem(ComplicationLocation location, int defaultComplicationResourceId, int layoutId, int complicationLayoutId) {
-        this.defaultComplicationResourceId = defaultComplicationResourceId;
-        this.location = location;
+    public ComplicationConfigItem(int layoutId) {
         this.layoutId = layoutId;
-        this.complicationLayoutId = complicationLayoutId;
-    }
-
-    public int getDefaultComplicationResourceId() {
-        return defaultComplicationResourceId;
-    }
-
-    public ComplicationLocation getLocation() {
-        return location;
     }
 
     public int getLayoutId() {
         return layoutId;
-    }
-
-    public int getComplicationLayoutId() {
-        return complicationLayoutId;
     }
 
     @Override

@@ -16,8 +16,6 @@
 
 package sk.trupici.gwatch.wear.config.complications;
 
-import android.app.Activity;
-
 /**
  * Data for color picker item in RecyclerView.
  */
@@ -26,14 +24,12 @@ public class ColorConfigItem implements ConfigItem {
     final private String label;
     final private int iconResourceId;
     final private String sharedPrefString;
-    final private Class<? extends Activity> activityToChoosePreference;
     final private Type type;
 
-    public ColorConfigItem(String label, int iconResourceId, String sharedPrefString, Class<? extends Activity> activity, Type type) {
+    public ColorConfigItem(String label, int iconResourceId, String sharedPrefString, Type type) {
         this.label = label;
         this.iconResourceId = iconResourceId;
         this.sharedPrefString = sharedPrefString;
-        this.activityToChoosePreference = activity;
         this.type = type;
     }
 
@@ -47,10 +43,6 @@ public class ColorConfigItem implements ConfigItem {
 
     public String getSharedPrefString() {
         return sharedPrefString;
-    }
-
-    public Class<? extends Activity> getActivityToChoosePreference() {
-        return activityToChoosePreference;
     }
 
     @Override

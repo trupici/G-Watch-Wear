@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.BackgroundChangeAware;
-import sk.trupici.gwatch.wear.config.ColorPickerActivity;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_COLOR;
@@ -33,8 +33,8 @@ import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BOR
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_DATA_COLOR;
 
 public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder implements BackgroundChangeAware {
-    TextView title;
-    WearableRecyclerView recyclerView;
+    final private TextView title;
+    final private WearableRecyclerView recyclerView;
 
     public ComplicationViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -54,24 +54,15 @@ public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder impl
         return title;
     }
 
-    public void setTitle(TextView title) {
-        this.title = title;
-    }
-
     public WearableRecyclerView getRecyclerView() {
         return recyclerView;
-    }
-
-    public void setRecyclerView(WearableRecyclerView recyclerView) {
-        this.recyclerView = recyclerView;
     }
 
     public ShapeConfigItem createBorderTypeItem(Context context, String prefPrefix) {
         return new ShapeConfigItem(
                 context.getString(R.string.config_item_border_shape_label),
                 R.drawable.config_border_rect_24,
-                prefPrefix + PREF_COMPL_BORDER_SHAPE,
-                BorderPickerActivity.class,
+                StringUtils.notNullString(prefPrefix) + PREF_COMPL_BORDER_SHAPE,
                 ConfigItem.Type.TYPE_BORDER_TYPE);
     }
 
@@ -79,8 +70,7 @@ public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder impl
         return new ColorConfigItem(
                 context.getString(R.string.config_item_border_color_label),
                 R.drawable.config_color_edit,
-                prefPrefix + PREF_COMPL_BORDER_COLOR,
-                ColorPickerActivity.class,
+                StringUtils.notNullString(prefPrefix) + PREF_COMPL_BORDER_COLOR,
                 ConfigItem.Type.TYPE_BORDER_COLOR);
     }
 
@@ -88,8 +78,7 @@ public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder impl
         return new ColorConfigItem(
                 context.getString(R.string.config_item_text_color_label),
                 R.drawable.config_color_edit,
-                prefPrefix + PREF_COMPL_DATA_COLOR,
-                ColorPickerActivity.class,
+                StringUtils.notNullString(prefPrefix) + PREF_COMPL_DATA_COLOR,
                 ConfigItem.Type.TYPE_DATA_COLOR);
     }
 
@@ -97,8 +86,7 @@ public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder impl
         return new ColorConfigItem(
                 context.getString(R.string.config_item_bkg_color_label),
                 R.drawable.config_color_edit,
-                prefPrefix + PREF_COMPL_BKG_COLOR,
-                ColorPickerActivity.class,
+                StringUtils.notNullString(prefPrefix) + PREF_COMPL_BKG_COLOR,
                 ConfigItem.Type.TYPE_BKG_COLOR);
     }
 }

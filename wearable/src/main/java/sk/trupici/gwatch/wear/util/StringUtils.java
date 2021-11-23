@@ -23,4 +23,8 @@ public class StringUtils {
     public static String formatColorStr(int color) {
         return String.format("#%08x", color);
     }
+
+    public static String notNullString(String str) {
+        return str != null ? str : EMPTY_STRING;
+    }
 }

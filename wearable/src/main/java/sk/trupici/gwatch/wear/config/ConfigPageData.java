@@ -16,8 +16,6 @@
 
 package sk.trupici.gwatch.wear.config;
 
-import android.util.Log;
-
 import java.util.Arrays;
 
 public class ConfigPageData {

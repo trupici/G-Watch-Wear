@@ -30,7 +30,6 @@ public interface ConfigItem {
         TYPE_COMPLICATION,
         TYPE_BORDER_TYPE,
         TYPE_BORDER_COLOR,
-        // TYPE_FONT_SIZE
         TYPE_DATA_COLOR,
         TYPE_BKG_COLOR,
         TYPE_PADDING;

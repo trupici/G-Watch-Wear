@@ -379,8 +379,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             }
 
             // this should be faster then regex
-            CharSequence cs = complicationData.getShortText().getText(getApplicationContext(), 0).toString();
-            String strValue = cs.chars()
+            String received = complicationData.getShortText().getText(getApplicationContext(), 0).toString();
+
+            if (received.toLowerCase(Locale.ROOT).contains("old")) {
+                Log.e(LOG_TAG, "processBgValue: old data indicator detected: " + received);
+                return;
+            }
+
+            String strValue = received.chars()
                     .filter(c -> (Character.isDigit(c) || c == '.' || c == ','))
                     .mapToObj(x -> String.valueOf((char) x))
                     .collect(Collectors.joining());
@@ -401,7 +407,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 chart.updateGraphData(value, System.currentTimeMillis());
             }
 
-            Log.d(LOG_TAG, "Received BG value: " + cs.toString() + " : " + strValue + " : " + value);
+            Log.d(LOG_TAG, "Received BG value: " + received + " : " + strValue + " : " + value);
         }
 
 

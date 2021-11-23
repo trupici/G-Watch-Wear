@@ -39,4 +39,15 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             />
+
+        <ImageView
+            android:id="@+id/selector"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/frame_50"
+            android:scaleType="centerCrop"
+            android:tint="@color/red"
+            android:background="@android:color/transparent"
+            android:visibility="invisible"
+            />
 </FrameLayout>

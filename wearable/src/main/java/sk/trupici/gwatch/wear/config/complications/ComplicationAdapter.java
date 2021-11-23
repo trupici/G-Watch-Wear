@@ -102,6 +102,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
         providerInfoRetriever.init();
 
+        Log.d(LOG_TAG, "ComplicationAdapter: pre-selecting LEFT_COMPLICATION_ID");
         selectedComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
     }
 
@@ -129,7 +130,6 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 View layout = LayoutInflater.from(parent.getContext()).inflate(complItem.getLayoutId(), parent, false);
                 viewHolder = new ComplicationsViewHolder(context, this, layout);
                 complicationViewHolder = (ComplicationsViewHolder) viewHolder;
-                complicationViewHolder.selectComplication(defaultComplicationId);
                 break;
             case TYPE_BORDER_COLOR:
             case TYPE_DATA_COLOR:

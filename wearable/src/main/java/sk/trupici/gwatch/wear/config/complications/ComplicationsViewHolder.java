@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationHelperActivity;
 import android.support.wearable.complications.ComplicationProviderInfo;
+import android.transition.Visibility;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,22 +48,10 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     private final ComplicationAdapter complicationAdapter;
 
     final private ViewGroup bkgViewGroup;
-
-    final private ImageButton leftComplication;
-    final private ImageView leftBackground;
-    final private ImageView leftComplicationBorder;
-
-    final private ImageButton rightComplication;
-    final private ImageView rightBackground;
-    final private ImageView rightComplicationBorder;
-
-    final private ImageButton centerComplication;
-    final private ImageView centerBackground;
-    final private ImageView centerComplicationBorder;
-
-    final private ImageButton bottomComplication;
-    final private ImageView bottomBackground;
-    final private ImageView bottomComplicationBorder;
+    final private ComplicationViews left;
+    final private ComplicationViews right;
+    final private ComplicationViews center;
+    final private ComplicationViews bottom;
 
     final private Drawable defaultComplicationDrawable;
 
@@ -75,34 +64,20 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
 
         bkgViewGroup = view.findViewById(R.id.backgrounds);
 
-        ViewGroup complLayout = view.findViewById(R.id.left_complication);
-        leftComplication = complLayout.findViewById(R.id.complication);
-        leftBackground = complLayout.findViewById(R.id.background);
-        leftComplicationBorder = complLayout.findViewById(R.id.border);
-        leftComplication.setOnClickListener(this);
-        leftComplication.setOnLongClickListener(this);
+        left = new ComplicationViews(view.findViewById(R.id.left_complication));
+        right = new ComplicationViews(view.findViewById(R.id.right_complication));
+        center = new ComplicationViews(view.findViewById(R.id.center_complication));
+        bottom = new ComplicationViews(view.findViewById(R.id.bottom_complication));
 
-        complLayout = view.findViewById(R.id.right_complication);
-        rightComplication = complLayout.findViewById(R.id.complication);
-        rightBackground = complLayout.findViewById(R.id.background);
-        rightComplicationBorder = complLayout.findViewById(R.id.border);
-        rightComplication.setOnClickListener(this);
-        rightComplication.setOnLongClickListener(this);
-
-        complLayout = view.findViewById(R.id.center_complication);
-        centerComplication = complLayout.findViewById(R.id.complication);
-        centerBackground = complLayout.findViewById(R.id.background);
-        centerComplicationBorder = complLayout.findViewById(R.id.border);
-        centerComplication.setOnClickListener(this);
-        centerComplication.setOnLongClickListener(this);
-
-        complLayout = view.findViewById(R.id.bottom_complication);
-        bottomComplication = complLayout.findViewById(R.id.complication);
-        bottomBackground = complLayout.findViewById(R.id.background);
-        bottomComplicationBorder = complLayout.findViewById(R.id.border);
-        bottomComplication.setOnClickListener(this);
-        bottomComplication.setOnLongClickListener(this);
-
+        // show selector for complication marked as selected in adapter
+        ComplicationId selected = complicationAdapter.getSelectedComplicationId();
+        if (selected != null) {
+            View selector = getComplicationViews(selected).selector;
+            if (selector != null) {
+                Log.d(LOG_TAG, "ComplicationsViewHolder: selecting " + selected);
+                selector.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
@@ -115,7 +90,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void selectComplication(ComplicationId complicationId) {
-        Log.d(LOG_TAG, "selectComplication: " + complicationId.name());
+        Log.d(LOG_TAG, "selectComplication: " + complicationId);
         ComplicationId prevComplicationId = complicationAdapter.getSelectedComplicationId();
         if (prevComplicationId == complicationId) {
             return;
@@ -123,14 +98,20 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             unselectComplication(prevComplicationId);
         }
 
-        // TODO
-
         complicationAdapter.setSelectedComplicationId(complicationId);
+        
+        View selector = getComplicationViews(complicationId).selector;
+        if (selector != null) {
+            selector.setVisibility(View.VISIBLE);
+        }
     }
 
     public void unselectComplication(ComplicationId complicationId) {
         Log.d(LOG_TAG, "unselectComplication: " + complicationId.name());
-        // TODO
+        View selector = getComplicationViews(complicationId).selector;
+        if (selector != null) {
+            selector.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -162,7 +143,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             return false;
         }
         ComplicationId complicationId = ComplicationId.valueOf(id);
-        ImageButton complication = getComplicationButton(complicationId);
+        ImageButton complication = getComplicationViews(complicationId).complication;
         if (complication == null) {
             return false;
         }
@@ -184,59 +165,29 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
         return true;
     }
 
-    public ImageButton getComplicationButton(ComplicationId complicationId) {
+    public ComplicationViews getComplicationViews(ComplicationId complicationId) {
         switch (complicationId) {
             case LEFT_COMPLICATION_ID:
-                return leftComplication;
+                return left;
             case RIGHT_COMPLICATION_ID:
-                return rightComplication;
+                return right;
             case CENTER_COMPLICATION_ID:
-                return centerComplication;
+                return center;
             case BOTTOM_COMPLICATION_ID:
-                return bottomComplication;
-            default:
-                return null;
-        }
-    }
-
-    private ImageView getComplicationBackground(ComplicationId complicationId) {
-        switch (complicationId) {
-            case LEFT_COMPLICATION_ID:
-                return leftBackground;
-            case RIGHT_COMPLICATION_ID:
-                return rightBackground;
-            case CENTER_COMPLICATION_ID:
-                return centerBackground;
-            case BOTTOM_COMPLICATION_ID:
-                return bottomBackground;
-            default:
-                return null;
-        }
-    }
-
-    private ImageView getComplicationBorder(ComplicationId complicationId) {
-        switch (complicationId) {
-            case LEFT_COMPLICATION_ID:
-                return leftComplicationBorder;
-            case RIGHT_COMPLICATION_ID:
-                return rightComplicationBorder;
-            case CENTER_COMPLICATION_ID:
-                return centerComplicationBorder;
-            case BOTTOM_COMPLICATION_ID:
-                return bottomComplicationBorder;
+                return bottom;
             default:
                 return null;
         }
     }
 
     public ComplicationId getComplicationId(View button) {
-        if (button.equals(leftComplication)) {
+        if (button.equals(left.complication)) {
             return ComplicationId.LEFT_COMPLICATION_ID;
-        } else if (button.equals(rightComplication)) {
+        } else if (button.equals(right.complication)) {
             return ComplicationId.RIGHT_COMPLICATION_ID;
-        } else if (button.equals(centerComplication)) {
+        } else if (button.equals(center.complication)) {
             return ComplicationId.CENTER_COMPLICATION_ID;
-        } else if (button.equals(bottomComplication)) {
+        } else if (button.equals(bottom.complication)) {
             return ComplicationId.BOTTOM_COMPLICATION_ID;
         } else {
             return null;
@@ -244,35 +195,35 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void setBackground(ComplicationId complicationId, Drawable drawable) {
-        ImageView background = getComplicationBackground(complicationId);
+        ImageView background = getComplicationViews(complicationId).background;
         if (background != null) {
             background.setBackground(drawable);
         }
     }
 
     public void setColorFilter(ComplicationId complicationId, ColorFilter colorFilter) {
-        ImageButton complication = getComplicationButton(complicationId);
+        ImageButton complication = getComplicationViews(complicationId).complication;
         if (complication != null) {
             complication.setColorFilter(colorFilter);
         }
     }
 
     public void setBorder(ComplicationId complicationId, Drawable borderDrawable) {
-        ImageView border = getComplicationBorder(complicationId);
+        ImageView border = getComplicationViews(complicationId).border;
         if (border != null) {
             border.setImageDrawable(borderDrawable);
         }
     }
 
     public void setIcon(ComplicationId complicationId, Icon icon) {
-        ImageButton complication = getComplicationButton(complicationId);
+        ImageButton complication = getComplicationViews(complicationId).complication;
         if (complication != null) {
             complication.setImageIcon(icon);
         }
     }
 
     public void setDrawable(ComplicationId complicationId, Drawable drawable) {
-        ImageButton complication = getComplicationButton(complicationId);
+        ImageButton complication = getComplicationViews(complicationId).complication;
         if (complication != null) {
             complication.setImageDrawable(drawable);
         }
@@ -280,5 +231,21 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
 
     public ViewGroup getBackgroundViewGroup() {
         return bkgViewGroup;
+    }
+
+    class ComplicationViews {
+        final ImageButton complication;
+        final ImageView background;
+        final ImageView border;
+        final ImageView selector;
+
+        ComplicationViews(ViewGroup complicationViewGroup) {
+            complication = complicationViewGroup.findViewById(R.id.complication);
+            background = complicationViewGroup.findViewById(R.id.background);
+            border = complicationViewGroup.findViewById(R.id.border);
+            selector = complicationViewGroup.findViewById(R.id.selector);
+            complication.setOnClickListener(ComplicationsViewHolder.this);
+            complication.setOnLongClickListener(ComplicationsViewHolder.this);
+        }
     }
 }

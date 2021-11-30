@@ -509,8 +509,10 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         @Override
                         public void onProviderInfoReceived(int watchFaceComplicationId, @Nullable ComplicationProviderInfo complicationProviderInfo) {
                             Log.d(LOG_TAG, "onProviderInfoReceived: " + watchFaceComplicationId + ", " + complicationProviderInfo);
-                            ComplicationId complicationId = ComplicationId.valueOf(watchFaceComplicationId);
-                            complicationViewHolder.setIcon(complicationId, complicationProviderInfo.providerIcon);
+                            if (complicationProviderInfo != null) {
+                                ComplicationId complicationId = ComplicationId.valueOf(watchFaceComplicationId);
+                                complicationViewHolder.setIcon(complicationId, complicationProviderInfo.providerIcon);
+                            }
                         }
                     },
                     componentName,

@@ -36,4 +36,40 @@
     <dimen name="config_indicator_height">22dp</dimen>
     <dimen name="config_indicator_padding">2dp</dimen>
 
+
+    <!--
+        FIXME:
+        consider to move to dpi specific folders
+        or recalculate to dpi values.
+        GW4 46mm 450x450 dp-to-pixel ratio = 2.125
+    -->
+
+    <dimen name="layout_ref_screen_width">450px</dimen>
+    <dimen name="layout_ref_screen_height">450px</dimen>
+
+    <dimen name="layout_graph_left">100px</dimen>
+    <dimen name="layout_graph_top">85px</dimen>
+    <dimen name="layout_graph_right">250px</dimen>
+    <dimen name="layout_graph_bottom">110px</dimen>
+
+    <dimen name="layout_left_compl_left">61px</dimen>
+    <dimen name="layout_left_compl_top">219px</dimen>
+    <dimen name="layout_left_compl_right">161px</dimen>
+    <dimen name="layout_left_compl_bottom">319px</dimen>
+
+    <dimen name="layout_right_compl_left">289px</dimen>
+    <dimen name="layout_right_compl_top">219px</dimen>
+    <dimen name="layout_right_compl_right">389px</dimen>
+    <dimen name="layout_right_compl_bottom">319px</dimen>
+
+    <dimen name="layout_center_compl_left">190px</dimen>
+    <dimen name="layout_center_compl_top">233px</dimen>
+    <dimen name="layout_center_compl_right">260px</dimen>
+    <dimen name="layout_center_compl_bottom">303px</dimen>
+
+    <dimen name="layout_bottom_compl_left">205px</dimen>
+    <dimen name="layout_bottom_compl_top">345px</dimen>
+    <dimen name="layout_bottom_compl_right">245px</dimen>
+    <dimen name="layout_bottom_compl_bottom">405px</dimen>
+
 </resources>

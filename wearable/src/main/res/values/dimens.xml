@@ -62,10 +62,10 @@
     <dimen name="layout_right_compl_right">389px</dimen>
     <dimen name="layout_right_compl_bottom">319px</dimen>
 
-    <dimen name="layout_center_compl_left">190px</dimen>
-    <dimen name="layout_center_compl_top">233px</dimen>
-    <dimen name="layout_center_compl_right">260px</dimen>
-    <dimen name="layout_center_compl_bottom">303px</dimen>
+    <dimen name="layout_center_compl_left">198px</dimen>
+    <dimen name="layout_center_compl_top">240px</dimen>
+    <dimen name="layout_center_compl_right">252px</dimen>
+    <dimen name="layout_center_compl_bottom">298px</dimen>
 
     <dimen name="layout_bottom_compl_left">205px</dimen>
     <dimen name="layout_bottom_compl_top">345px</dimen>

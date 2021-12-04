@@ -54,6 +54,7 @@ import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -105,8 +106,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
     public static final float MINUTE_HAND_SHADOW_OFFSET = 5;
     public static final float SECOND_HAND_SHADOW_OFFSET = 7;
 
-    public static final int CHART_BOTTOM_MARGIN = 10;
-
     /*
      * Updates rate in milliseconds for interactive mode. We update once a second to advance the
      * second hand.
@@ -151,12 +150,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         private final Handler updateTimeHandler = new EngineHandler(this);
         private Calendar calendar;
         private DateFormat dayOfWeekFormat;
-        private DateFormat dateFormat;
+        private DateFormat monthFormat;
+        private DateFormat dateOfMonthFormat;
 
         private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 calendar.setTimeZone(TimeZone.getDefault());
+                initDateFormats();
                 invalidate();
             }
         };
@@ -206,8 +207,11 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private RectF leftComplCoefs;
         private RectF rightComplCoefs;
-        private RectF centerComplCoefs;
         private RectF bottomComplCoefs;
+
+        private RectF centerComplCoefs;
+        private Rect datePanelBounds;
+        private TextPaint datePaint;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -218,8 +222,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             setWatchFaceStyle(new WatchFaceStyle.Builder(StandardAnalogWatchfaceService.this)
                     .setAcceptsTapEvents(true)
                     .build());
-
-            calendar = Calendar.getInstance();
 
             // Used throughout watch face to pull user's preferences.
             Context context = getApplicationContext();
@@ -276,6 +278,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     getResources().getDimension(R.dimen.layout_bottom_compl_bottom) / refScreenHeight
             );
             Log.w(LOG_TAG, "Rect: " + bottomComplCoefs);
+
+            calendar = Calendar.getInstance();
+            datePaint = new TextPaint();
+            datePaint.setAntiAlias(true);
+            datePaint.setTextAlign(Paint.Align.CENTER);
+            datePaint.setTextScaleX(0.9f);
+            initDateFormats();
         }
 
 
@@ -291,10 +300,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
 //            Log.d(LOG_TAG, "RIGHT: " + rightComplSettings.toString());
 
-            centerComplSettings = new ComplicationSettings();
-            centerComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.CENTER_PREFIX);
-//            Log.d(LOG_TAG, "CENTER: " + centerComplSettings.toString());
-
             bottomComplSettings = new ComplicationSettings();
             bottomComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX);
 //            Log.d(LOG_TAG, "BOTTOM: " + bottomComplSettings.toString());
@@ -309,8 +314,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     SystemProviders.WATCH_BATTERY, ComplicationData.TYPE_RANGED_VALUE);
             setDefaultSystemComplicationProvider (ComplicationId.RIGHT_COMPLICATION_ID.ordinal(),
                     SystemProviders.STEP_COUNT, ComplicationData.TYPE_SMALL_IMAGE);
-            setDefaultSystemComplicationProvider(ComplicationId.CENTER_COMPLICATION_ID.ordinal(),
-                    SystemProviders.DAY_AND_DATE, ComplicationData.TYPE_NOT_CONFIGURED);
             setDefaultComplicationProvider (ComplicationId.BOTTOM_COMPLICATION_ID.ordinal(),
                     null, ComplicationData.TYPE_EMPTY);
 
@@ -325,10 +328,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             complicationDrawable = new ComplicationDrawable(context);
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
                     .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, rightComplSettings));
-
-            complicationDrawable = new ComplicationDrawable(context);
-            Config.getComplicationConfig(ComplicationId.CENTER_COMPLICATION_ID)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, centerComplSettings));
 
             // to be changed
             complicationDrawable = new ComplicationDrawable(context);
@@ -448,11 +447,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         }
 
 
-        private void initFormats() {
-            dayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        private void initDateFormats() {
+            dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
             dayOfWeekFormat.setCalendar(calendar);
-            dateFormat = android.text.format.DateFormat.getDateFormat(StandardAnalogWatchfaceService.this);
-            dateFormat.setCalendar(calendar);
+            monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
+            monthFormat.setCalendar(calendar);
+            dateOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
+            dateOfMonthFormat.setCalendar(calendar);
         }
 
 
@@ -497,6 +498,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
 
         // TODO update complication drawables
+//            datePaint.setColor(Color.WHITE);
 
             super.onPropertiesChanged(properties);
             lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
@@ -521,6 +523,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 complicationConfig.getComplicationDrawable().setInAmbientMode(ambientMode);
             }
 
+            if (lowBitAmbient) {
+                boolean antiAlias = !inAmbientMode;
+                datePaint.setAntiAlias(antiAlias);
+                handsPaint.setAntiAlias(antiAlias);
+                backgroundPaint.setAntiAlias(antiAlias);
+            }
+
             /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer();
         }
@@ -534,7 +543,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             /* Dim display in mute mode. */
             if (muted != inMuteMode) {
                 muted = inMuteMode;
-                handsPaint.setAlpha(inMuteMode ? 100 : 255);
+                int alpha = inMuteMode ? 100 : 255;
+                handsPaint.setAlpha(alpha);
+                datePaint.setAlpha(alpha);
                 invalidate();
             }
         }
@@ -624,13 +635,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bounds = new Rect(left, top, right, bottom);
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable().setBounds(bounds);
 
-            // center complication
+            // date component
             left = (int) (centerComplCoefs.left * width);
             top = (int) (centerComplCoefs.top * height);
             right = (int) (centerComplCoefs.right * width);
             bottom = (int) (centerComplCoefs.bottom * height);
-            bounds = new Rect(left, top, right, bottom);
-            Config.getComplicationConfig(ComplicationId.CENTER_COMPLICATION_ID).getComplicationDrawable().setBounds(bounds);
+            datePanelBounds = new Rect(left, top, right, bottom);
+            datePaint.setTextSize(bounds.height() / 3.5f);
 
             // bottom complication
             left = (int) (bottomComplCoefs.left * width);
@@ -696,6 +707,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             drawBackground(canvas);
             chart.draw(canvas, ambientMode);
+            drawDate(canvas);
             drawComplications(canvas, now);
             drawWatchFace(canvas);
         }
@@ -709,6 +721,42 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 }
             } else {
                 canvas.drawBitmap(backgroundBitmap, 0, 0, backgroundPaint);
+            }
+        }
+
+        private void drawDate(Canvas canvas) {
+            Date date = calendar.getTime();
+
+            // FIXME - configurable colors
+
+//            // draw background if needed
+//            datePaint.setColor(Color.GREEN);
+//            datePaint.setStyle(Paint.Style.FILL);
+//            canvas.drawRect(datePanelBounds, datePaint);
+
+            int color = isInAmbientMode() ? Color.DKGRAY : Color.WHITE;
+            datePaint.setColor(color);
+
+            if (false) {
+                // Day of week
+                int centerX = datePanelBounds.left + datePanelBounds.width() / 2;
+                canvas.drawText(dayOfWeekFormat.format(date),
+                        centerX, datePanelBounds.top + datePanelBounds.height() / 2 - 5,
+                        datePaint);
+                // Day of Month
+                canvas.drawText(dateOfMonthFormat.format(date),
+                        centerX, datePanelBounds.bottom - 5,
+                        datePaint);
+            } else {
+                // Day of Month
+                canvas.drawText(dateOfMonthFormat.format(date),
+                        centerX, datePanelBounds.top + datePanelBounds.height()/2 - 5,
+                        datePaint);
+                // Month
+                int centerX = datePanelBounds.left + datePanelBounds.width()/2;
+                canvas.drawText(monthFormat.format(date),
+                        centerX, datePanelBounds.bottom - 5,
+                        datePaint);
             }
         }
 
@@ -839,7 +887,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID).getComplicationDrawable(), leftComplSettings);
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable(), rightComplSettings);
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.CENTER_COMPLICATION_ID).getComplicationDrawable(), centerComplSettings);
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID).getComplicationDrawable(), bottomComplSettings);
 
                 initializeBackground();
@@ -849,7 +896,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 registerReceiver();
                 /* Update time zone in case it changed while we weren"t visible. */
                 calendar.setTimeZone(TimeZone.getDefault());
-                invalidate();
+                initDateFormats();
             } else {
                 unregisterReceiver();
             }

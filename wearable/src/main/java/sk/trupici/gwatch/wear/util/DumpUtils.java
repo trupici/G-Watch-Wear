@@ -129,4 +129,47 @@ public class DumpUtils {
         }
     }
 
+    public static String dumpData(byte buffer[], int len) {
+
+        if (len == 0) {
+            return StringUtils.EMPTY_STRING;
+        }
+
+        StringBuffer str = new StringBuffer();
+        StringBuffer str1 = new StringBuffer(64);
+        StringBuffer str2 = new StringBuffer(24);
+
+        // shrink size if it is too big
+        int maxlen = Math.min(len, 10240);
+        for (int i = 0; i < maxlen; i++) {
+            if (i > 0 && (i & 7) == 0) {
+                if ((i & 15) == 0)
+                {
+                    str.append("  ").append(str.toString()).append(" :   ").append(str2).append("\n");
+                    str1.setLength(0);
+                    str2.setLength(0);
+                } else {
+                    str1.append(" ");
+                }
+            }
+
+            byte b = buffer[i];
+            str1.append(String.format("%02x ", b));
+            char c = (char) b;
+            str2.append(isPrintableChar(c) ? ""+c : ".");
+        }
+
+        str.append("  ").append(str1.toString()).append(" :   ").append(str2).append("\n");
+
+        if (maxlen < len) {
+            str.append("  ...");
+        }
+
+        return str.toString();
+    }
+
+    public static boolean isPrintableChar(char c) {
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+        return (!Character.isISOControl(c)) && block != null && block != Character.UnicodeBlock.SPECIALS;
+    }
 }

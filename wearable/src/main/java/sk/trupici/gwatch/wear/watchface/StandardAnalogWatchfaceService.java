@@ -50,6 +50,9 @@ import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import com.google.android.gms.wearable.MessageClient;
+import com.google.android.gms.wearable.Wearable;
+
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -57,9 +60,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
+import androidx.annotation.NonNull;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.bgchart.SimpleBgChart;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
@@ -67,10 +71,11 @@ import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.Config;
-import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_COLOR;
@@ -207,11 +212,21 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private RectF leftComplCoefs;
         private RectF rightComplCoefs;
-        private RectF bottomComplCoefs;
 
         private RectF centerComplCoefs;
         private Rect datePanelBounds;
         private TextPaint datePaint;
+
+        private RectF bottomComplCoefs;
+        private Rect bgPanelBounds;
+        private TextPaint bgPanelPaint;
+        private String bgLine1;
+        private String bgLine2;
+
+        private int bgValue = 0;
+        private long bgTimestamp = 0;
+
+        private MessageClient messageClient;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -285,6 +300,19 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             datePaint.setTextAlign(Paint.Align.CENTER);
             datePaint.setTextScaleX(0.9f);
             initDateFormats();
+
+            bgPanelPaint = new TextPaint();
+            bgPanelPaint.setAntiAlias(true);
+            bgPanelPaint.setTextAlign(Paint.Align.CENTER);
+
+            // Build a new MessageClient for the Wearable API
+            messageClient = Wearable.getMessageClient(context);
+            messageClient.addListener(messageEvent -> {
+                byte[] bgData = messageEvent.getData();
+                Log.d(LOG_TAG, "onReceive: " + bgData.length);
+                handleBgData(bgData);
+            });
+
         }
 
 
@@ -314,8 +342,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     SystemProviders.WATCH_BATTERY, ComplicationData.TYPE_RANGED_VALUE);
             setDefaultSystemComplicationProvider (ComplicationId.RIGHT_COMPLICATION_ID.ordinal(),
                     SystemProviders.STEP_COUNT, ComplicationData.TYPE_SMALL_IMAGE);
-            setDefaultComplicationProvider (ComplicationId.BOTTOM_COMPLICATION_ID.ordinal(),
-                    null, ComplicationData.TYPE_EMPTY);
 
             // Creates a ComplicationDrawable for each location where the user can render a
             // complication on the watch face.
@@ -328,15 +354,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             complicationDrawable = new ComplicationDrawable(context);
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
                     .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, rightComplSettings));
-
-            // to be changed
-            complicationDrawable = new ComplicationDrawable(context);
-            bottomComplSettings.setFontSize(80);
-            ComplicationDrawable drawable = updateComplicationDrawable(complicationDrawable, bottomComplSettings);
-            drawable.setTitleSizeActive(80);
-            Config.getComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID)
-                    .setComplicationDrawable(drawable);
-
 
             setActiveComplications(Config.getComplicationIds());
         }
@@ -397,55 +414,12 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             // Adds/updates active complication data in the array.
             activeComplicationDataSparseArray.put(complicationId, complicationData);
 
-            DumpUtils.dumpComplicationData(getApplicationContext(), complicationData);
-            if (complicationId == ComplicationId.BOTTOM_COMPLICATION_ID.ordinal()) {
-                processBgValue(complicationData);
-            }
-
             // Updates correct ComplicationDrawable with updated data.
             Config.getComplicationConfig(complicationId)
                     .getComplicationDrawable().setComplicationData(complicationData);
 
             invalidate();
         }
-
-        private void processBgValue(ComplicationData complicationData) {
-            if (complicationData.getShortText() == null) {
-                return;
-            }
-
-            // this should be faster then regex
-            String received = complicationData.getShortText().getText(getApplicationContext(), 0).toString();
-
-            if (received.toLowerCase(Locale.ROOT).contains("old")) {
-                Log.e(LOG_TAG, "processBgValue: old data indicator detected: " + received);
-                return;
-            }
-
-            String strValue = received.chars()
-                    .filter(c -> (Character.isDigit(c) || c == '.' || c == ','))
-                    .mapToObj(x -> String.valueOf((char) x))
-                    .collect(Collectors.joining());
-
-            Double value = null;
-            try {
-                value = Double.valueOf(strValue.replace(',', '.'));
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getLocalizedMessage());
-            }
-
-            // check if in required units
-            if (value != null) {
-                if (value < BgUtils.MMOL_L_BOUNDARY_VALUE) { // convert to
-                    value = BgUtils.convertGlucoseToMgDl(value);
-                }
-
-                chart.updateGraphData(value, System.currentTimeMillis());
-            }
-
-            Log.d(LOG_TAG, "Received BG value: " + received + " : " + strValue + " : " + value);
-        }
-
 
         private void initDateFormats() {
             dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
@@ -643,13 +617,12 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             datePanelBounds = new Rect(left, top, right, bottom);
             datePaint.setTextSize(bounds.height() / 3.5f);
 
-            // bottom complication
+            // Blood Glucose component
             left = (int) (bottomComplCoefs.left * width);
             top = (int) (bottomComplCoefs.top * height);
             right = (int) (bottomComplCoefs.right * width);
             bottom = (int) (bottomComplCoefs.bottom * height);
-            bounds = new Rect(left, top, right, bottom);
-            Config.getComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID).getComplicationDrawable().setBounds(bounds);
+            bgPanelBounds = new Rect(left, top, right, bottom);
 
 //            Rect screenForBackgroundBound = new Rect(0, 0, width, height);
 //            ComplicationDrawable backgroundComplicationDrawable = complicationDrawableSparseArray.get(BACKGROUND_COMPLICATION_ID);
@@ -709,6 +682,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             chart.draw(canvas, ambientMode);
             drawDate(canvas);
             drawComplications(canvas, now);
+            drawBgPanel(canvas);
             drawWatchFace(canvas);
         }
 
@@ -734,14 +708,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 //            datePaint.setStyle(Paint.Style.FILL);
 //            canvas.drawRect(datePanelBounds, datePaint);
 
-            int color = isInAmbientMode() ? Color.DKGRAY : Color.WHITE;
+            int color = isInAmbientMode() ? Color.LTGRAY : Color.WHITE;
             datePaint.setColor(color);
 
             if (false) {
                 // Day of week
                 int centerX = datePanelBounds.left + datePanelBounds.width() / 2;
                 canvas.drawText(dayOfWeekFormat.format(date),
-                        centerX, datePanelBounds.top + datePanelBounds.height() / 2 - 5,
+                        centerX, datePanelBounds.top + datePanelBounds.height() / 2f - 5,
                         datePaint);
                 // Day of Month
                 canvas.drawText(dateOfMonthFormat.format(date),
@@ -750,7 +724,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             } else {
                 // Day of Month
                 canvas.drawText(dateOfMonthFormat.format(date),
-                        centerX, datePanelBounds.top + datePanelBounds.height()/2 - 5,
+                        centerX, datePanelBounds.top + datePanelBounds.height()/2f - 5,
                         datePaint);
                 // Month
                 int centerX = datePanelBounds.left + datePanelBounds.width()/2;
@@ -806,73 +780,68 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private void drawComplications(Canvas canvas, long currentTimeMillis) {
             for (ComplicationConfig complicationConfig : Config.getConfig()) {
-                if (complicationConfig.getComplicationId() == ComplicationId.BOTTOM_COMPLICATION_ID) {
-                    drawBGComplication(complicationConfig, bottomComplSettings, canvas, currentTimeMillis);
-                } else {
-                    complicationConfig.getComplicationDrawable().draw(canvas, currentTimeMillis);
-                }
+                complicationConfig.getComplicationDrawable().draw(canvas, currentTimeMillis);
             }
         }
 
-        private void drawBGComplication(ComplicationConfig complicationConfig, ComplicationSettings complicationSettings, Canvas canvas, long currentTimeMillis) {
-            Rect bounds = complicationConfig.getComplicationDrawable().getBounds();
-            ComplicationData complicationData = activeComplicationDataSparseArray.get(complicationConfig.getId());
-            if (complicationData != null) {
-                if (!isInAmbientMode()) {
-                    Paint paint = new Paint();
-                    paint.setColor(complicationSettings.getBackgroundColor());
-                    paint.setStyle(Paint.Style.FILL_AND_STROKE);
-                    if (complicationSettings.isBorderRounded()) {
-                        canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom, BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-                    } else if (complicationSettings.isBorderRing()) {
-                        canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom, BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-                    } else {
-                        canvas.drawRect(bounds, paint);
-                    }
-
-                    if (complicationSettings.getBorderType() != BorderType.NONE) {
-                        paint = new Paint();
-                        paint.setColor(complicationSettings.getBorderColor());
-                        paint.setStyle(Paint.Style.STROKE);
-                        paint.setStrokeWidth(BORDER_WIDTH);
-                        if (complicationSettings.getBorderDrawableStyle() == ComplicationDrawable.BORDER_STYLE_DASHED) {
-                            if (complicationSettings.isBorderDotted()) {
-                                paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
-                            } else {
-                                paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
-                            }
-                        }
-                        if (complicationSettings.isBorderRounded()) {
-                            canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom, BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-                        } else if (complicationSettings.isBorderRing()) {
-                            canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom, BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-                        } else {
-                            canvas.drawRect(bounds, paint);
-                        }
-                    }
+        private void drawBgPanel(Canvas canvas) {
+            if (!isInAmbientMode()) {
+                // draw background
+                bgPanelPaint.setColor(bottomComplSettings.getBackgroundColor());
+                bgPanelPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+                if (bottomComplSettings.isBorderRounded()) {
+                    canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
+                            BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bgPanelPaint);
+                } else if (bottomComplSettings.isBorderRing()) {
+                    canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
+                            BORDER_RING_RADIUS, BORDER_RING_RADIUS, bgPanelPaint);
+                } else {
+                    canvas.drawRect(bgPanelBounds, bgPanelPaint);
                 }
 
-                float x = bounds.left + bounds.width() / 2f; // text will be centered around
-                TextPaint textPaint = new TextPaint();
-                textPaint.setColor(complicationSettings.getDataColor());
-                textPaint.setAntiAlias(!isInAmbientMode());
-                textPaint.setTextAlign(Paint.Align.CENTER);
-                textPaint.setTextSize(bounds.height() / 2f);
-                textPaint.setFakeBoldText(true);
-
-                canvas.drawText(complicationData.getShortText() == null ? ComplicationConfig.NO_DATA_TEXT
-                                : complicationData.getShortText().getText(getApplicationContext(), currentTimeMillis).toString(),
-                        x, bounds.top + bounds.height() / 2f, textPaint);
-                textPaint.setTextSize(bounds.height() / 3f);
-                textPaint.setFakeBoldText(false);
-                try {
-                    canvas.drawText(
-                            complicationData.getShortTitle().getText(getApplicationContext(), currentTimeMillis).toString(),
-                            x, bounds.bottom - bounds.height() / 10f, textPaint);
-                } catch (NullPointerException e) {
-                    Log.e(LOG_TAG, "drawBGComplication: null object reference");
+                // draw border
+                if (bottomComplSettings.getBorderType() != BorderType.NONE) {
+                    bgPanelPaint.setColor(bottomComplSettings.getBorderColor());
+                    bgPanelPaint.setStyle(Paint.Style.STROKE);
+                    bgPanelPaint.setStrokeWidth(BORDER_WIDTH);
+                    if (bottomComplSettings.getBorderDrawableStyle() == ComplicationDrawable.BORDER_STYLE_DASHED) {
+                        if (bottomComplSettings.isBorderDotted()) {
+                            bgPanelPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
+                        } else {
+                            bgPanelPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
+                        }
+                    }
+                    if (bottomComplSettings.isBorderRounded()) {
+                        canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
+                                BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bgPanelPaint);
+                    } else if (bottomComplSettings.isBorderRing()) {
+                        canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
+                                BORDER_RING_RADIUS, BORDER_RING_RADIUS, bgPanelPaint);
+                    } else {
+                        canvas.drawRect(bgPanelBounds, bgPanelPaint);
+                    }
                 }
             }
+
+            // draw bg value
+            float x = bgPanelBounds.left + bgPanelBounds.width() / 2f; // text will be centered around
+            if (isInAmbientMode()) {
+                bgPanelPaint.setColor(Color.LTGRAY);
+                bgPanelPaint.setAntiAlias(!isInAmbientMode());
+            } else {
+                bgPanelPaint.setColor(bottomComplSettings.getDataColor());
+                bgPanelPaint.setAntiAlias(!isInAmbientMode());
+            }
+            bgPanelPaint.setTextAlign(Paint.Align.CENTER);
+            bgPanelPaint.setTextSize(bgPanelBounds.height() / 2f);
+            bgPanelPaint.setFakeBoldText(true);
+
+            canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
+                    x, bgPanelBounds.top + bgPanelBounds.height() / 2f, bgPanelPaint);
+            bgPanelPaint.setTextSize(bgPanelBounds.height() / 3f);
+            bgPanelPaint.setFakeBoldText(false);
+            canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
+                    x, bgPanelBounds.bottom - bgPanelBounds.height() / 10f, bgPanelPaint);
         }
 
         @Override
@@ -887,7 +856,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID).getComplicationDrawable(), leftComplSettings);
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable(), rightComplSettings);
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID).getComplicationDrawable(), bottomComplSettings);
 
                 initializeBackground();
                 initializeHands();
@@ -952,6 +920,43 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             }
         }
 
+        ///
+
+        private void handleBgData(byte[] bgData) {
+            Log.d(LOG_TAG, DumpUtils.dumpData(bgData, bgData.length));
+
+            GlucosePacket glucosePacket = GlucosePacket.of(bgData);
+            if (glucosePacket != null) {
+                Log.d(LOG_TAG, glucosePacket.toText(getApplicationContext(), ""));
+
+                int bgDiff = bgValue == 0 ? 0 : (int)glucosePacket.getGlucoseValue() - bgValue;
+                int bgTimestampDiff = bgTimestamp == 0 ? 0 : (int)(glucosePacket.getTimestamp()-bgTimestamp) / 60000; // to minutes
+                if (bgTimestampDiff > 24 * 60) {
+                    bgTimestampDiff = -1;
+                }
+                GlucosePacket.Trend trend = glucosePacket.getTrend();
+                if (trend == null || trend == GlucosePacket.Trend.UNKNOWN) {
+                    trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : BgPanel.calcTrend(bgDiff, bgTimestampDiff);
+                }
+                char trendArrow = BgPanel.TREND_SET_1[trend.ordinal()];
+
+                boolean isUnitConversion = true; // FIXME
+                if (isUnitConversion) {
+                    bgLine1 = UiUtils.convertGlucoseToMmolLStr(glucosePacket.getGlucoseValue()) + trendArrow;
+                    bgLine2 = bgTimestampDiff <= 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
+                } else {
+                    bgLine1 = "" + glucosePacket.getGlucoseValue() + trendArrow;
+                    bgLine2 = bgTimestampDiff <= 0 ? "" : "Δ " + bgDiff;
+                }
+
+                Log.d(LOG_TAG, "bgValue: " + bgLine1 + " / " + bgLine2);
+
+                bgValue = glucosePacket.getGlucoseValue();
+                bgTimestamp = glucosePacket.getTimestamp();
+
+                chart.updateGraphData((double) bgValue, bgTimestamp);
+            }
+        }
         ///
 
         class ComplicationSettings {
@@ -1072,6 +1077,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 this.fontSize = fontSize;
             }
 
+            @NonNull
             @Override
             public String toString() {
                 return "\nData color: " + StringUtils.formatColorStr(dataColor)

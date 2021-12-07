@@ -28,7 +28,7 @@ public enum ComplicationId {
     LEFT_COMPLICATION_ID,
     RIGHT_COMPLICATION_ID,
     CENTER_COMPLICATION_ID,
-    BOTTOM_COMPLICATION_ID, // GLUCOSE ?
+    BOTTOM_COMPLICATION_ID,
     ;
 
     public static ComplicationId valueOf(int ordinal) {

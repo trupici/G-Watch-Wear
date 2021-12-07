@@ -51,7 +51,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     final private ComplicationViews left;
     final private ComplicationViews right;
 //    final private ComplicationViews center;
-    final private ComplicationViews bottom;
+//    final private ComplicationViews bottom;
 
     final private Drawable defaultComplicationDrawable;
 
@@ -67,7 +67,7 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
         left = new ComplicationViews(view.findViewById(R.id.left_complication));
         right = new ComplicationViews(view.findViewById(R.id.right_complication));
 //        center = new ComplicationViews(view.findViewById(R.id.center_complication));
-        bottom = new ComplicationViews(view.findViewById(R.id.bottom_complication));
+//        bottom = new ComplicationViews(view.findViewById(R.id.bottom_complication));
 
         // show selector for complication marked as selected in adapter
         ComplicationId selected = complicationAdapter.getSelectedComplicationId();
@@ -173,8 +173,8 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
                 return right;
 //            case CENTER_COMPLICATION_ID:
 //                return center;
-            case BOTTOM_COMPLICATION_ID:
-                return bottom;
+//            case BOTTOM_COMPLICATION_ID:
+//                return bottom;
             default:
                 return null;
         }
@@ -187,8 +187,8 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             return ComplicationId.RIGHT_COMPLICATION_ID;
 //        } else if (button.equals(center.complication)) {
 //            return ComplicationId.CENTER_COMPLICATION_ID;
-        } else if (button.equals(bottom.complication)) {
-            return ComplicationId.BOTTOM_COMPLICATION_ID;
+//        } else if (button.equals(bottom.complication)) {
+//            return ComplicationId.BOTTOM_COMPLICATION_ID;
         } else {
             return null;
         }

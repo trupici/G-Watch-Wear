@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2019 Juraj Antal
+
+ Originally created in G-Watch App
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!-- PACKETS -->
+
+    <string name="packet_type">Type: %1$s</string>
+    <string name="packet_source">Source: %1$s</string>
+    <string name="packet_received_at">Received at: %1$s</string>
+    <string name="packet_timestamp">Timestamp: %1$s</string>
+    <string name="packet_bg_value">Glucose: %1$d mg/dl (%2$.1f mmol/l)</string>
+    <string name="packet_trend">Trend: %1$s</string>
+    <string name="packet_battery">Battery: %1$d%%</string>
+    <string name="packet_length">Length: %1$d B</string>
+    <string name="packet_file_name">Name: %1$s</string>
+
+    <string name="aaps_packet_cob">COB: %1$sg</string>
+    <string name="aaps_packet_iob">IOB: %1$sU</string>
+    <string name="aaps_packet_tbr">TBR: %1$s</string>
+    <string name="aaps_packet_profile">Profile: %1$s</string>
+    <string name="aaps_packet_pump">Pump: %1$s</string>
+
+    <string name="tlv_packet_items">Items: %1$d</string>
+
+</resources>

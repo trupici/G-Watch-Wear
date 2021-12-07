@@ -39,11 +39,6 @@ public class Config {
                             ComplicationData.TYPE_LONG_TEXT,
                             ComplicationData.TYPE_SMALL_IMAGE,
                             ComplicationData.TYPE_ICON
-                    }),
-            new ComplicationConfig(ComplicationId.BOTTOM_COMPLICATION_ID,
-                    ComplicationLocation.BOTTOM,
-                    new int[] {
-                            ComplicationData.TYPE_SHORT_TEXT,
                     })
     };
 

@@ -77,6 +77,8 @@ import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
+import static sk.trupici.gwatch.wear.components.BgPanel.TREND_SET_1;
+import static sk.trupici.gwatch.wear.components.BgPanel.TREND_SET_2;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_COLOR;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_SHAPE;
@@ -929,6 +931,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             if (glucosePacket != null) {
                 Log.d(LOG_TAG, glucosePacket.toText(getApplicationContext(), ""));
 
+                boolean isUnitConversion = false; // FIXME
+                int sampleTimeDelta = 5; // FIXME
+
                 int bgDiff = bgValue == 0 ? 0 : (int)glucosePacket.getGlucoseValue() - bgValue;
                 int bgTimestampDiff = bgTimestamp == 0 ? 0 : (int)(glucosePacket.getTimestamp()-bgTimestamp) / 60000; // to minutes
                 if (bgTimestampDiff > 24 * 60) {
@@ -936,17 +941,16 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 }
                 GlucosePacket.Trend trend = glucosePacket.getTrend();
                 if (trend == null || trend == GlucosePacket.Trend.UNKNOWN) {
-                    trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : BgPanel.calcTrend(bgDiff, bgTimestampDiff);
+                    trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : BgPanel.calcTrend(bgDiff, sampleTimeDelta);
                 }
-                char trendArrow = BgPanel.TREND_SET_1[trend.ordinal()];
+                char trendArrow = TREND_SET_1[trend.ordinal()];
 
-                boolean isUnitConversion = true; // FIXME
                 if (isUnitConversion) {
                     bgLine1 = UiUtils.convertGlucoseToMmolLStr(glucosePacket.getGlucoseValue()) + trendArrow;
-                    bgLine2 = bgTimestampDiff <= 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
+                    bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
                 } else {
                     bgLine1 = "" + glucosePacket.getGlucoseValue() + trendArrow;
-                    bgLine2 = bgTimestampDiff <= 0 ? "" : "Δ " + bgDiff;
+                    bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgDiff;
                 }
 
                 Log.d(LOG_TAG, "bgValue: " + bgLine1 + " / " + bgLine2);

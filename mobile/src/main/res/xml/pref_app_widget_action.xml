@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2019 Juraj Antal
+
+ Originally created in G-Watch App
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/pref_widget_action_title"
+    android:summary="@string/pref_widget_action_summary"
+    android:key="widget_action_screen"
+    app:iconSpaceReserved="false"
+    >
+    <androidx.preference.PreferenceCategory
+        android:title="@string/pref_widget_launch_title"
+        >
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/app_name"
+            android:key="pref_widget_launch_me"
+            android:summary="@string/pref_widget_launch_me_summary"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="Glimp"
+            android:key="pref_widget_launch_glimp"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="xDrip+"
+            android:key="pref_widget_launch_xdrip"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="AndroidAPS"
+            android:key="pref_widget_launch_aaps"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="DiaBox"
+            android:key="pref_widget_launch_diabox"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="Dexcom App"
+            android:key="pref_widget_launch_dexcom"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+    </androidx.preference.PreferenceCategory>
+</androidx.preference.PreferenceScreen>

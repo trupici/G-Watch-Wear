@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2019 Juraj Antal
+
+ Originally created in G-Watch App
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/pref_data_source_title"
+    android:summary="@string/pref_data_source_summary"
+    android:key="data_source_screen"
+    app:iconSpaceReserved="false"
+    >
+    <androidx.preference.CheckBoxPreference
+        android:title="Glimp"
+        android:key="pref_data_source_glimp"
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="xDrip+"
+        android:key="pref_data_source_xdrip"
+        android:defaultValue="true"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="AndroidAPS"
+        android:key="pref_data_source_aaps"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/pref_data_source_aaps_ignore_bg_title"
+        android:key="pref_data_source_aaps_ignore_bg"
+        android:defaultValue="false"
+        app:iconSpaceReserved="true"
+        android:dependency="pref_data_source_aaps"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="Libre Alarm"
+        android:key="pref_data_source_libre_alarm"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="DiaBox"
+        android:key="pref_data_source_diabox"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="DexCom App"
+        android:summary="@string/pref_data_source_dexcom_summary"
+        android:key="pref_data_source_dexcom"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="LibreLink"
+        android:summary="@string/pref_data_source_libre_summary"
+        android:key="pref_data_source_libre"
+        android:defaultValue="false"
+        android:visibility="gone"
+        app:iconSpaceReserved="false"
+        />
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/pref_data_source_nightscout"
+        >
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/pref_nightscout_enable"
+            android:key="pref_data_source_nightscout_enable"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
+            android:title="@string/pref_nightscout_url_title"
+            android:summary="@string/pref_nightscout_url_summary"
+            android:key="cfg_nightscout_url"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
+            android:title="@string/pref_nightscout_api_secret_title"
+            android:summary="@string/pref_nightscout_api_secret_summary"
+            android:key="cfg_nightscout_secret"
+            maskSummary="true"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
+            android:title="@string/pref_nightscout_token_title"
+            android:summary="@string/pref_nightscout_token_summary"
+            android:key="cfg_nightscout_token"
+            maskSummary="true"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/pref_nightscout_exp_trust_title"
+            android:summary="@string/pref_nightscout_exp_trust_summary"
+            android:key="pref_nightscout_explicit_trust"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
+        <sk.trupici.gwatch.wear.settings.IntegerPreference
+            android:title="@string/pref_cloud_request_latency_title"
+            android:summary="@string/pref_cloud_request_latency_summary"
+            android:key="cfg_nightscout_latency"
+            android:inputType="number"
+            defaultValue="30"
+            minValue="10"
+            maxValue="150"
+            units=" s"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
+        android:title="@string/pref_data_source_dexcom_share"
+        >
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/pref_dexcom_share_enable"
+            android:key="pref_data_source_dexcom_share_enable"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
+            android:title="@string/pref_dexcom_share_account_title"
+            android:summary="@string/pref_dexcom_share_account_summary"
+            android:key="cfg_dexcom_share_account"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_dexcom_share_enable"
+            />
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
+            android:title="@string/pref_dexcom_share_secret_title"
+            android:summary="@string/pref_dexcom_share_secret_summary"
+            android:key="cfg_dexcom_share_secret"
+            maskSummary="true"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_dexcom_share_enable"
+            />
+        <androidx.preference.SwitchPreferenceCompat
+            android:title="@string/pref_dexcom_share_us_account_title"
+            android:summaryOn="@string/pref_dexcom_share_us_account_summary_on"
+            android:summaryOff="@string/pref_dexcom_share_us_account_summary_off"
+            android:key="cfg_dexcom_share_us_account"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_dexcom_share_enable"
+            />
+        <sk.trupici.gwatch.wear.settings.IntegerPreference
+            android:title="@string/pref_cloud_request_latency_title"
+            android:summary="@string/pref_cloud_request_latency_summary"
+            android:key="cfg_dexcom_share_latency"
+            android:inputType="number"
+            defaultValue="30"
+            minValue="10"
+            maxValue="150"
+            units=" s"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_dexcom_share_enable"
+            />
+    </androidx.preference.PreferenceCategory>
+</androidx.preference.PreferenceScreen>

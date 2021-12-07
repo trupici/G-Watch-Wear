@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2019 Juraj Antal
+
+ Originally created in G-Watch App
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/pref_glucose_levels_title"
+    android:summary="@string/pref_glucose_levels_summary"
+    android:key="glucose_levels_screen"
+    app:iconSpaceReserved="false"
+    >
+    <androidx.preference.SwitchPreferenceCompat
+        android:title="@string/pref_glucose_level_units"
+        android:summaryOn="@string/pref_glucose_level_units_mmoll"
+        android:summaryOff="@string/pref_glucose_level_units_mgdl"
+        android:key="cfg_glucose_units"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+
+    <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
+        android:title="@string/pref_glucose_level_hypo"
+        android:summary="@string/pref_glucose_level_hypo_summary"
+        android:key="cfg_glucose_level_hypo"
+        android:defaultValue="70"
+        android:inputType="number"
+        minValue="36"
+        maxValue="90"
+        maxPreferenceKey="cfg_glucose_level_low"
+        unitsPreferenceKey="cfg_glucose_units"
+        app:iconSpaceReserved="false"
+        />
+    <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
+        android:title="@string/pref_glucose_level_low"
+        android:summary="@string/pref_glucose_level_low_summary"
+        android:key="cfg_glucose_level_low"
+        android:defaultValue="80"
+        android:inputType="number"
+        minValue="54"
+        maxValue="100"
+        minPreferenceKey="cfg_glucose_level_hypo"
+        maxPreferenceKey="cfg_glucose_level_high"
+        unitsPreferenceKey="cfg_glucose_units"
+        app:iconSpaceReserved="false"
+        />
+    <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
+        android:title="@string/pref_glucose_level_high"
+        android:summary="@string/pref_glucose_level_high_summary"
+        android:key="cfg_glucose_level_high"
+        android:defaultValue="170"
+        android:inputType="number"
+        minValue="126"
+        maxValue="254"
+        minPreferenceKey="cfg_glucose_level_low"
+        maxPreferenceKey="cfg_glucose_level_hyper"
+        unitsPreferenceKey="cfg_glucose_units"
+        app:iconSpaceReserved="false"
+        />
+    <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
+        android:title="@string/pref_glucose_level_hyper"
+        android:summary="@string/pref_glucose_level_hyper_summary"
+        android:key="cfg_glucose_level_hyper"
+        android:defaultValue="270"
+        android:inputType="number"
+        minValue="200"
+        maxValue="360"
+        minPreferenceKey="cfg_glucose_level_high"
+        unitsPreferenceKey="cfg_glucose_units"
+        app:iconSpaceReserved="false"
+        />
+</androidx.preference.PreferenceScreen>

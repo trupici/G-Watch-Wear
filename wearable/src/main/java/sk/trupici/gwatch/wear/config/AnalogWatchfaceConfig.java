@@ -42,11 +42,10 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
             new ConfigPageData(
                     ConfigPageData.ConfigType.BACKGROUND,
                     new ConfigPageData.ConfigItemData[] {
-                            new ConfigPageData.ConfigItemData(0, "Standard" , R.drawable.analog_background_default),
-                            new ConfigPageData.ConfigItemData(1, "Circuit board", R.drawable.analog_background_1),
-                            new ConfigPageData.ConfigItemData(2, "Green", R.drawable.analog_bkg_green),
-                            new ConfigPageData.ConfigItemData(3, "Blue", R.drawable.analog_bkg_blue),
-                            new ConfigPageData.ConfigItemData(4, "Red", R.drawable.analog_bkg_red)
+                            new ConfigPageData.ConfigItemData(0, "Stripes" , R.drawable.analog_background_default),
+                            new ConfigPageData.ConfigItemData(1, "Circuit Board", R.drawable.analog_background_1),
+                            new ConfigPageData.ConfigItemData(1, "Classic Silver", R.drawable.analaog_classic_background_1),
+
                     },
                     R.string.config_page_title_bkg
             ),

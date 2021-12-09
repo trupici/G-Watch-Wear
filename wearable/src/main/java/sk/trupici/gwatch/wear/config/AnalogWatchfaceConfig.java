@@ -44,7 +44,8 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                     new ConfigPageData.ConfigItemData[] {
                             new ConfigPageData.ConfigItemData(0, "Stripes" , R.drawable.analog_background_default),
                             new ConfigPageData.ConfigItemData(1, "Circuit Board", R.drawable.analog_background_1),
-                            new ConfigPageData.ConfigItemData(1, "Classic Silver", R.drawable.analaog_classic_background_1),
+                            new ConfigPageData.ConfigItemData(1, "Classic Silver", R.drawable.analog_classic_background_1),
+                            new ConfigPageData.ConfigItemData(1, "Classic Coral", R.drawable.analog_classic_background_2),
 
                     },
                     R.string.config_page_title_bkg
@@ -56,14 +57,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                                     R.drawable.hours_default, R.drawable.hours_shadow_default,
                                     R.drawable.minutes_default, R.drawable.minutes_shadow_default,
                                     R.drawable.seconds_default, R.drawable.seconds_shadow_default),
-                            new ConfigPageData.HandsConfigData(1, "", R.drawable.analog_hands_preview_1,
-                                    R.drawable.analog_hour_1, R.drawable.analog_hour_1_shadow,
-                                    R.drawable.analog_minute_1, R.drawable.analog_minute_1_shadow,
-                                    R.drawable.analog_second_1, R.drawable.analog_second_1_shadow),
-                            new ConfigPageData.HandsConfigData(2, "", R.drawable.analog_hands_preview_2,
-                                    R.drawable.analog_hour_2, R.drawable.analog_hour_2_shadow,
-                                    R.drawable.analog_minute_2, R.drawable.analog_minute_2_shadow,
-                                    R.drawable.analog_second_2, R.drawable.analog_second_2_shadow)
+
                     },
                     R.string.config_page_title_hands
             ),

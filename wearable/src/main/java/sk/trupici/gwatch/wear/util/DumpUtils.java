@@ -135,17 +135,17 @@ public class DumpUtils {
             return StringUtils.EMPTY_STRING;
         }
 
-        StringBuffer str = new StringBuffer();
         StringBuffer str1 = new StringBuffer(64);
         StringBuffer str2 = new StringBuffer(24);
+        StringBuffer str = new StringBuffer().append(" \n");
 
         // shrink size if it is too big
         int maxlen = Math.min(len, 10240);
+
         for (int i = 0; i < maxlen; i++) {
             if (i > 0 && (i & 7) == 0) {
-                if ((i & 15) == 0)
-                {
-                    str.append("  ").append(str.toString()).append(" :   ").append(str2).append("\n");
+                if ((i & 15) == 0) {
+                    str.append("  ").append(str1.toString()).append(":   ").append(str2).append("\n");
                     str1.setLength(0);
                     str2.setLength(0);
                 } else {
@@ -159,10 +159,10 @@ public class DumpUtils {
             str2.append(isPrintableChar(c) ? ""+c : ".");
         }
 
-        str.append("  ").append(str1.toString()).append(" :   ").append(str2).append("\n");
+        str.append("  ").append(String.format("%-49s", str1.toString())).append(":   ").append(str2).append("\n");
 
         if (maxlen < len) {
-            str.append("  ...");
+            str.append("\n  ...");
         }
 
         return str.toString();

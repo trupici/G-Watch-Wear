@@ -145,14 +145,6 @@ public class SimpleBgChart {
         chartBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     }
 
-    public void scale(float scaleX, float scaleY) {
-//        chartBitmap = Bitmap.createScaledBitmap(
-//                chartBitmap,
-//                (int) (chartBitmap.getWidth() * scaleX),
-//                (int) (chartBitmap.getHeight() * scaleY),
-//                true);
-    }
-
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;

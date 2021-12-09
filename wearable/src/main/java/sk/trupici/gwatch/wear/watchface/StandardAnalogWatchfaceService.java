@@ -16,20 +16,9 @@
 
 package sk.trupici.gwatch.wear.watchface;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.DashPathEffect;
-import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -43,7 +32,6 @@ import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
-import android.text.TextPaint;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
@@ -54,43 +42,21 @@ import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
-import androidx.annotation.NonNull;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgPanel;
+import sk.trupici.gwatch.wear.components.ComponentsConfig;
+import sk.trupici.gwatch.wear.components.DatePanel;
+import sk.trupici.gwatch.wear.components.WatchHands;
 import sk.trupici.gwatch.wear.components.bgchart.SimpleBgChart;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
-import sk.trupici.gwatch.wear.config.ConfigPageData;
-import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.Config;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
 
-import static sk.trupici.gwatch.wear.components.BgPanel.TREND_SET_1;
-import static sk.trupici.gwatch.wear.components.BgPanel.TREND_SET_2;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_SHAPE;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_DATA_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_TEXT_SIZE;
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_PREFIX;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DASH_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DOT_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_GAP_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_RING_RADIUS;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_ROUND_RECT_RADIUS;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_WIDTH;
 
 /**
  * Analog watch face with a ticking second hand. In ambient mode, the second hand isn"t
@@ -107,11 +73,6 @@ import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BO
 public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
     public static final String LOG_TAG = "StdAnalogGWatchface";
-
-    // offsets for watch hands shadows - currently we use the same value for X and Y
-    public static final float HOUR_HAND_SHADOW_OFFSET = 3;
-    public static final float MINUTE_HAND_SHADOW_OFFSET = 5;
-    public static final float SECOND_HAND_SHADOW_OFFSET = 7;
 
     /*
      * Updates rate in milliseconds for interactive mode. We update once a second to advance the
@@ -155,50 +116,11 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         /* Handler to update the time once a second in interactive mode. */
         private final Handler updateTimeHandler = new EngineHandler(this);
-        private Calendar calendar;
-        private DateFormat dayOfWeekFormat;
-        private DateFormat monthFormat;
-        private DateFormat dateOfMonthFormat;
 
-        private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                calendar.setTimeZone(TimeZone.getDefault());
-                initDateFormats();
-                invalidate();
-            }
-        };
-        private boolean timeZoneRegistered = false;
         private boolean muted;
 
-        private float centerX;
-        private float centerY;
-
-        private Paint handsPaint;
-
-        private Bitmap hourBitmap;
-        private Bitmap hourShadowBitmap;
-
-        private Bitmap minuteBitmap;
-        private Bitmap minuteShadowBitmap;
-
-        private Bitmap secondBitmap;
-        private Bitmap secondShadowBitmap;
-
-        private Paint backgroundPaint;
-        private Bitmap backgroundBitmap;
-        private Bitmap ambientBackgroundBitmap;
-
-        private SimpleBgChart chart;
-
-        private boolean ambientMode;
-        private boolean lowBitAmbient;
-        private boolean burnInProtection;
-
-        private ComplicationSettings leftComplSettings;
-        private ComplicationSettings rightComplSettings;
-        private ComplicationSettings centerComplSettings;
-        private ComplicationSettings bottomComplSettings;
+        private ComponentsConfig leftComplSettings;
+        private ComponentsConfig rightComplSettings;
 
         /* Maps active complication ids to the data for that complication. Note: Data will only be
          * present if the user has chosen a provider via the settings activity for the watch face.
@@ -209,24 +131,17 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         // indicating there are unread notifications.
         private SharedPreferences sharedPrefs;
 
-        private float refScreenWidth;
-        private float refScreenHeight;
+        private float screenWidth;
+        private float screenHeight;
 
         private RectF leftComplCoefs;
         private RectF rightComplCoefs;
 
-        private RectF centerComplCoefs;
-        private Rect datePanelBounds;
-        private TextPaint datePaint;
-
-        private RectF bottomComplCoefs;
-        private Rect bgPanelBounds;
-        private TextPaint bgPanelPaint;
-        private String bgLine1;
-        private String bgLine2;
-
-        private int bgValue = 0;
-        private long bgTimestamp = 0;
+        private BackgroundPanel bkgPanel;
+        private WatchHands watchHands;;
+        private SimpleBgChart chart;
+        private BgPanel bgPanel;
+        private DatePanel datePanel;
 
         private MessageClient messageClient;
 
@@ -246,73 +161,64 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     getString(R.string.standard_analog_complication_preferences_key),
                     Context.MODE_PRIVATE);
 
-            loadSavedPreferences();
-
-            initializeBackground();
-            initializeComplications();
-            initializeHands();
 
             WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             Display display = windowManager.getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
 
-            refScreenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
-            refScreenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
+            screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
+            screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
+
+            bkgPanel = new BackgroundPanel(watchfaceConfig);
+            bkgPanel.onCreate(context, sharedPrefs);
+
+            datePanel = new DatePanel((int) screenWidth, (int) screenHeight);
+            datePanel.onCreate(context, sharedPrefs);
+
+            watchHands = new WatchHands(watchfaceConfig);
+            watchHands.onCreate(context, sharedPrefs);
+
+            bgPanel = new BgPanel((int) screenWidth, (int) screenHeight);
+            bgPanel.onCreate(context, sharedPrefs);
+            bgPanel.setBgValueCallback((bgValue, bgTimestamp) -> {
+                chart.updateGraphData((double) bgValue, bgTimestamp);
+            });
+
 
             /*
                 FIXME: consider to use dp values to avoid these calculations
             */
 
-            int left = (int) (getResources().getDimension(R.dimen.layout_graph_left) * size.x / refScreenWidth);
-            int top = (int) (getResources().getDimension(R.dimen.layout_graph_top) * size.y / refScreenHeight);
-            int width = (int) (getResources().getDimension(R.dimen.layout_graph_right) * size.x / refScreenWidth);
-            int height = (int) (getResources().getDimension(R.dimen.layout_graph_bottom) * size.y / refScreenHeight);
+            int left = (int) (getResources().getDimension(R.dimen.layout_graph_left) * size.x / screenWidth);
+            int top = (int) (getResources().getDimension(R.dimen.layout_graph_top) * size.y / screenHeight);
+            int width = (int) (getResources().getDimension(R.dimen.layout_graph_right) * size.x / screenWidth);
+            int height = (int) (getResources().getDimension(R.dimen.layout_graph_bottom) * size.y / screenHeight);
             chart = new SimpleBgChart(left, top, width, height, sharedPrefs);
 
             leftComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.layout_left_compl_left) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_left_compl_top) / refScreenHeight,
-                    getResources().getDimension(R.dimen.layout_left_compl_right) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_left_compl_bottom) / refScreenHeight
+                    getResources().getDimension(R.dimen.layout_left_compl_left) / screenWidth,
+                    getResources().getDimension(R.dimen.layout_left_compl_top) / screenHeight,
+                    getResources().getDimension(R.dimen.layout_left_compl_right) / screenWidth,
+                    getResources().getDimension(R.dimen.layout_left_compl_bottom) / screenHeight
             );
             rightComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.layout_right_compl_left) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_right_compl_top) / refScreenHeight,
-                    getResources().getDimension(R.dimen.layout_right_compl_right) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_right_compl_bottom) / refScreenHeight
+                    getResources().getDimension(R.dimen.layout_right_compl_left) / screenWidth,
+                    getResources().getDimension(R.dimen.layout_right_compl_top) / screenHeight,
+                    getResources().getDimension(R.dimen.layout_right_compl_right) / screenWidth,
+                    getResources().getDimension(R.dimen.layout_right_compl_bottom) / screenHeight
             );
-            centerComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.layout_center_compl_left) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_center_compl_top) / refScreenHeight,
-                    getResources().getDimension(R.dimen.layout_center_compl_right) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_center_compl_bottom) / refScreenHeight
-            );
-            bottomComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.layout_bottom_compl_left) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_bottom_compl_top) / refScreenHeight,
-                    getResources().getDimension(R.dimen.layout_bottom_compl_right) / refScreenWidth,
-                    getResources().getDimension(R.dimen.layout_bottom_compl_bottom) / refScreenHeight
-            );
-            Log.w(LOG_TAG, "Rect: " + bottomComplCoefs);
 
-            calendar = Calendar.getInstance();
-            datePaint = new TextPaint();
-            datePaint.setAntiAlias(true);
-            datePaint.setTextAlign(Paint.Align.CENTER);
-            datePaint.setTextScaleX(0.9f);
-            initDateFormats();
+            loadSavedPreferences();
 
-            bgPanelPaint = new TextPaint();
-            bgPanelPaint.setAntiAlias(true);
-            bgPanelPaint.setTextAlign(Paint.Align.CENTER);
+            initializeComplications();
 
             // Build a new MessageClient for the Wearable API
             messageClient = Wearable.getMessageClient(context);
             messageClient.addListener(messageEvent -> {
                 byte[] bgData = messageEvent.getData();
                 Log.d(LOG_TAG, "onReceive: " + bgData.length);
-                handleBgData(bgData);
+                bgPanel.onDataUpdate(getApplicationContext(), bgData);
             });
 
         }
@@ -322,17 +228,20 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         private void loadSavedPreferences() {
             PreferenceUtils.dumpPreferences(sharedPrefs);
 
-            leftComplSettings = new ComplicationSettings();
+            leftComplSettings = new ComponentsConfig();
             leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
 //            Log.d(LOG_TAG, "LEFT: " + leftComplSettings.toString());
 
-            rightComplSettings = new ComplicationSettings();
+            rightComplSettings = new ComponentsConfig();
             rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
 //            Log.d(LOG_TAG, "RIGHT: " + rightComplSettings.toString());
 
-            bottomComplSettings = new ComplicationSettings();
-            bottomComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX);
-//            Log.d(LOG_TAG, "BOTTOM: " + bottomComplSettings.toString());
+
+            Context context = getApplicationContext();
+            bkgPanel.onConfigChanged(context, sharedPrefs);
+            watchHands.onConfigChanged(getApplicationContext(), sharedPrefs);
+            bgPanel.onConfigChanged(getApplicationContext(), sharedPrefs);
+            datePanel.onConfigChanged(getApplicationContext(), sharedPrefs);
         }
 
         private void initializeComplications() {
@@ -360,7 +269,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             setActiveComplications(Config.getComplicationIds());
         }
 
-        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComplicationSettings settings) {
+        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComponentsConfig settings) {
             /*
             More settings to do:
                 app:highlightColor="@color/fuchsia"
@@ -423,45 +332,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             invalidate();
         }
 
-        private void initDateFormats() {
-            dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-            dayOfWeekFormat.setCalendar(calendar);
-            monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-            monthFormat.setCalendar(calendar);
-            dateOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
-            dateOfMonthFormat.setCalendar(calendar);
-        }
-
-
-        private void initializeBackground() {
-            backgroundPaint = new Paint();
-            backgroundBitmap = BitmapFactory.decodeResource(getResources(),
-                    watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.BACKGROUND,
-                            sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_BACKGROUND_IDX, AnalogWatchfaceConfig.DEF_BACKGROUND_IDX)
-                    ).getResourceId());
-        }
-
-        private void initializeHands() {
-            ConfigPageData.HandsConfigData handsData = (ConfigPageData.HandsConfigData)
-                    watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
-                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
-
-            handsPaint = new Paint();
-            handsPaint.setAntiAlias(true);
-
-            hourBitmap = BitmapFactory.decodeResource(getResources(), handsData.getHourHandId());
-            hourShadowBitmap = handsData.getHourHandShadowId() == 0 ? null
-                    : BitmapFactory.decodeResource(getResources(), handsData.getHourHandShadowId());
-
-            minuteBitmap = BitmapFactory.decodeResource(getResources(), handsData.getMinuteHandId());
-            minuteShadowBitmap = handsData.getMinuteHandShadowId() == 0 ? null
-                    : BitmapFactory.decodeResource(getResources(), handsData.getMinuteHandShadowId());
-
-            secondBitmap = BitmapFactory.decodeResource(getResources(), handsData.getSecondHandId());
-            secondShadowBitmap = handsData.getSecondHandShadowId() == 0 ? null
-                    : BitmapFactory.decodeResource(getResources(), handsData.getSecondHandShadowId());
-        }
-
         @Override
         public void onDestroy() {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
@@ -472,12 +342,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         public void onPropertiesChanged(Bundle properties) {
             Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
 
-        // TODO update complication drawables
-//            datePaint.setColor(Color.WHITE);
-
             super.onPropertiesChanged(properties);
-            lowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-            burnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
+
+            Context context = getApplicationContext();
+            bkgPanel.onPropertiesChanged(context, properties);
+            watchHands.onPropertiesChanged(context, properties);
+            bgPanel.onPropertiesChanged(context, properties);
+            datePanel.onPropertiesChanged(context, properties);
         }
 
         @Override
@@ -489,21 +360,20 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
-            ambientMode = inAmbientMode;
 
             // Update drawable complications' ambient state.
             // Note: ComplicationDrawable handles switching between active/ambient colors, we just
             // have to inform it to enter ambient mode.
             for (ComplicationConfig complicationConfig : Config.getConfig()) {
-                complicationConfig.getComplicationDrawable().setInAmbientMode(ambientMode);
+                complicationConfig.getComplicationDrawable().setInAmbientMode(inAmbientMode);
             }
 
-            if (lowBitAmbient) {
-                boolean antiAlias = !inAmbientMode;
-                datePaint.setAntiAlias(antiAlias);
-                handsPaint.setAntiAlias(antiAlias);
-                backgroundPaint.setAntiAlias(antiAlias);
-            }
+//            if (lowBitAmbient) {
+//                boolean antiAlias = !inAmbientMode;
+//                datePaint.setAntiAlias(antiAlias);
+//                handsPaint.setAntiAlias(antiAlias);
+//                backgroundPaint.setAntiAlias(antiAlias);
+//            }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer();
@@ -519,9 +389,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             if (muted != inMuteMode) {
                 muted = inMuteMode;
                 int alpha = inMuteMode ? 100 : 255;
-                handsPaint.setAlpha(alpha);
-                datePaint.setAlpha(alpha);
-                invalidate();
+//                handsPaint.setAlpha(alpha);
+//                datePaint.setAlpha(alpha);
+//                invalidate();
             }
         }
 
@@ -535,55 +405,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         }
 
         private void adjustSize(int width, int height) {
+            this.screenHeight = width;
+            this.screenHeight = height;
 
-            /*
-             * Find the coordinates of the center point on the screen, and ignore the window
-             * insets, so that, on round watches with a "chin", the watch face is centered on the
-             * entire screen, not just the usable portion.
-             */
-            centerX = width / 2f;
-            centerY = height / 2f;
-
-            /* Scale loaded background image (more efficient) if surface dimensions change. */
-            float scale = ((float) width) / (float) backgroundBitmap.getWidth();
-            backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap,
-                    (int) (backgroundBitmap.getWidth() * scale),
-                    (int) (backgroundBitmap.getHeight() * scale), true);
-
-            chart.scale(scale, scale);
-
-            scale = ((float) width) / (float) hourBitmap.getWidth();
-            int wScale = (int) (hourBitmap.getWidth() * scale);
-            int hScale = (int) (hourBitmap.getHeight() * scale);
-
-            hourBitmap = Bitmap.createScaledBitmap(hourBitmap, wScale, hScale, true);
-            if (hourShadowBitmap != null) {
-                hourShadowBitmap = Bitmap.createScaledBitmap(hourShadowBitmap, wScale, hScale, true);
-            }
-
-            minuteBitmap = Bitmap.createScaledBitmap(minuteBitmap, wScale, hScale, true);
-            if (minuteShadowBitmap != null) {
-                minuteShadowBitmap = Bitmap.createScaledBitmap(minuteShadowBitmap, wScale, hScale, true);
-            }
-
-            secondBitmap = Bitmap.createScaledBitmap(secondBitmap, wScale, hScale, true);
-            if (secondShadowBitmap != null) {
-                secondShadowBitmap = Bitmap.createScaledBitmap(secondShadowBitmap, wScale, hScale, true);
-            }
-
-            /*
-             * Create a gray version of the image only if it will look nice on the device in
-             * ambient mode. That means we don"t want devices that support burn-in
-             * protection (slight movements in pixels, not great for images going all the way to
-             * edges) and low ambient mode (degrades image quality).
-             *
-             * Also, if your watch face will know about all images ahead of time (users aren"t
-             * selecting their own photos for the watch face), it will be more
-             * efficient to create a black/white version (png, etc.) and load that when you need it.
-             */
-            if (!burnInProtection && !lowBitAmbient) {
-                initGrayBackgroundBitmap();
-            }
+            Context context = getApplicationContext();
+            bkgPanel.onSizeChanged(context, width, height);
+            watchHands.onSizeChanged(context, width, height);
+            datePanel.onSizeChanged(context, width, height);
+            bgPanel.onSizeChanged(context, width, height);
 
             /*
              * Calculates location bounds for right and left circular complications. Please note,
@@ -610,38 +439,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bounds = new Rect(left, top, right, bottom);
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable().setBounds(bounds);
 
-            // date component
-            left = (int) (centerComplCoefs.left * width);
-            top = (int) (centerComplCoefs.top * height);
-            right = (int) (centerComplCoefs.right * width);
-            bottom = (int) (centerComplCoefs.bottom * height);
-            datePanelBounds = new Rect(left, top, right, bottom);
-            datePaint.setTextSize(bounds.height() / 3.5f);
-
-            // Blood Glucose component
-            left = (int) (bottomComplCoefs.left * width);
-            top = (int) (bottomComplCoefs.top * height);
-            right = (int) (bottomComplCoefs.right * width);
-            bottom = (int) (bottomComplCoefs.bottom * height);
-            bgPanelBounds = new Rect(left, top, right, bottom);
-
 //            Rect screenForBackgroundBound = new Rect(0, 0, width, height);
 //            ComplicationDrawable backgroundComplicationDrawable = complicationDrawableSparseArray.get(BACKGROUND_COMPLICATION_ID);
 //            backgroundComplicationDrawable.setBounds(screenForBackgroundBound);
-        }
-
-        private void initGrayBackgroundBitmap() {
-            ambientBackgroundBitmap = Bitmap.createBitmap(
-                    backgroundBitmap.getWidth(),
-                    backgroundBitmap.getHeight(),
-                    Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(ambientBackgroundBitmap);
-            Paint grayPaint = new Paint();
-            ColorMatrix colorMatrix = new ColorMatrix();
-            colorMatrix.setSaturation(0);
-            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-            grayPaint.setColorFilter(filter);
-            canvas.drawBitmap(backgroundBitmap, 0, 0, grayPaint);
         }
 
         /**
@@ -677,172 +477,21 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             long now = System.currentTimeMillis();
-            calendar.setTimeInMillis(now);
+            boolean isAmbientMode = isInAmbientMode();
 
-            drawBackground(canvas);
-            chart.draw(canvas, ambientMode);
-            drawDate(canvas);
+            bkgPanel.onDraw(canvas, isAmbientMode);
+            chart.draw(canvas, isAmbientMode);
+            datePanel.onDraw(canvas, isAmbientMode);
+            datePanel.onDraw(canvas, isAmbientMode);
+            bgPanel.onDraw(canvas, isAmbientMode);
             drawComplications(canvas, now);
-            drawBgPanel(canvas);
-            drawWatchFace(canvas);
-        }
-
-        private void drawBackground(Canvas canvas) {
-            if (ambientMode) {
-                if (lowBitAmbient || burnInProtection) {
-                    canvas.drawColor(Color.BLACK);
-                } else {
-                    canvas.drawBitmap(ambientBackgroundBitmap, 0, 0, backgroundPaint);
-                }
-            } else {
-                canvas.drawBitmap(backgroundBitmap, 0, 0, backgroundPaint);
-            }
-        }
-
-        private void drawDate(Canvas canvas) {
-            Date date = calendar.getTime();
-
-            // FIXME - configurable colors
-
-//            // draw background if needed
-//            datePaint.setColor(Color.GREEN);
-//            datePaint.setStyle(Paint.Style.FILL);
-//            canvas.drawRect(datePanelBounds, datePaint);
-
-            int color = isInAmbientMode() ? Color.LTGRAY : Color.WHITE;
-            datePaint.setColor(color);
-
-            if (false) {
-                // Day of week
-                int centerX = datePanelBounds.left + datePanelBounds.width() / 2;
-                canvas.drawText(dayOfWeekFormat.format(date),
-                        centerX, datePanelBounds.top + datePanelBounds.height() / 2f - 5,
-                        datePaint);
-                // Day of Month
-                canvas.drawText(dateOfMonthFormat.format(date),
-                        centerX, datePanelBounds.bottom - 5,
-                        datePaint);
-            } else {
-                // Day of Month
-                canvas.drawText(dateOfMonthFormat.format(date),
-                        centerX, datePanelBounds.top + datePanelBounds.height()/2f - 5,
-                        datePaint);
-                // Month
-                int centerX = datePanelBounds.left + datePanelBounds.width()/2;
-                canvas.drawText(monthFormat.format(date),
-                        centerX, datePanelBounds.bottom - 5,
-                        datePaint);
-            }
-        }
-
-        private void drawWatchFace(Canvas canvas) {
-
-            /*
-             * These calculations reflect the rotation in degrees per unit of time, e.g.,
-             * 360 / 60 = 6 and 360 / 12 = 30.
-             */
-            final float seconds = (calendar.get(Calendar.SECOND) + calendar.get(Calendar.MILLISECOND) / 1000f);
-            final float secondsRotation = seconds * 6f;
-
-            final int minutes = calendar.get(Calendar.MINUTE);
-            final float minutesHandOffset = seconds / 10f;
-            final float minutesRotation = calendar.get(Calendar.MINUTE) * 6f + minutesHandOffset;
-
-            final float hourHandOffset = minutes / 2f;
-            final float hoursRotation = calendar.get(Calendar.HOUR) * 30f + hourHandOffset;
-
-
-            Matrix matrix = new Matrix();
-            matrix.postRotate(hoursRotation, centerX, centerY);
-            matrix.postTranslate(HOUR_HAND_SHADOW_OFFSET, HOUR_HAND_SHADOW_OFFSET);
-            canvas.drawBitmap(hourShadowBitmap, matrix, handsPaint);
-
-            matrix.postTranslate(-HOUR_HAND_SHADOW_OFFSET, -HOUR_HAND_SHADOW_OFFSET);
-            canvas.drawBitmap(hourBitmap, matrix, handsPaint);
-
-            matrix.reset();
-            matrix.postRotate(minutesRotation, centerX, centerY);
-            matrix.postTranslate(MINUTE_HAND_SHADOW_OFFSET, MINUTE_HAND_SHADOW_OFFSET);
-            canvas.drawBitmap(minuteShadowBitmap, matrix, handsPaint);
-
-            matrix.postTranslate(-MINUTE_HAND_SHADOW_OFFSET, -MINUTE_HAND_SHADOW_OFFSET);
-            canvas.drawBitmap(minuteBitmap, matrix, handsPaint);
-
-            if (!ambientMode) {
-                matrix.reset();
-                matrix.postRotate(secondsRotation, centerX, centerY);
-                matrix.postTranslate(SECOND_HAND_SHADOW_OFFSET, SECOND_HAND_SHADOW_OFFSET);
-                canvas.drawBitmap(secondShadowBitmap, matrix, handsPaint);
-
-                matrix.postTranslate(-SECOND_HAND_SHADOW_OFFSET, -SECOND_HAND_SHADOW_OFFSET);
-                canvas.drawBitmap(secondBitmap, matrix, handsPaint);
-            }
+            watchHands.onDraw(canvas, isAmbientMode);
         }
 
         private void drawComplications(Canvas canvas, long currentTimeMillis) {
             for (ComplicationConfig complicationConfig : Config.getConfig()) {
                 complicationConfig.getComplicationDrawable().draw(canvas, currentTimeMillis);
             }
-        }
-
-        private void drawBgPanel(Canvas canvas) {
-            if (!isInAmbientMode()) {
-                // draw background
-                bgPanelPaint.setColor(bottomComplSettings.getBackgroundColor());
-                bgPanelPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-                if (bottomComplSettings.isBorderRounded()) {
-                    canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
-                            BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bgPanelPaint);
-                } else if (bottomComplSettings.isBorderRing()) {
-                    canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
-                            BORDER_RING_RADIUS, BORDER_RING_RADIUS, bgPanelPaint);
-                } else {
-                    canvas.drawRect(bgPanelBounds, bgPanelPaint);
-                }
-
-                // draw border
-                if (bottomComplSettings.getBorderType() != BorderType.NONE) {
-                    bgPanelPaint.setColor(bottomComplSettings.getBorderColor());
-                    bgPanelPaint.setStyle(Paint.Style.STROKE);
-                    bgPanelPaint.setStrokeWidth(BORDER_WIDTH);
-                    if (bottomComplSettings.getBorderDrawableStyle() == ComplicationDrawable.BORDER_STYLE_DASHED) {
-                        if (bottomComplSettings.isBorderDotted()) {
-                            bgPanelPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
-                        } else {
-                            bgPanelPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
-                        }
-                    }
-                    if (bottomComplSettings.isBorderRounded()) {
-                        canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
-                                BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bgPanelPaint);
-                    } else if (bottomComplSettings.isBorderRing()) {
-                        canvas.drawRoundRect(bgPanelBounds.left, bgPanelBounds.top, bgPanelBounds.right, bgPanelBounds.bottom,
-                                BORDER_RING_RADIUS, BORDER_RING_RADIUS, bgPanelPaint);
-                    } else {
-                        canvas.drawRect(bgPanelBounds, bgPanelPaint);
-                    }
-                }
-            }
-
-            // draw bg value
-            float x = bgPanelBounds.left + bgPanelBounds.width() / 2f; // text will be centered around
-            if (isInAmbientMode()) {
-                bgPanelPaint.setColor(Color.LTGRAY);
-                bgPanelPaint.setAntiAlias(!isInAmbientMode());
-            } else {
-                bgPanelPaint.setColor(bottomComplSettings.getDataColor());
-                bgPanelPaint.setAntiAlias(!isInAmbientMode());
-            }
-            bgPanelPaint.setTextAlign(Paint.Align.CENTER);
-            bgPanelPaint.setTextSize(bgPanelBounds.height() / 2f);
-            bgPanelPaint.setFakeBoldText(true);
-
-            canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
-                    x, bgPanelBounds.top + bgPanelBounds.height() / 2f, bgPanelPaint);
-            bgPanelPaint.setTextSize(bgPanelBounds.height() / 3f);
-            bgPanelPaint.setFakeBoldText(false);
-            canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
-                    x, bgPanelBounds.bottom - bgPanelBounds.height() / 10f, bgPanelPaint);
         }
 
         @Override
@@ -858,37 +507,21 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID).getComplicationDrawable(), leftComplSettings);
                 updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable(), rightComplSettings);
 
-                initializeBackground();
-                initializeHands();
-                adjustSize((int)centerX * 2, (int)centerY * 2);
+                Context context = getApplicationContext();
+                bkgPanel.onConfigChanged(context, sharedPrefs);
+                watchHands.onConfigChanged(getApplicationContext(), sharedPrefs);
+                bgPanel.onConfigChanged(getApplicationContext(), sharedPrefs);
+                datePanel.onConfigChanged(getApplicationContext(), sharedPrefs);
 
-                registerReceiver();
-                /* Update time zone in case it changed while we weren"t visible. */
-                calendar.setTimeZone(TimeZone.getDefault());
-                initDateFormats();
+                adjustSize((int)screenWidth, (int)screenHeight);
+
+                datePanel.registerReceiver(StandardAnalogWatchfaceService.this);
             } else {
-                unregisterReceiver();
+                datePanel.unregisterReceiver(StandardAnalogWatchfaceService.this);
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer();
-        }
-
-        private void registerReceiver() {
-            if (timeZoneRegistered) {
-                return;
-            }
-            timeZoneRegistered = true;
-            IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            StandardAnalogWatchfaceService.this.registerReceiver(timeZoneReceiver, filter);
-        }
-
-        private void unregisterReceiver() {
-            if (!timeZoneRegistered) {
-                return;
-            }
-            timeZoneRegistered = false;
-            StandardAnalogWatchfaceService.this.unregisterReceiver(timeZoneReceiver);
         }
 
         /**
@@ -906,7 +539,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
          * should only run in active mode.
          */
         private boolean shouldTimerBeRunning() {
-            return isVisible() && !ambientMode;
+            return isVisible() && !isInAmbientMode();
         }
 
         /**
@@ -920,175 +553,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 updateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
-
-        ///
-
-        private void handleBgData(byte[] bgData) {
-            Log.d(LOG_TAG, DumpUtils.dumpData(bgData, bgData.length));
-
-            GlucosePacket glucosePacket = GlucosePacket.of(bgData);
-            if (glucosePacket != null) {
-                Log.d(LOG_TAG, glucosePacket.toText(getApplicationContext(), ""));
-
-                boolean isUnitConversion = false; // FIXME
-                int sampleTimeDelta = 5; // FIXME
-
-                int bgDiff = bgValue == 0 ? 0 : (int)glucosePacket.getGlucoseValue() - bgValue;
-                int bgTimestampDiff = bgTimestamp == 0 ? 0 : (int)(glucosePacket.getTimestamp()-bgTimestamp) / 60000; // to minutes
-                if (bgTimestampDiff > 24 * 60) {
-                    bgTimestampDiff = -1;
-                }
-                GlucosePacket.Trend trend = glucosePacket.getTrend();
-                if (trend == null || trend == GlucosePacket.Trend.UNKNOWN) {
-                    trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : BgPanel.calcTrend(bgDiff, sampleTimeDelta);
-                }
-                char trendArrow = TREND_SET_1[trend.ordinal()];
-
-                if (isUnitConversion) {
-                    bgLine1 = UiUtils.convertGlucoseToMmolLStr(glucosePacket.getGlucoseValue()) + trendArrow;
-                    bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
-                } else {
-                    bgLine1 = "" + glucosePacket.getGlucoseValue() + trendArrow;
-                    bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgDiff;
-                }
-
-                Log.d(LOG_TAG, "bgValue: " + bgLine1 + " / " + bgLine2);
-
-                bgValue = glucosePacket.getGlucoseValue();
-                bgTimestamp = glucosePacket.getTimestamp();
-
-                chart.updateGraphData((double) bgValue, bgTimestamp);
-            }
-        }
-        ///
-
-        class ComplicationSettings {
-            private int dataColor;
-            private int backgroundColor;
-            private int borderColor;
-            private BorderType borderType;
-            private int fontSize; // [sp]
-
-            public ComplicationSettings() {
-                init();
-            }
-
-            public void init() {
-                borderType = BorderType.NONE;
-                borderColor = Color.TRANSPARENT;
-                dataColor = Color.WHITE;
-                backgroundColor = Color.TRANSPARENT;
-                fontSize = -1;
-            }
-
-            public void load(SharedPreferences prefs, String prefix) {
-                borderType = BorderType.getByNameOrDefault(prefs.getString(prefix + PREF_COMPL_BORDER_SHAPE, null));
-                borderColor = prefs.getInt(prefix + PREF_COMPL_BORDER_COLOR, Color.TRANSPARENT);
-                dataColor = prefs.getInt(prefix + PREF_COMPL_DATA_COLOR, Color.WHITE);
-                backgroundColor = prefs.getInt(prefix + PREF_COMPL_BKG_COLOR, Color.TRANSPARENT);
-                fontSize = prefs.getInt(prefix + PREF_COMPL_TEXT_SIZE, -1);
-            }
-
-            public int getBorderDrawableStyle() {
-                switch (borderType) {
-                    case RECT:
-                    case ROUNDED_RECT:
-                    case RING:
-                        return ComplicationDrawable.BORDER_STYLE_SOLID;
-                    case DASHED_RECT:
-                    case DASHED_ROUNDED_RECT:
-                    case DASHED_RING:
-                    case DOTTED_RECT:
-                    case DOTTED_ROUNDED_RECT:
-                    case DOTTED_RING:
-                        return ComplicationDrawable.BORDER_STYLE_DASHED;
-                    default:
-                        return ComplicationDrawable.BORDER_STYLE_NONE;
-                }
-            }
-
-            public boolean isBorderDotted() {
-                switch (borderType) {
-                    case DOTTED_RECT:
-                    case DOTTED_ROUNDED_RECT:
-                    case DOTTED_RING:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            public boolean isBorderRounded() {
-                switch (borderType) {
-                    case ROUNDED_RECT:
-                    case DOTTED_ROUNDED_RECT:
-                    case DASHED_ROUNDED_RECT:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            public boolean isBorderRing() {
-                switch (borderType) {
-                    case RING:
-                    case DOTTED_RING:
-                    case DASHED_RING:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-
-            public int getDataColor() {
-                return dataColor;
-            }
-
-            public void setDataColor(int dataColor) {
-                this.dataColor = dataColor;
-            }
-
-            public int getBorderColor() {
-                return borderColor;
-            }
-
-            public void setBorderColor(int borderColor) {
-                this.borderColor = borderColor;
-            }
-
-            public int getBackgroundColor() {
-                return backgroundColor;
-            }
-
-            public void setBackgroundColor(int backgroundColor) {
-                this.backgroundColor = backgroundColor;
-            }
-
-            public BorderType getBorderType() {
-                return borderType;
-            }
-
-            public void setBorderType(BorderType borderType) {
-                this.borderType = borderType;
-            }
-
-            public int getFontSize() {
-                return fontSize;
-            }
-
-            public void setFontSize(int fontSize) {
-                this.fontSize = fontSize;
-            }
-
-            @NonNull
-            @Override
-            public String toString() {
-                return "\nData color: " + StringUtils.formatColorStr(dataColor)
-                        + "\nBackground color: " + StringUtils.formatColorStr((backgroundColor))
-                        + "\nBorder type: " + (borderType == null ? "null" : borderType.name())
-                        + "\nBorder color: " + StringUtils.formatColorStr(borderColor)
-                        + "\nFont size: " + fontSize;
-            }
-        }
     }
+
 }

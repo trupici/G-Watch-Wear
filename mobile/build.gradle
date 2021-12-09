@@ -6,14 +6,6 @@ def buildProperties = new Properties()
 buildProperties.load(new FileInputStream(rootProject.file("local.properties")))
 
 android {
-    signingConfigs {
-        release {
-            keyAlias buildProperties['signKeyAlias']
-            keyPassword buildProperties['signKeyPassword']
-            storeFile file(buildProperties['signStorePath'])
-            storePassword buildProperties['signStorePassword']
-        }
-    }
 
     compileSdk 30
 
@@ -31,7 +23,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
     lintOptions {

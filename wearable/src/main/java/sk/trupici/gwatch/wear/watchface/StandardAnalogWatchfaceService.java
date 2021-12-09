@@ -439,7 +439,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.BACKGROUND,
                             sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_BACKGROUND_IDX, AnalogWatchfaceConfig.DEF_BACKGROUND_IDX)
                     ).getResourceId());
-            ambientBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.analog_bkg_ambient);
         }
 
         private void initializeHands() {

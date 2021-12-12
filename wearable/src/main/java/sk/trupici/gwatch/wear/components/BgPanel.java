@@ -35,11 +35,11 @@ import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
+import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_PREFIX;
 import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DOT_LEN;
 import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_GAP_LEN;
@@ -56,18 +56,30 @@ public class BgPanel implements ComponentPanel {
 
     public interface BgValueCallback extends BiConsumer<Integer, Long> { }
 
-    public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "is_unit_conversion";
-    public static final String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "sample_period";
+    public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
+    public static final String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
+
+    public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
+    public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
+    public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_warn";
+    public static final String PREF_IN_RANGE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_in_range";
+    public static final String PREF_NO_DATA_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_no_data";
+
+    public static final String PREF_HYPER_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hyper";
+    public static final String PREF_HIGH_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_high";
+    public static final String PREF_LOW_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_low";
+    public static final String PREF_HYPO_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hypo";
+    public static final String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_no_data";
+
+    public static final String PREF_BORDER_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_color";
+    public static final String PREF_BORDER_TYPE = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_type";
 
     // TODO more sets are available in standard unicode font
     private static final char[] TREND_SET_1 = {' ', '⇈', '↑', '↗', '→', '↘', '↓', '⇊'}; // standard arrows
     private static final char[] TREND_SET_2 = {' ', '⮅', '⭡', '⭧', '⭢', '⭨', '⭣', '⮇'}; // triangle arrows (unknown chars on watch)
 
-    private static final boolean DEF_IS_UNIT_CONVERSION_VALUE = false; // mg/dl
-    // 5 minutes is common interval to update bg value in the most of CGM apps
-    private static final int DEF_SAMPLE_PERIOD_MIN = 5;
-
     private RectF sizeFactors;
+    private float topOffset;
 
     private Rect bounds;
     private TextPaint paint;
@@ -77,15 +89,28 @@ public class BgPanel implements ComponentPanel {
     private int bgValue = 0;
     private long bgTimestamp = 0;
 
-    boolean isUnitConversion = DEF_IS_UNIT_CONVERSION_VALUE;
-    int samplePeriod = DEF_SAMPLE_PERIOD_MIN;
-
-    private ComponentsConfig bottomComplSettings;
+    boolean isUnitConversion;
+    int samplePeriod;
 
     private BgValueCallback callback;
 
     final private int refScreenWidth;
     final private int refScreenHeight;
+
+    private int backgroundColor;
+    private int criticalColor;
+    private int warnColor;
+    private int inRangeColor;
+    private int noDataColor;
+
+    private int hyperThreshold;
+    private int highThreshold;
+    private int lowThreshold;
+    private int hypoThreshold;
+    private int noDataThreshold;
+
+    private int borderColor;
+    private BorderType borderType;
 
     public BgPanel(int screenWidth, int screenHeight) {
         this.refScreenWidth = screenWidth;
@@ -95,11 +120,12 @@ public class BgPanel implements ComponentPanel {
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
         sizeFactors = new RectF(
-                context.getResources().getDimension(R.dimen.layout_bottom_compl_left) / (float)refScreenWidth,
-                context.getResources().getDimension(R.dimen.layout_bottom_compl_top) / (float)refScreenHeight,
-                context.getResources().getDimension(R.dimen.layout_bottom_compl_right) / (float)refScreenWidth,
-                context.getResources().getDimension(R.dimen.layout_bottom_compl_bottom) / (float)refScreenHeight
+                context.getResources().getDimension(R.dimen.layout_bg_pnel_left) / (float)refScreenWidth,
+                context.getResources().getDimension(R.dimen.layout_bg_panel_top) / (float)refScreenHeight,
+                context.getResources().getDimension(R.dimen.layout_bg_panel_right) / (float)refScreenWidth,
+                context.getResources().getDimension(R.dimen.layout_bg_panel_bottom) / (float)refScreenHeight
         );
+        topOffset = context.getResources().getDimension(R.dimen.layout_bg_panel_top_offset);
         Log.w(CommonConstants.LOG_TAG, "Rect: " + sizeFactors);
 
         paint = new TextPaint();
@@ -118,11 +144,27 @@ public class BgPanel implements ComponentPanel {
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-        bottomComplSettings = new ComponentsConfig();
-        bottomComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.BOTTOM_PREFIX);
 
-        isUnitConversion = sharedPrefs.getBoolean(PREF_IS_UNIT_CONVERSION, DEF_IS_UNIT_CONVERSION_VALUE);
-        samplePeriod = sharedPrefs.getInt(PREF_SAMPLE_PERIOD_MIN, DEF_SAMPLE_PERIOD_MIN);
+        isUnitConversion = sharedPrefs.getBoolean(PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
+        samplePeriod = sharedPrefs.getInt(PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
+
+        // thresholds
+        hyperThreshold = sharedPrefs.getInt(PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+        highThreshold = sharedPrefs.getInt(PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
+        lowThreshold = sharedPrefs.getInt(PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
+        hypoThreshold = sharedPrefs.getInt(PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
+        noDataThreshold = sharedPrefs.getInt(PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
+
+        // colors
+        backgroundColor = sharedPrefs.getInt(PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));
+        criticalColor = sharedPrefs.getInt(PREF_CRITICAL_COLOR, context.getColor(R.color.def_bg_critical));
+        warnColor = sharedPrefs.getInt(PREF_WARN_COLOR, context.getColor(R.color.def_bg_warn));
+        inRangeColor = sharedPrefs.getInt(PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range));
+        noDataColor = sharedPrefs.getInt(PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
+
+        // border
+        borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, Color.TRANSPARENT);
+        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, null));
     }
 
     @Override
@@ -134,12 +176,12 @@ public class BgPanel implements ComponentPanel {
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
         if (isAmbientMode) {
             // draw background
-            paint.setColor(bottomComplSettings.getBackgroundColor());
+            paint.setColor(backgroundColor);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            if (bottomComplSettings.isBorderRounded()) {
+            if (BorderUtils.isBorderRounded(borderType)) {
                 canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
                         BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-            } else if (bottomComplSettings.isBorderRing()) {
+            } else if (BorderUtils.isBorderRing(borderType)) {
                 canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
                         BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
             } else {
@@ -147,21 +189,21 @@ public class BgPanel implements ComponentPanel {
             }
 
             // draw border
-            if (bottomComplSettings.getBorderType() != BorderType.NONE) {
-                paint.setColor(bottomComplSettings.getBorderColor());
+            if (borderType != BorderType.NONE) {
+                paint.setColor(borderColor);
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(BORDER_WIDTH);
-                if (bottomComplSettings.getBorderDrawableStyle() == ComplicationDrawable.BORDER_STYLE_DASHED) {
-                    if (bottomComplSettings.isBorderDotted()) {
+                if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
+                    if (BorderUtils.isBorderDotted(borderType)) {
                         paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
                     } else {
                         paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
                     }
                 }
-                if (bottomComplSettings.isBorderRounded()) {
+                if (BorderUtils.isBorderRounded(borderType)) {
                     canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
                             BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-                } else if (bottomComplSettings.isBorderRing()) {
+                } else if (BorderUtils.isBorderRing(borderType)) {
                     canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
                             BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
                 } else {
@@ -174,24 +216,89 @@ public class BgPanel implements ComponentPanel {
 
         // line 1
         float x = bounds.left + bounds.width() / 2f; // text will be centered around
+        float top = bounds.top + topOffset;
+        float height = bounds.height() - topOffset;
+        long bgTimeDiff = System.currentTimeMillis() / 60000 - bgTimestamp;
         if (isAmbientMode) {
             paint.setColor(Color.LTGRAY);
-            paint.setAntiAlias(!isAmbientMode);
+//            paint.setAntiAlias(false);
         } else {
-            paint.setColor(bottomComplSettings.getDataColor());
-            paint.setAntiAlias(!isAmbientMode);
+            paint.setColor(getRangedColor(bgValue, bgTimeDiff));
+//            paint.setAntiAlias(true);
         }
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(bounds.height() / 2f);
+        paint.setTextSize(height / 2f);
         paint.setFakeBoldText(true);
+        canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
+                x, top + height / 2f, paint);
 
         // line 2
-        canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
-                x, bounds.top + bounds.height() / 2f, paint);
-        paint.setTextSize(bounds.height() / 3f);
+        paint.setTextSize(height / 3f);
         paint.setFakeBoldText(false);
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
-                x, bounds.bottom - bounds.height() / 10f, paint);
+                x, bounds.bottom - height / 10f, paint);
+
+
+        // range indicator - EXPERIMENTAL
+        if (!isAmbientMode) {
+            Log.d(LOG_TAG, "onDraw: " + bounds);
+            Paint indicatorPaint = new Paint();
+            int padding = 10;
+            height = (bounds.height() - padding) / 3f - padding;
+            RectF indicatorBounds = new RectF();
+            indicatorBounds.left = bounds.left + 7;
+            indicatorBounds.right = indicatorBounds.left + 10;
+            indicatorBounds.bottom = bounds.bottom - padding;
+            indicatorBounds.top = indicatorBounds.bottom - height;
+            boolean isCritical = isBgCritical(bgValue);
+            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isCritical ? criticalColor : criticalColor & 0x60FFFFFF);
+            indicatorBounds.bottom = indicatorBounds.top - padding;
+            indicatorBounds.top = indicatorBounds.bottom - height;
+            boolean isInRange = !isCritical && isBgInRange(bgValue);
+            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isInRange ? inRangeColor : inRangeColor & 0x60FFFFFF);
+            indicatorBounds.top = bounds.top + padding;
+            indicatorBounds.bottom = indicatorBounds.top + height;
+            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, !isInRange && !isCritical ? warnColor : warnColor & 0x60FFFFFF);
+        }
+    }
+
+    private void paintIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
+        Log.d(LOG_TAG, "paintIndicatorBar: " + bounds);
+        paint.reset();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(1f);
+        canvas.drawRoundRect(bounds, 10f, 10f, paint);
+        paint.reset();
+        paint.setAntiAlias(true);
+        paint.setColor(fillColor);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRoundRect(bounds, 10f, 10f, paint);
+    }
+
+    private boolean isBgCritical(int bgValue) {
+        return bgValue >= hyperThreshold || bgValue <= hypoThreshold;
+    }
+
+    private boolean isBgInRange(int bgValue) {
+        return lowThreshold < bgValue && bgValue < highThreshold;
+    }
+
+    private int getRangedColor(int bgValue, long bgTimeDiff) {
+        if (bgValue == 0) {
+            return Color.WHITE;
+        }
+        if (bgValue > 0 && bgTimeDiff > noDataThreshold) {
+            return noDataColor;
+        }
+        if (bgValue <= lowThreshold) {
+            return bgValue <= hypoThreshold ? criticalColor : warnColor;
+        } else if (bgValue >= highThreshold) {
+            return bgValue >= hyperThreshold ? criticalColor : warnColor;
+        } else {
+            return inRangeColor;
+        }
     }
 
     public void onDataUpdate(Context context, byte[] bgData) {

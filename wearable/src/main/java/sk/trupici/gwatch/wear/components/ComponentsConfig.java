@@ -18,10 +18,10 @@ package sk.trupici.gwatch.wear.components;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.wearable.complications.rendering.ComplicationDrawable;
 
 import androidx.annotation.NonNull;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
+import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
@@ -58,54 +58,19 @@ public class ComponentsConfig {
     }
 
     public int getBorderDrawableStyle() {
-        switch (borderType) {
-            case RECT:
-            case ROUNDED_RECT:
-            case RING:
-                return ComplicationDrawable.BORDER_STYLE_SOLID;
-            case DASHED_RECT:
-            case DASHED_ROUNDED_RECT:
-            case DASHED_RING:
-            case DOTTED_RECT:
-            case DOTTED_ROUNDED_RECT:
-            case DOTTED_RING:
-                return ComplicationDrawable.BORDER_STYLE_DASHED;
-            default:
-                return ComplicationDrawable.BORDER_STYLE_NONE;
-        }
+        return BorderUtils.getBorderDrawableStyle(borderType);
     }
 
     public boolean isBorderDotted() {
-        switch (borderType) {
-            case DOTTED_RECT:
-            case DOTTED_ROUNDED_RECT:
-            case DOTTED_RING:
-                return true;
-            default:
-                return false;
-        }
+        return BorderUtils.isBorderDotted(borderType);
     }
 
     public boolean isBorderRounded() {
-        switch (borderType) {
-            case ROUNDED_RECT:
-            case DOTTED_ROUNDED_RECT:
-            case DASHED_ROUNDED_RECT:
-                return true;
-            default:
-                return false;
-        }
+        return BorderUtils.isBorderRounded(borderType);
     }
 
     public boolean isBorderRing() {
-        switch (borderType) {
-            case RING:
-            case DOTTED_RING:
-            case DASHED_RING:
-                return true;
-            default:
-                return false;
-        }
+        return BorderUtils.isBorderRing(borderType);
     }
 
     public int getDataColor() {

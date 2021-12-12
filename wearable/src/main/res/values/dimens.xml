@@ -67,9 +67,4 @@
     <dimen name="layout_center_compl_right">252px</dimen>
     <dimen name="layout_center_compl_bottom">298px</dimen>
 
-    <dimen name="layout_bottom_compl_left">205px</dimen>
-    <dimen name="layout_bottom_compl_top">345px</dimen>
-    <dimen name="layout_bottom_compl_right">245px</dimen>
-    <dimen name="layout_bottom_compl_bottom">405px</dimen>
-
 </resources>

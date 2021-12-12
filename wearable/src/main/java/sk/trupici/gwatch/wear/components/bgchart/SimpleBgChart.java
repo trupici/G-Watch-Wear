@@ -90,7 +90,7 @@ public class SimpleBgChart {
 
     private int backgroundColor;
     private int criticalColor;
-    private int warColor;
+    private int warnColor;
     private int inRangeColor;
 
     private int vertLineColor;
@@ -166,7 +166,7 @@ public class SimpleBgChart {
         // colors
         backgroundColor = prefs.getInt("graph_color_warn", Color.TRANSPARENT);
         criticalColor = prefs.getInt("graph_color_critical", Color.RED/*ContextCompat.getColor(context, R.color.def_red)*/);
-        warColor = prefs.getInt("graph_color_warn", Color.YELLOW/*ContextCompat.getColor(context, R.color.def_orange)*/);
+        warnColor = prefs.getInt("graph_color_warn", Color.YELLOW/*ContextCompat.getColor(context, R.color.def_orange)*/);
         inRangeColor = prefs.getInt("graph_color_in_range", Color.WHITE/*ContextCompat.getColor(context, R.color.def_green)*/);
 
         // lines
@@ -295,9 +295,9 @@ public class SimpleBgChart {
 
 //        int width = this.width - leftPadding - rightPadding;
 //        int height = this.height - topPadding - bottomPadding;
-        if (BuildConfig.DEBUG) {
+//        if (BuildConfig.DEBUG) {
 //            Log.d(LOG_TAG, "Paint size: " + width + " x " + height);
-        }
+//        }
 
         float padding = DEF_DOT_PADDING; // FIXME horizontal scale
         int count = (int)(width / (2*DOT_RADIUS + padding));
@@ -388,11 +388,11 @@ public class SimpleBgChart {
             if (value <= hypoThreshold) {
                 color = criticalColor;
             } else if (value <= lowThreshold) {
-                color = warColor;
+                color = warnColor;
             } else if (value < highThreshold) {
                 color = inRangeColor;
             } else if (value < hyperThreshold) {
-                color = warColor;
+                color = warnColor;
             } else {
                 color = criticalColor;
             }

@@ -405,7 +405,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         }
 
         private void adjustSize(int width, int height) {
-            this.screenHeight = width;
+            this.screenWidth = width;
             this.screenHeight = height;
 
             Context context = getApplicationContext();

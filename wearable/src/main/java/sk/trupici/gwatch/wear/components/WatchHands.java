@@ -35,7 +35,6 @@ import sk.trupici.gwatch.wear.util.CommonConstants;
 public class WatchHands implements ComponentPanel {
     public static final String LOG_TAG = CommonConstants.LOG_TAG;
 
-
     // offsets for watch hands shadows - currently we use the same value for X and Y
     private static final float HOUR_HAND_SHADOW_OFFSET = 3;
     private static final float MINUTE_HAND_SHADOW_OFFSET = 5;

@@ -28,6 +28,7 @@ import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import sk.trupici.gwatch.wear.R;
@@ -54,7 +55,9 @@ public class BgPanel implements ComponentPanel {
 
     public static final String LOG_TAG = CommonConstants.LOG_TAG;
 
-    public interface BgValueCallback extends BiConsumer<Integer, Long> { }
+    public interface BgValueCallback {
+        void accept(int bgValue, long bgTimestamp, SharedPreferences sharedPrefs);
+    }
 
     public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
     public static final String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
@@ -301,7 +304,7 @@ public class BgPanel implements ComponentPanel {
         }
     }
 
-    public void onDataUpdate(Context context, byte[] bgData) {
+    public void onDataUpdate(byte[] bgData, Context context, SharedPreferences sharedPrefs) {
         Log.d(CommonConstants.LOG_TAG, DumpUtils.dumpData(bgData, bgData.length));
 
         GlucosePacket glucosePacket = GlucosePacket.of(bgData);
@@ -333,7 +336,7 @@ public class BgPanel implements ComponentPanel {
             bgTimestamp = glucosePacket.getTimestamp();
 
             if (callback != null) {
-                callback.accept(bgValue, bgTimestamp);
+                callback.accept(bgValue, bgTimestamp, sharedPrefs);
             }
         }
     }

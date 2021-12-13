@@ -16,42 +16,64 @@
 
 package sk.trupici.gwatch.wear.components.bgchart;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.RectF;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import sk.trupici.gwatch.wear.BuildConfig;
+import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.components.BgPanel;
+import sk.trupici.gwatch.wear.components.ComponentPanel;
+import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
-public class SimpleBgChart {
+public class SimpleBgChart implements ComponentPanel {
     final private static String LOG_TAG = DumpUtils.class.getSimpleName();
+
+    public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_background";
+    public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical";
+    public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_warn";
+    public static final String PREF_IN_RANGE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_in_range";
+
+    public static final String PREF_VERT_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_vert_line";
+    public static final String PREF_LOW_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_low_line";
+    public static final String PREF_HIGH_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_high_line";
+    public static final String PREF_CRITICAL_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical_line";
+
+    public static final String PREF_ENABLE_VERT_LINES = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_vert_lines";
+    public static final String PREF_ENABLE_CRITICAL_LINES = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_critical_lines";
+    public static final String PREF_ENABLE_HIGH_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_high_line";
+    public static final String PREF_ENABLE_LOW_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_low_line";
+
+    public static final String PREF_ENABLE_DYNAMIC_RANGE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_dynamic_range";
+
+    public static final String PREF_TYPE_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_type_draw_line";
+    public static final String PREF_TYPE_DOTS = AnalogWatchfaceConfig.PREF_PREFIX + "graph_type_draw_dots";
+
+    private static final String PREF_DATA = AnalogWatchfaceConfig.PREF_PREFIX + "graph_data";
+    private static final String PREF_DATA_LAST_UPD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "graph_last_upd";
+
+    private static final String PREF_REFRESH_RATE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_refresh_rate";
+
 
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
     private static final float GRAPH_VALUE_INT = (GRAPH_MAX_VALUE-GRAPH_MIN_VALUE + 1);
 
-    private static final int MIN_GRAPH_WIDTH_DP = 110;
-    private static final int MIN_GRAPH_HEIGHT_DP = 40;
-
-    private static final int GRAPH_LEFT_PADDING = 1;
-    private static final int GRAPH_RIGHT_PADDING = 1;
-    private static final int GRAPH_TOP_PADDING = 1;
-    private static final int GRAPH_BOTTOM_PADDING = 1;
-
     private static final int MINUTE_IN_MS = 60000; // 60 * 1000
-    private static final int DAY_IN_MINUTES = 1440; // 24 * 60
     private static final int HOUR_IN_MINUTES = 60;
-
 
     private static final float DOT_RADIUS = 2f;
     private static final float DEF_DOT_PADDING = 1.5f;
@@ -60,29 +82,25 @@ public class SimpleBgChart {
 
     private static final int GRAPH_DYN_PADDING = 7;
 
-
     private static final int GRAPH_DATA_LEN = 48;
-
-    private static final int DEF_REFRESH_RATE_MIN = 5;
-    private static final int HIGH_REFRESH_RATE_MIN = 1;
-
-    private static final String GRAPH_PREF_DATA_NAME = "pref_graph_data";
-    private static final String GRAPH_PREF_DATA_LAST_UPD_MIN = "pref_graph_last_upd";
 
 
     private int[] graphData = new int[GRAPH_DATA_LEN];
     private long lastGraphUpdateMin = 0;
-    private int refreshRateMin = DEF_REFRESH_RATE_MIN;
+    private int refreshRateMin;
+
+    private int minValue = 0;
+    private int maxValue = 0;
 
     private int width;
     private int height;
 
     private Point position;
 
-    private int leftPadding = GRAPH_LEFT_PADDING;
-    private int rightPadding = GRAPH_RIGHT_PADDING;
-    private int topPadding = GRAPH_TOP_PADDING;
-    private int bottomPadding = GRAPH_BOTTOM_PADDING;
+    private int leftPadding;
+    private int rightPadding;
+    private int topPadding;
+    private int bottomPadding;
 
     private Bitmap chartBitmap;
     private Paint chartPaint;
@@ -103,9 +121,6 @@ public class SimpleBgChart {
     private int highThreshold;
     private int hyperThreshold;
 
-    private int minValue = 0;
-    private int maxValue = 0;
-
     private boolean enableDynamicRange;
     private boolean enableVertLines;
     private boolean enableCriticalLines;
@@ -115,12 +130,42 @@ public class SimpleBgChart {
     private boolean drawChartLine;
     private boolean drawChartDots;
 
-    private SharedPreferences prefs;
+    private RectF sizeFactors;
 
-    public SimpleBgChart(int left, int top, int width, int height, SharedPreferences prefs) {
-        this.prefs = prefs;
+    final private int refScreenWidth;
+    final private int refScreenHeight;
 
-        layout(left, top, width, height);
+    public SimpleBgChart(int screenWidth, int screenHeight) {
+        this.refScreenWidth = screenWidth;
+        this.refScreenHeight = screenHeight;
+    }
+
+    @Override
+    public void onCreate(Context context, SharedPreferences sharedPrefs) {
+
+        float left = context.getResources().getDimension(R.dimen.layout_graph_panel_left);
+        float top = context.getResources().getDimension(R.dimen.layout_graph_panel_top);
+        float right = context.getResources().getDimension(R.dimen.layout_graph_panel_right);
+        float bottom = context.getResources().getDimension(R.dimen.layout_graph_panel_bottom);
+
+        position = new Point((int)left, (int)top);
+
+        width = (int) (right - left + 1);
+        height = (int) (bottom - top + 1);
+
+        sizeFactors = new RectF(
+                left / refScreenWidth,
+                top / refScreenHeight,
+                right / refScreenWidth,
+                bottom / refScreenHeight
+        );
+
+        chartBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        leftPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_left_padding);
+        topPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_top_padding);
+        rightPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_right_padding);
+        bottomPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_bottom_padding);
 
         chartPaint = new Paint();
         chartPaint.setStyle(Paint.Style.FILL);
@@ -133,82 +178,76 @@ public class SimpleBgChart {
         chartPaint.setAntiAlias(false);
         ambientPaint.setColorFilter(filter);
 
-        updateConfig();
+        onConfigChanged(context, sharedPrefs);
 
-        restoreChartData();
+        restoreChartData(sharedPrefs);
     }
 
-    public void layout(int left, int top, int width, int height) {
-        setPosition(left, top);
-        setSize(width, height);
+    @Override
+    public void onSizeChanged(Context context, int width, int height) {
+        this.width = width;
+        this.height = height;
+
+        position = new Point((int)(sizeFactors.left * width), (int)(sizeFactors.top * height));
 
         chartBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     }
 
-    public void setSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public void setPosition(int left, int top) {
-        this.position = new Point(left, top);
-    }
-
-    public void setPadding(int left, int top, int right, int bottom) {
-        this.leftPadding = left;
-        this.topPadding = top;
-        this.rightPadding = right;
-        this.bottomPadding = bottom;
-    }
-
-    public void updateConfig() {
+    @Override
+    public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
         // colors
-        backgroundColor = prefs.getInt("graph_color_warn", Color.TRANSPARENT);
-        criticalColor = prefs.getInt("graph_color_critical", Color.RED/*ContextCompat.getColor(context, R.color.def_red)*/);
-        warnColor = prefs.getInt("graph_color_warn", Color.YELLOW/*ContextCompat.getColor(context, R.color.def_orange)*/);
-        inRangeColor = prefs.getInt("graph_color_in_range", Color.WHITE/*ContextCompat.getColor(context, R.color.def_green)*/);
+        backgroundColor = sharedPrefs.getInt(PREF_BKG_COLOR, context.getColor(R.color.def_graph_color_background));
+        criticalColor = sharedPrefs.getInt(PREF_CRITICAL_COLOR, context.getColor(R.color.def_graph_color_critical));
+        warnColor = sharedPrefs.getInt(PREF_WARN_COLOR, context.getColor(R.color.def_graph_color_warn));
+        inRangeColor = sharedPrefs.getInt(PREF_IN_RANGE_COLOR, context.getColor(R.color.def_graph_color_in_range));
 
         // lines
-        vertLineColor = prefs.getInt("graph_color_vert_line", Color.TRANSPARENT);
-        lowLineColor = prefs.getInt("graph_color_low_line", Color.RED);
-        highLineColor = prefs.getInt("graph_color_high_line", Color.YELLOW);
-        criticalLineColor = prefs.getInt("graph_color_critical_line", Color.RED);
+        vertLineColor = sharedPrefs.getInt(PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));
+        lowLineColor = sharedPrefs.getInt(PREF_LOW_LINE_COLOR, context.getColor(R.color.def_graph_color_low_line));
+        highLineColor = sharedPrefs.getInt(PREF_HIGH_LINE_COLOR, context.getColor(R.color.def_graph_color_high_line));
+        criticalLineColor = sharedPrefs.getInt(PREF_CRITICAL_LINE_COLOR, context.getColor(R.color.def_graph_color_critical_line));
 
-        enableVertLines = prefs.getBoolean("graph_enable_vert_lines", true);
-        enableCriticalLines = prefs.getBoolean("graph_enable_vert_lines", true);
-        enableHighLine = prefs.getBoolean("graph_enable_high_line", true);
-        enableLowLine = prefs.getBoolean("graph_enable_low_line", true);
+        enableVertLines = sharedPrefs.getBoolean(PREF_ENABLE_VERT_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_vert_lines));
+        enableCriticalLines = sharedPrefs.getBoolean(PREF_ENABLE_CRITICAL_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_critical_lines));
+        enableHighLine = sharedPrefs.getBoolean(PREF_ENABLE_HIGH_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_high_line));
+        enableLowLine = sharedPrefs.getBoolean(PREF_ENABLE_LOW_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_low_line));
 
-        // levels
-        hypoThreshold = PreferenceUtils.getStringValueAsInt(prefs, "cfg_glucose_level_hypo", 70);
-        lowThreshold = PreferenceUtils.getStringValueAsInt(prefs, "cfg_glucose_level_low", 80);
-        highThreshold = PreferenceUtils.getStringValueAsInt(prefs, "cfg_glucose_level_high", 170);
-        hyperThreshold = PreferenceUtils.getStringValueAsInt(prefs, "cfg_glucose_level_hyper", 270);
+        enableDynamicRange = sharedPrefs.getBoolean(PREF_ENABLE_DYNAMIC_RANGE, context.getResources().getBoolean(R.bool.def_graph_enable_dynamic_range));
 
-        enableDynamicRange = prefs.getBoolean("graph_enable_dynamic_range", true);
+        drawChartLine = sharedPrefs.getBoolean(PREF_TYPE_LINE, context.getResources().getBoolean(R.bool.def_graph_type_draw_line));
+        drawChartDots = sharedPrefs.getBoolean(PREF_TYPE_DOTS, context.getResources().getBoolean(R.bool.def_graph_type_draw_dots));
 
-        drawChartLine = prefs.getBoolean("graph_type_draw_line", false);
-        drawChartDots = prefs.getBoolean("graph_type_draw_dots", true);
+        refreshRateMin = sharedPrefs.getInt(PREF_REFRESH_RATE, context.getResources().getInteger(R.integer.def_graph_refresh_rate));
+
+        // levels - external BG panel settings dependency !
+        hypoThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
+        lowThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
+        highThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
+        hyperThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
     }
 
-    public void draw(Canvas canvas, boolean ambientMode) {
-        if (ambientMode) {
+    @Override
+    public void onPropertiesChanged(Context context, Bundle properties) {
+    }
+
+    @Override
+    public void onDraw(Canvas canvas, boolean isAmbientMode) {
+        if (isAmbientMode) {
             canvas.drawBitmap(chartBitmap, position.x, position.y, ambientPaint);
         } else {
-            long currentMinute = System.currentTimeMillis() / MINUTE_IN_MS;
-            if (lastGraphUpdateMin != currentMinute) {
-                refresh();
-            }
             canvas.drawBitmap(chartBitmap, position.x, position.y, chartPaint);
         }
     }
 
-    public void refresh() {
-        updateGraphData(null, System.currentTimeMillis());
+    public void refresh(long timeMs, SharedPreferences sharedPrefs) {
+        long currentMinute = timeMs / MINUTE_IN_MS;
+        if (lastGraphUpdateMin != currentMinute) {
+            updateGraphData(null, timeMs, sharedPrefs);
+        }
     }
 
-    public void updateGraphData(Double bgValue, long timestamp) {
+    public void updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs) {
         if (BuildConfig.DEBUG && bgValue != null) {
             Log.d(LOG_TAG, "updateGraphData: " + bgValue);
         }
@@ -257,7 +296,7 @@ public class SimpleBgChart {
         drawChart();
 
         if (dataChanged) {
-            storeChartData();
+            storeChartData(sharedPrefs);
         }
     }
 
@@ -285,19 +324,23 @@ public class SimpleBgChart {
     }
 
     private void drawChart() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "Bitmap size: " + chartBitmap.getWidth() + " x " + chartBitmap.getHeight());
+            Log.d(LOG_TAG, "Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
+        }
 
         chartBitmap.eraseColor(backgroundColor);
         chartPaint.reset();
         chartPaint.setStyle(Paint.Style.FILL);
-        chartPaint.setAntiAlias(true);
+//        chartPaint.setAntiAlias(true);
 
         Canvas canvas = new Canvas(chartBitmap);
 
-//        int width = this.width - leftPadding - rightPadding;
-//        int height = this.height - topPadding - bottomPadding;
-//        if (BuildConfig.DEBUG) {
-//            Log.d(LOG_TAG, "Paint size: " + width + " x " + height);
-//        }
+        int width = this.width - leftPadding - rightPadding;
+        int height = this.height - topPadding - bottomPadding;
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "Paint size: " + width + " x " + height);
+        }
 
         float padding = DEF_DOT_PADDING; // FIXME horizontal scale
         int count = (int)(width / (2*DOT_RADIUS + padding));
@@ -307,13 +350,9 @@ public class SimpleBgChart {
         }
         float graphPaddingX = (width - count * (2*DOT_RADIUS + padding))/2.0f;
 
-        if (BuildConfig.DEBUG) {
-//            Log.d(LOG_TAG, "count: " + count + ", r: " + DOT_RADIUS + ", pad: " + padding);
-        }
-
         float x, y;
-        float xOffset = GRAPH_LEFT_PADDING + graphPaddingX + padding / 2 + DOT_RADIUS;
-        float yOffset = GRAPH_TOP_PADDING + height;
+        float xOffset = leftPadding + graphPaddingX + padding / 2 + DOT_RADIUS;
+        float yOffset = topPadding + height;
 
         GraphRange graphRange = enableDynamicRange ? getDynamicRange()
                 : new GraphRange(GRAPH_MIN_VALUE, GRAPH_MAX_VALUE, height / GRAPH_VALUE_INT);
@@ -327,10 +366,10 @@ public class SimpleBgChart {
             chartPaint.setColor(vertLineColor);
             for (int mins = HOUR_IN_MINUTES;; mins += HOUR_IN_MINUTES) {
                 float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) refreshRateMin);
-                if (lx < GRAPH_LEFT_PADDING) {
+                if (lx < leftPadding) {
                     break;
                 }
-                canvas.drawLine(lx, GRAPH_TOP_PADDING, lx, height - GRAPH_BOTTOM_PADDING, chartPaint);
+                canvas.drawLine(lx, topPadding, lx, height - bottomPadding, chartPaint);
             }
         }
 
@@ -339,12 +378,12 @@ public class SimpleBgChart {
             chartPaint.setColor(criticalLineColor);
             if (graphRange.isInRange(hyperThreshold)) {
                 y = yOffset - (hyperThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(GRAPH_LEFT_PADDING, y, width - GRAPH_RIGHT_PADDING, y, chartPaint);
+                canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
             }
 
             if (graphRange.isInRange(hypoThreshold)) {
                 y = yOffset - (hypoThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(GRAPH_LEFT_PADDING, y, width - GRAPH_RIGHT_PADDING, y, chartPaint);
+                canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
             }
         }
 
@@ -352,14 +391,14 @@ public class SimpleBgChart {
         if (enableHighLine && graphRange.isInRange(highThreshold)) {
             chartPaint.setColor(highLineColor);
             y = yOffset - (highThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(GRAPH_LEFT_PADDING, y, width - GRAPH_RIGHT_PADDING, y, chartPaint);
+            canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
         }
 
         // draw low boundary line (horizontal)
         if (enableLowLine && graphRange.isInRange(lowThreshold)) {
             chartPaint.setColor(lowLineColor);
             y = yOffset - (lowThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(GRAPH_LEFT_PADDING, y, width - GRAPH_RIGHT_PADDING, y, chartPaint);
+            canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
         }
 
         // get offset of the left most value
@@ -456,28 +495,28 @@ public class SimpleBgChart {
     }
 
 
-    private void storeChartData() {
+    private void storeChartData(SharedPreferences sharedPrefs) {
         try {
             String serialized = Arrays.stream(graphData)
                     .mapToObj(Integer::toString)
                     .collect(Collectors.joining(":"));
 
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.putString(GRAPH_PREF_DATA_NAME, serialized);
-            edit.putInt(GRAPH_PREF_DATA_LAST_UPD_MIN, (int) lastGraphUpdateMin);
+            SharedPreferences.Editor edit = sharedPrefs.edit();
+            edit.putString(PREF_DATA, serialized);
+            edit.putInt(PREF_DATA_LAST_UPD_MIN, (int) lastGraphUpdateMin);
             edit.apply();
         } catch (Exception e) {
             Log.e(LOG_TAG, "storeChartData: failed to store data: " + e.getLocalizedMessage());
         }
     }
 
-    private void restoreChartData() {
-        lastGraphUpdateMin = prefs.getInt(GRAPH_PREF_DATA_LAST_UPD_MIN, 0);
+    private void restoreChartData(SharedPreferences sharedPrefs) {
+        lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, 0);
         if (lastGraphUpdateMin == 0) {
             return;
         }
 
-        String serialized = prefs.getString(GRAPH_PREF_DATA_NAME, null);
+        String serialized = sharedPrefs.getString(PREF_DATA, null);
         if (serialized == null) {
             lastGraphUpdateMin = 0;
             return;

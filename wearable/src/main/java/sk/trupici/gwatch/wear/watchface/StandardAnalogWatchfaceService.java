@@ -162,10 +162,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     Context.MODE_PRIVATE);
 
 
-            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            Display display = windowManager.getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
+//            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+//            Display display = windowManager.getDefaultDisplay();
+//            Point size = new Point();
+//            display.getSize(size);
 
             screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
             screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
@@ -181,20 +181,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             bgPanel = new BgPanel((int) screenWidth, (int) screenHeight);
             bgPanel.onCreate(context, sharedPrefs);
-            bgPanel.setBgValueCallback((bgValue, bgTimestamp) -> {
-                chart.updateGraphData((double) bgValue, bgTimestamp);
+
+            chart = new SimpleBgChart((int) screenWidth, (int) screenHeight);
+            chart.onCreate(context, sharedPrefs);
+
+            bgPanel.setBgValueCallback((bgValue, bgTimestamp, sharedPrefs) -> {
+                chart.updateGraphData((double) bgValue, bgTimestamp, sharedPrefs);
             });
-
-
-            /*
-                FIXME: consider to use dp values to avoid these calculations
-            */
-
-            int left = (int) (getResources().getDimension(R.dimen.layout_graph_left) * size.x / screenWidth);
-            int top = (int) (getResources().getDimension(R.dimen.layout_graph_top) * size.y / screenHeight);
-            int width = (int) (getResources().getDimension(R.dimen.layout_graph_right) * size.x / screenWidth);
-            int height = (int) (getResources().getDimension(R.dimen.layout_graph_bottom) * size.y / screenHeight);
-            chart = new SimpleBgChart(left, top, width, height, sharedPrefs);
 
             leftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.layout_left_compl_left) / screenWidth,
@@ -218,7 +211,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             messageClient.addListener(messageEvent -> {
                 byte[] bgData = messageEvent.getData();
                 Log.d(LOG_TAG, "onReceive: " + bgData.length);
-                bgPanel.onDataUpdate(getApplicationContext(), bgData);
+                bgPanel.onDataUpdate(bgData, getApplicationContext(), sharedPrefs);
             });
 
         }
@@ -479,8 +472,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             boolean isAmbientMode = isInAmbientMode();
 
+            chart.refresh(now, sharedPrefs);
+
             bkgPanel.onDraw(canvas, isAmbientMode);
-            chart.draw(canvas, isAmbientMode);
+            chart.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             bgPanel.onDraw(canvas, isAmbientMode);

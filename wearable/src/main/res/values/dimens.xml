@@ -47,11 +47,6 @@
     <dimen name="layout_ref_screen_width">450px</dimen>
     <dimen name="layout_ref_screen_height">450px</dimen>
 
-    <dimen name="layout_graph_left">100px</dimen>
-    <dimen name="layout_graph_top">85px</dimen>
-    <dimen name="layout_graph_right">250px</dimen>
-    <dimen name="layout_graph_bottom">110px</dimen>
-
     <dimen name="layout_left_compl_left">61px</dimen>
     <dimen name="layout_left_compl_top">219px</dimen>
     <dimen name="layout_left_compl_right">161px</dimen>

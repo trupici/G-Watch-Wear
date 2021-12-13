@@ -40,12 +40,12 @@ import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DASH_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_DOT_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_GAP_LEN;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_RING_RADIUS;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_ROUND_RECT_RADIUS;
-import static sk.trupici.gwatch.wear.config.complications.ComplicationAdapter.BORDER_WIDTH;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_GAP_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_RING_RADIUS;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
 /**
  * Component showing BG value and related info (trend, delta, etc...)
@@ -163,8 +163,8 @@ public class BgPanel implements ComponentPanel {
         noDataColor = sharedPrefs.getInt(PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
 
         // border
-        borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, Color.TRANSPARENT);
-        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, null));
+        borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
+        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
     }
 
     @Override
@@ -174,7 +174,7 @@ public class BgPanel implements ComponentPanel {
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
-        if (isAmbientMode) {
+        if (!isAmbientMode) {
             // draw background
             paint.setColor(backgroundColor);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);

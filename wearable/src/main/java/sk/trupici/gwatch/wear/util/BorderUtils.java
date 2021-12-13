@@ -22,6 +22,13 @@ import sk.trupici.gwatch.wear.config.complications.BorderType;
 
 public class BorderUtils {
 
+    final public static int BORDER_WIDTH = 2;
+    final public static float BORDER_DASH_LEN = 6f;
+    final public static float BORDER_GAP_LEN = 2f;
+    final public static float BORDER_DOT_LEN = BORDER_WIDTH;
+    final public static float BORDER_ROUND_RECT_RADIUS = 15f;
+    final public static float BORDER_RING_RADIUS = 100f;
+
     public static int getBorderDrawableStyle(BorderType borderType) {
         switch (borderType) {
             case RECT:

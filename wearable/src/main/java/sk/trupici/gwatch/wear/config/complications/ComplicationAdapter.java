@@ -53,15 +53,14 @@ import static android.app.Activity.RESULT_OK;
 import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.BORDER_TYPE_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.UPDATE_COLORS_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_GAP_LEN;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_RING_RADIUS;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
+import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
 public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements BackgroundChangeAware {
-
-    final public static int BORDER_WIDTH = 2;
-    final public static float BORDER_DASH_LEN = 6f;
-    final public static float BORDER_GAP_LEN = 2f;
-    final public static float BORDER_DOT_LEN = BORDER_WIDTH;
-    final public static float BORDER_ROUND_RECT_RADIUS = 15f;
-    final public static float BORDER_RING_RADIUS = 100f;
 
     final private static String LOG_TAG = ComplicationAdapter.class.getSimpleName();
     final private Context context;

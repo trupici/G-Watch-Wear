@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <color name="def_date_background_color">#00000000</color>
+    <color name="def_date_month_color">#FFFC0709</color>
+    <color name="def_date_day_of_week_color">#FFFC0709</color>
+    <color name="def_date_day_of_month_color">#FFFCFCFC</color>
+
+    <color name="def_date_border_color">#00000000</color>
+    <string name="def_date_border_type" translatable="false">NONE</string>
+
+    <bool name="def_date_show_month">false</bool>
+
+
+    <!--
+        FIXME:
+        consider to move to dpi specific folders
+        or recalculate to dpi values.
+        GW4 46mm 450x450 dp-to-pixel ratio = 2.125
+    -->
+
+    <dimen name="layout_date_panel_left">198px</dimen>
+    <dimen name="layout_date_panel_top">240px</dimen>
+    <dimen name="layout_date_panel_right">252px</dimen>
+    <dimen name="layout_date_panel_bottom">298px</dimen>
+
+</resources>

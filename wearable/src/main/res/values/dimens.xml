@@ -62,9 +62,4 @@
     <dimen name="layout_right_compl_right">389px</dimen>
     <dimen name="layout_right_compl_bottom">319px</dimen>
 
-    <dimen name="layout_center_compl_left">198px</dimen>
-    <dimen name="layout_center_compl_top">240px</dimen>
-    <dimen name="layout_center_compl_right">252px</dimen>
-    <dimen name="layout_center_compl_bottom">298px</dimen>
-
 </resources>

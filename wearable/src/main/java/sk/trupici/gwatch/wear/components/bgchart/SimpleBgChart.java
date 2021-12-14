@@ -97,7 +97,7 @@ public class SimpleBgChart implements ComponentPanel {
     private int bottomPadding;
 
     private Bitmap bitmap;
-    private Paint chartPaint;
+    private Paint paint;
     private Paint ambientPaint;
 
     private int backgroundColor;
@@ -156,9 +156,9 @@ public class SimpleBgChart implements ComponentPanel {
         rightPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_right_padding);
         bottomPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_bottom_padding);
 
-        chartPaint = new Paint();
-        chartPaint.setStyle(Paint.Style.FILL);
-        chartPaint.setAntiAlias(true);
+        paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
 
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0);
@@ -226,13 +226,14 @@ public class SimpleBgChart implements ComponentPanel {
         if (isAmbientMode) {
             canvas.drawBitmap(bitmap, bounds.left, bounds.top, ambientPaint);
         } else {
-            canvas.drawBitmap(bitmap, bounds.left, bounds.top, chartPaint);
+            canvas.drawBitmap(bitmap, bounds.left, bounds.top, paint);
         }
     }
 
     public void refresh(long timeMs, SharedPreferences sharedPrefs) {
         long currentMinute = timeMs / MINUTE_IN_MS;
         if (lastGraphUpdateMin != currentMinute) {
+            lastGraphUpdateMin = currentMinute;
             updateGraphData(null, timeMs, sharedPrefs);
         }
     }
@@ -324,9 +325,9 @@ public class SimpleBgChart implements ComponentPanel {
         }
 
         bitmap.eraseColor(backgroundColor);
-        chartPaint.reset();
-        chartPaint.setStyle(Paint.Style.FILL);
-//        chartPaint.setAntiAlias(true);
+        paint.reset();
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
 
         Canvas canvas = new Canvas(bitmap);
 
@@ -353,46 +354,46 @@ public class SimpleBgChart implements ComponentPanel {
 
 
         // draw lines
-        chartPaint.setStrokeWidth(1f);
+        paint.setStrokeWidth(1f);
 
         // draw hour interval (vertical) lines
         if (enableVertLines) {
-            chartPaint.setColor(vertLineColor);
+            paint.setColor(vertLineColor);
             for (int mins = HOUR_IN_MINUTES;; mins += HOUR_IN_MINUTES) {
                 float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) refreshRateMin);
                 if (lx < leftPadding) {
                     break;
                 }
-                canvas.drawLine(lx, topPadding, lx, height - bottomPadding, chartPaint);
+                canvas.drawLine(lx, topPadding, lx, height - bottomPadding, paint);
             }
         }
 
         // draw critical boundaries (horizontal) lines
         if (enableCriticalLines) {
-            chartPaint.setColor(criticalLineColor);
+            paint.setColor(criticalLineColor);
             if (graphRange.isInRange(hyperThreshold)) {
                 y = yOffset - (hyperThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
+                canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
             }
 
             if (graphRange.isInRange(hypoThreshold)) {
                 y = yOffset - (hypoThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
+                canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
             }
         }
 
         // draw high boundary line (horizontal)
         if (enableHighLine && graphRange.isInRange(highThreshold)) {
-            chartPaint.setColor(highLineColor);
+            paint.setColor(highLineColor);
             y = yOffset - (highThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
+            canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
         }
 
         // draw low boundary line (horizontal)
         if (enableLowLine && graphRange.isInRange(lowThreshold)) {
-            chartPaint.setColor(lowLineColor);
+            paint.setColor(lowLineColor);
             y = yOffset - (lowThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, width - rightPadding, y, chartPaint);
+            canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
         }
 
         // get offset of the left most value
@@ -430,20 +431,20 @@ public class SimpleBgChart implements ComponentPanel {
                 color = criticalColor;
             }
 
-            chartPaint.setColor(color);
+            paint.setColor(color);
 
             // draw value with color
             if (drawChartLine) { // line graph
-                chartPaint.setStrokeWidth(LINE_WIDTH);
+                paint.setStrokeWidth(LINE_WIDTH);
                 if (prevX == 0 || prevY == 0) {
-                    canvas.drawLine(x - LINE_WIDTH / 2f, y, x + LINE_WIDTH / 2f, y, chartPaint);
+                    canvas.drawLine(x - LINE_WIDTH / 2f, y, x + LINE_WIDTH / 2f, y, paint);
                 } else {
-                    canvas.drawLine(prevX, prevY, x, y, chartPaint);
+                    canvas.drawLine(prevX, prevY, x, y, paint);
                 }
             }
 
             if (drawChartDots) { // dot graph
-                canvas.drawCircle(x, y, DOT_RADIUS, chartPaint);
+                canvas.drawCircle(x, y, DOT_RADIUS, paint);
             }
 
             prevX = x;

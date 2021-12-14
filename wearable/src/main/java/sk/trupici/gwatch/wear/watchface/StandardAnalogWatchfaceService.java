@@ -496,9 +496,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
                 Context context = getApplicationContext();
                 bkgPanel.onConfigChanged(context, sharedPrefs);
-                watchHands.onConfigChanged(getApplicationContext(), sharedPrefs);
-                bgPanel.onConfigChanged(getApplicationContext(), sharedPrefs);
-                datePanel.onConfigChanged(getApplicationContext(), sharedPrefs);
+                watchHands.onConfigChanged(context, sharedPrefs);
+                bgPanel.onConfigChanged(context, sharedPrefs);
+                datePanel.onConfigChanged(context, sharedPrefs);
 
                 adjustSize((int)screenWidth, (int)screenHeight);
 

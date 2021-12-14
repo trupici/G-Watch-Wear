@@ -24,6 +24,7 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.util.Log;
@@ -92,17 +93,12 @@ public class SimpleBgChart implements ComponentPanel {
     private int minValue = 0;
     private int maxValue = 0;
 
-    private int width;
-    private int height;
-
-    private Point position;
-
     private int leftPadding;
     private int rightPadding;
     private int topPadding;
     private int bottomPadding;
 
-    private Bitmap chartBitmap;
+    private Bitmap bitmap;
     private Paint chartPaint;
     private Paint ambientPaint;
 
@@ -131,9 +127,11 @@ public class SimpleBgChart implements ComponentPanel {
     private boolean drawChartDots;
 
     private RectF sizeFactors;
+    private RectF bounds;
 
     final private int refScreenWidth;
     final private int refScreenHeight;
+
 
     public SimpleBgChart(int screenWidth, int screenHeight) {
         this.refScreenWidth = screenWidth;
@@ -148,11 +146,6 @@ public class SimpleBgChart implements ComponentPanel {
         float right = context.getResources().getDimension(R.dimen.layout_graph_panel_right);
         float bottom = context.getResources().getDimension(R.dimen.layout_graph_panel_bottom);
 
-        position = new Point((int)left, (int)top);
-
-        width = (int) (right - left + 1);
-        height = (int) (bottom - top + 1);
-
         sizeFactors = new RectF(
                 left / refScreenWidth,
                 top / refScreenHeight,
@@ -160,7 +153,8 @@ public class SimpleBgChart implements ComponentPanel {
                 bottom / refScreenHeight
         );
 
-        chartBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bounds = new RectF(left, top, right, bottom);
+        bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
 
         leftPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_left_padding);
         topPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_top_padding);
@@ -175,7 +169,7 @@ public class SimpleBgChart implements ComponentPanel {
         colorMatrix.setSaturation(0);
         ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
         ambientPaint = new Paint();
-        chartPaint.setAntiAlias(false);
+        ambientPaint.setAntiAlias(false);
         ambientPaint.setColorFilter(filter);
 
         onConfigChanged(context, sharedPrefs);
@@ -185,12 +179,13 @@ public class SimpleBgChart implements ComponentPanel {
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
-        this.width = width;
-        this.height = height;
+        bounds = new RectF(
+                width * sizeFactors.left,
+                height * sizeFactors.top,
+                width * sizeFactors.right,
+                height * sizeFactors.bottom);
 
-        position = new Point((int)(sizeFactors.left * width), (int)(sizeFactors.top * height));
-
-        chartBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
     }
 
     @Override
@@ -234,9 +229,9 @@ public class SimpleBgChart implements ComponentPanel {
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
         if (isAmbientMode) {
-            canvas.drawBitmap(chartBitmap, position.x, position.y, ambientPaint);
+            canvas.drawBitmap(bitmap, bounds.left, bounds.top, ambientPaint);
         } else {
-            canvas.drawBitmap(chartBitmap, position.x, position.y, chartPaint);
+            canvas.drawBitmap(bitmap, bounds.left, bounds.top, chartPaint);
         }
     }
 
@@ -325,19 +320,19 @@ public class SimpleBgChart implements ComponentPanel {
 
     private void drawChart() {
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Bitmap size: " + chartBitmap.getWidth() + " x " + chartBitmap.getHeight());
+            Log.d(LOG_TAG, "Bitmap size: " + bitmap.getWidth() + " x " + bitmap.getHeight());
             Log.d(LOG_TAG, "Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
         }
 
-        chartBitmap.eraseColor(backgroundColor);
+        bitmap.eraseColor(backgroundColor);
         chartPaint.reset();
         chartPaint.setStyle(Paint.Style.FILL);
 //        chartPaint.setAntiAlias(true);
 
-        Canvas canvas = new Canvas(chartBitmap);
+        Canvas canvas = new Canvas(bitmap);
 
-        int width = this.width - leftPadding - rightPadding;
-        int height = this.height - topPadding - bottomPadding;
+        int width = (int)bounds.width() - leftPadding - rightPadding;
+        int height = (int)bounds.height() - topPadding - bottomPadding;
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "Paint size: " + width + " x " + height);
         }
@@ -457,7 +452,6 @@ public class SimpleBgChart implements ComponentPanel {
         }
     }
 
-
     private GraphRange getDynamicRange() {
         float scale;
 
@@ -478,7 +472,7 @@ public class SimpleBgChart implements ComponentPanel {
         if (max < highThreshold) {
             max = highThreshold;
         } else {
-            scale = height / ((float) (max - min + 1));
+            scale = bounds.width() / ((float) (max - min + 1));
             max += GRAPH_DYN_PADDING / scale; // increase upper boundary if scaled
         }
         max += GRAPH_DYN_PADDING;
@@ -487,7 +481,7 @@ public class SimpleBgChart implements ComponentPanel {
         }
 
         // get dynamic horizontal scale
-        scale = height / ((float) (max - min + 1));
+        scale = bounds.height() / ((float) (max - min + 1));
         if (BuildConfig.DEBUG) {
 //          Log.d(LOG_TAG, "getDynamicRange: min=" + min + ", max=" + max + ", scale=" + scale);
         }

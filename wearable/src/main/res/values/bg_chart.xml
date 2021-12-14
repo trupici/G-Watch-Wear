@@ -45,9 +45,9 @@
     GW4 46mm 450x450 dp-to-pixel ratio = 2.125
 -->
 
-    <dimen name="layout_graph_panel_left">90px</dimen>
+    <dimen name="layout_graph_panel_left">91px</dimen>
     <dimen name="layout_graph_panel_top">85px</dimen>
-    <dimen name="layout_graph_panel_right">359px</dimen>
+    <dimen name="layout_graph_panel_right">360px</dimen>
     <dimen name="layout_graph_panel_bottom">195px</dimen>
 
     <dimen name="graph_left_padding">1px</dimen>

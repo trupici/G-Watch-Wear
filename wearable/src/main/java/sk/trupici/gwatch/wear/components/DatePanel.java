@@ -20,16 +20,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.WatchFaceService;
 import android.text.TextPaint;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,6 +41,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
@@ -66,8 +70,6 @@ public class DatePanel implements ComponentPanel {
 
     private boolean showMonth;
 
-    final private int ambientColor = Color.LTGRAY;
-
     private int backgroundColor;
     private int monthColor;
     private int dayOfMonthColor;
@@ -82,8 +84,15 @@ public class DatePanel implements ComponentPanel {
     private DateFormat dayOfMonthFormat;
 
     private RectF sizeFactors;
-    private Rect bounds;
+    private RectF bounds;
+
+    private Bitmap bitmap;
+    private Bitmap bkgBitmap;
+
+    private int lastDayOfYear;
+
     private TextPaint paint;
+    private TextPaint ambientPaint;
 
     final private int refScreenWidth;
     final private int refScreenHeight;
@@ -93,6 +102,7 @@ public class DatePanel implements ComponentPanel {
         @Override
         public void onReceive(Context context, Intent intent) {
             calendar.setTimeZone(TimeZone.getDefault());
+            drawDate();
         }
     };
 
@@ -103,12 +113,23 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
+        lastDayOfYear = -1; // force redraw
 
         calendar = Calendar.getInstance();
+
         paint = new TextPaint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextScaleX(0.9f);
+
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+        ambientPaint = new TextPaint();
+        ambientPaint.setAntiAlias(false);
+        ambientPaint.setColorFilter(filter);
+        ambientPaint.setTextAlign(Paint.Align.CENTER);
+        ambientPaint.setTextScaleX(0.9f);
 
         sizeFactors = new RectF(
                 context.getResources().getDimension(R.dimen.layout_date_panel_left) / refScreenWidth,
@@ -120,81 +141,120 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
+        bounds = new RectF(
+                width * sizeFactors.left,
+                height * sizeFactors.top,
+                width * sizeFactors.right,
+                height * sizeFactors.bottom);
 
-        // date component
-        int left = (int) (sizeFactors.left * width);
-        int top = (int) (sizeFactors.top * height);
-        int right = (int) (sizeFactors.right * width);
-        int bottom = (int) (sizeFactors.bottom * height);
-        bounds = new Rect(left, top, right, bottom);
+        bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
+        bkgBitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
+
         paint.setTextSize(bounds.height() / 2.2f);
+        ambientPaint.setTextSize(paint.getTextSize());
     }
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
-        // TODO bitmap-backed painting
-
         calendar.setTimeInMillis(System.currentTimeMillis());
 
-        if (!isAmbientMode) {
-            // draw background
-            paint.setColor(backgroundColor);
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            if (BorderUtils.isBorderRounded(borderType)) {
-                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-            } else if (BorderUtils.isBorderRing(borderType)) {
-                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-            } else {
-                canvas.drawRect(bounds, paint);
-            }
-
-            // draw border
-            if (borderType != BorderType.NONE) {
-                paint.setColor(borderColor);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(BORDER_WIDTH);
-                if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
-                    if (BorderUtils.isBorderDotted(borderType)) {
-                        paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
-                    } else {
-                        paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
-                    }
-                }
-                if (BorderUtils.isBorderRounded(borderType)) {
-                    canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                            BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-                } else if (BorderUtils.isBorderRing(borderType)) {
-                    canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                            BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-                } else {
-                    canvas.drawRect(bounds, paint);
-                }
-            }
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        if (dayOfYear != lastDayOfYear) {
+            lastDayOfYear = dayOfYear;
+            drawDate();
         }
 
-        String line1;
+        if (isAmbientMode) {
+            canvas.drawBitmap(bitmap, bounds.left, bounds.top, ambientPaint);
+        } else {
+            canvas.drawBitmap(bkgBitmap, bounds.left, bounds.top, paint);
+            canvas.drawBitmap(bitmap, bounds.left, bounds.top, paint);
+        }
+    }
+
+    private void drawDate() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "drawDate: ");
+        }
+        if (bitmap == null) {
+            return; // not ready yet
+        }
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
         final Date date = calendar.getTime();
-        final int centerX = bounds.left + bounds.width() / 2;
+
+        Canvas canvas = new Canvas(bitmap);
+
+        String line1;
         if (showMonth) { // Month
-            paint.setColor(isAmbientMode ? ambientColor : monthColor);
+            paint.setColor(monthColor);
             line1 = monthFormat.format(date);
         } else { // Day of week
-            paint.setColor(isAmbientMode ? ambientColor : dayOfWeekColor);
+            paint.setColor(dayOfWeekColor);
             line1 = dayOfWeekFormat.format(date);
         }
 
+        final float centerX = bounds.width() / 2f;
+
         // upper text
-        canvas.drawText(line1,
-                centerX, bounds.top + bounds.height() / 2f - 5,
-                paint);
+        canvas.drawText(line1, centerX, bounds.height() / 2f - 5, paint);
 
         // Day of Month
-        paint.setColor(isAmbientMode ? ambientColor : dayOfMonthColor);
-        canvas.drawText(dayOfMonthFormat.format(date),
-                centerX, bounds.bottom - 5,
-                paint);
+        paint.setColor(dayOfMonthColor);
+        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 5, paint);
+    }
+
+    private void drawBackgroundAndBorder() {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "drawBackgroundAndBorder: ");
+        }
+        if (bkgBitmap == null) {
+            return; // not ready yet
+        }
+
+        bkgBitmap.eraseColor(Color.TRANSPARENT);
+
+        Canvas canvas = new Canvas(bkgBitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        // draw background
+        if (backgroundColor != Color.TRANSPARENT) {
+            paint.setColor(backgroundColor);
+            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            if (BorderUtils.isBorderRounded(borderType)) {
+                canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
+                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
+            } else if (BorderUtils.isBorderRing(borderType)) {
+                canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
+                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
+            } else {
+                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, paint);
+            }
+        }
+
+        // draw border
+        if (borderType != BorderType.NONE) {
+            paint.setColor(borderColor);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(BORDER_WIDTH);
+            if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
+                if (BorderUtils.isBorderDotted(borderType)) {
+                    paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
+                } else {
+                    paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
+                }
+            }
+            if (BorderUtils.isBorderRounded(borderType)) {
+                canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
+                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
+            } else if (BorderUtils.isBorderRing(borderType)) {
+                canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
+                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
+            } else {
+                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, paint);
+            }
+        }
     }
 
     @Override
@@ -216,6 +276,9 @@ public class DatePanel implements ComponentPanel {
         // border
         borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_date_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_date_border_type)));
+
+        drawBackgroundAndBorder();
+        drawDate();
     }
 
     @Override

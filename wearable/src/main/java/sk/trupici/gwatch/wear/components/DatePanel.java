@@ -93,7 +93,6 @@ public class DatePanel implements ComponentPanel {
         @Override
         public void onReceive(Context context, Intent intent) {
             calendar.setTimeZone(TimeZone.getDefault());
-            initDateFormats();
         }
     };
 
@@ -110,7 +109,6 @@ public class DatePanel implements ComponentPanel {
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextScaleX(0.9f);
-        initDateFormats();
 
         sizeFactors = new RectF(
                 context.getResources().getDimension(R.dimen.layout_date_panel_left) / refScreenWidth,
@@ -118,7 +116,6 @@ public class DatePanel implements ComponentPanel {
                 context.getResources().getDimension(R.dimen.layout_date_panel_right) / refScreenWidth,
                 context.getResources().getDimension(R.dimen.layout_date_panel_bottom) / refScreenHeight
         );
-
     }
 
     @Override
@@ -135,6 +132,9 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
+        // TODO bitmap-backed painting
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
 
         if (!isAmbientMode) {
             // draw background
@@ -201,7 +201,9 @@ public class DatePanel implements ComponentPanel {
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
         /* Update time zone in case it changed while we weren"t visible. */
         calendar.setTimeZone(TimeZone.getDefault());
-        initDateFormats();
+        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
+        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
 
         showMonth = sharedPrefs.getBoolean(PREF_SHOW_MONTH, context.getResources().getBoolean(R.bool.def_date_show_month));
 
@@ -219,15 +221,6 @@ public class DatePanel implements ComponentPanel {
     @Override
     public void onPropertiesChanged(Context context, Bundle properties) {
 
-    }
-
-    private void initDateFormats() {
-        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        dayOfWeekFormat.setCalendar(calendar);
-        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-        monthFormat.setCalendar(calendar);
-        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
-        dayOfMonthFormat.setCalendar(calendar);
     }
 
     public void registerReceiver(WatchFaceService watchFaceService) {

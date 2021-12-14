@@ -181,6 +181,7 @@ public class SimpleBgChart implements ComponentPanel {
                 height * sizeFactors.bottom);
 
         bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
+        drawChart();
     }
 
     @Override

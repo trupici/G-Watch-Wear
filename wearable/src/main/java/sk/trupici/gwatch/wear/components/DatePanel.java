@@ -152,6 +152,9 @@ public class DatePanel implements ComponentPanel {
 
         paint.setTextSize(bounds.height() / 2.2f);
         ambientPaint.setTextSize(paint.getTextSize());
+
+        drawDate();
+        drawBackgroundAndBorder();
     }
 
     @Override
@@ -211,7 +214,6 @@ public class DatePanel implements ComponentPanel {
         if (bkgBitmap == null) {
             return; // not ready yet
         }
-
         bkgBitmap.eraseColor(Color.TRANSPARENT);
 
         Canvas canvas = new Canvas(bkgBitmap);
@@ -277,13 +279,12 @@ public class DatePanel implements ComponentPanel {
         borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_date_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_date_border_type)));
 
-        drawBackgroundAndBorder();
-        drawDate();
+//        drawBackgroundAndBorder();
+//        drawDate();
     }
 
     @Override
     public void onPropertiesChanged(Context context, Bundle properties) {
-
     }
 
     public void registerReceiver(WatchFaceService watchFaceService) {

@@ -23,8 +23,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.util.Log;
@@ -152,9 +150,6 @@ public class SimpleBgChart implements ComponentPanel {
                 right / refScreenWidth,
                 bottom / refScreenHeight
         );
-
-        bounds = new RectF(left, top, right, bottom);
-        bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
 
         leftPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_left_padding);
         topPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_top_padding);
@@ -319,6 +314,10 @@ public class SimpleBgChart implements ComponentPanel {
     }
 
     private void drawChart() {
+        if (bitmap == null) {
+            return; // not ready yet
+        }
+
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "Bitmap size: " + bitmap.getWidth() + " x " + bitmap.getHeight());
             Log.d(LOG_TAG, "Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
@@ -482,9 +481,7 @@ public class SimpleBgChart implements ComponentPanel {
 
         // get dynamic horizontal scale
         scale = bounds.height() / ((float) (max - min + 1));
-        if (BuildConfig.DEBUG) {
-//          Log.d(LOG_TAG, "getDynamicRange: min=" + min + ", max=" + max + ", scale=" + scale);
-        }
+
         return new GraphRange(min, max, scale);
     }
 

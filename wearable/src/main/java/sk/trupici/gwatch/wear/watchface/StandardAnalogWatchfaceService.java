@@ -19,7 +19,6 @@ package sk.trupici.gwatch.wear.watchface;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -34,9 +33,7 @@ import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Display;
 import android.view.SurfaceHolder;
-import android.view.WindowManager;
 
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.Wearable;
@@ -160,12 +157,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             sharedPrefs = context.getSharedPreferences(
                     getString(R.string.standard_analog_complication_preferences_key),
                     Context.MODE_PRIVATE);
-
-
-//            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-//            Display display = windowManager.getDefaultDisplay();
-//            Point size = new Point();
-//            display.getSize(size);
 
             screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
             screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
@@ -403,6 +394,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
+            chart.onSizeChanged(context, width, height);
             watchHands.onSizeChanged(context, width, height);
             datePanel.onSizeChanged(context, width, height);
             bgPanel.onSizeChanged(context, width, height);

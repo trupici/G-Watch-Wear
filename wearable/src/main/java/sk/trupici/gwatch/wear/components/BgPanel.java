@@ -35,7 +35,11 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
+import sk.trupici.gwatch.wear.data.AAPSPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
+import sk.trupici.gwatch.wear.data.GlucosePacketBase;
+import sk.trupici.gwatch.wear.data.PacketBase;
+import sk.trupici.gwatch.wear.data.PacketType;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
@@ -244,12 +248,12 @@ public class BgPanel implements ComponentPanel {
 
         // range indicator - EXPERIMENTAL
         if (!isAmbientMode) {
-            Log.d(LOG_TAG, "onDraw: " + bounds);
+//            Log.d(LOG_TAG, "onDraw: " + bounds);
             Paint indicatorPaint = new Paint();
             int padding = 10;
             height = (bounds.height() - padding) / 3f - padding;
             RectF indicatorBounds = new RectF();
-            indicatorBounds.left = bounds.left + 7;
+            indicatorBounds.left = bounds.left + 6;
             indicatorBounds.right = indicatorBounds.left + 10;
             indicatorBounds.bottom = bounds.bottom - padding;
             indicatorBounds.top = indicatorBounds.bottom - height;
@@ -266,7 +270,7 @@ public class BgPanel implements ComponentPanel {
     }
 
     private void paintIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
-        Log.d(LOG_TAG, "paintIndicatorBar: " + bounds);
+//        Log.d(LOG_TAG, "paintIndicatorBar: " + bounds);
         paint.reset();
         paint.setAntiAlias(true);
         paint.setColor(Color.WHITE);
@@ -307,7 +311,22 @@ public class BgPanel implements ComponentPanel {
     public void onDataUpdate(byte[] bgData, Context context, SharedPreferences sharedPrefs) {
         Log.d(CommonConstants.LOG_TAG, DumpUtils.dumpData(bgData, bgData.length));
 
-        GlucosePacket glucosePacket = GlucosePacket.of(bgData);
+        if (bgData.length < PacketBase.PACKET_HEADER_SIZE) {
+            return;
+        }
+
+        PacketType type = PacketType.getByCode(bgData[0]);
+        Log.d(CommonConstants.LOG_TAG, "PACKET TYPE: " + (type == null ? "null" : type.name()));
+        GlucosePacketBase glucosePacket;
+        if (type == PacketType.GLUCOSE) {
+            glucosePacket = GlucosePacket.of(bgData);
+        } else if (type == PacketType.AAPS) {
+            glucosePacket = AAPSPacket.of(bgData);
+        } else {
+            return; // TODO
+        }
+        Log.d(CommonConstants.LOG_TAG, "PACKET: " + (glucosePacket == null ? "null" : glucosePacket));
+
         if (glucosePacket != null) {
             Log.d(CommonConstants.LOG_TAG, glucosePacket.toText(context, ""));
 
@@ -316,7 +335,10 @@ public class BgPanel implements ComponentPanel {
             if (bgTimestampDiff > 24 * 60) {
                 bgTimestampDiff = -1;
             }
-            GlucosePacket.Trend trend = glucosePacket.getTrend();
+            GlucosePacket.Trend trend = null;
+            if (glucosePacket instanceof GlucosePacket) {
+                trend = ((GlucosePacket)glucosePacket).getTrend();
+            }
             if (trend == null || trend == GlucosePacket.Trend.UNKNOWN) {
                 trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : calcTrend(bgDiff, samplePeriod);
             }

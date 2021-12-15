@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2019 Juraj Antal
- *
- * Originally created in G-Watch App
+ * Copyright (C) 2021 Juraj Antal
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +14,9 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.util;
 
-import sk.trupici.gwatch.wear.util.StringUtils;
-
-public abstract class PacketBase implements Packet {
-    private static final String LOCAL_SOURCE = "G-Watch Service";
-
-    private final PacketType type;
-    private final String source;
-
-    public PacketBase(PacketType type, String source) {
-        this.type = type;
-        this.source = source == null ? LOCAL_SOURCE : source;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Packet implementation
-
-    @Override
-    public PacketType getType() {
-        return type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Helper methods
+public class PacketUtils {
 
     /**
      * Encode <code>short</code> to byte array as unsigned 2-byte value
@@ -53,11 +25,23 @@ public abstract class PacketBase implements Packet {
      * @param val value to encode
      * @return number of bytes written
      */
-    int encodeShort(byte[] data, int offset, short val) {
+    public static int encodeShort(byte[] data, int offset, short val) {
         int idx = offset;
         data[idx++] = (byte) (val & 0xFF);
         data[idx++] = (byte) ((val & 0xFF00) >> 8);
         return idx - offset;
+    }
+
+    /**
+     * Decode <code>short</code> from byte array as unsigned 2-byte value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded short value
+     */
+    public static short decodeShort(byte[] data, int offset) {
+        int value = (data[offset++] & 0xFF);
+        value += ((data[offset++] << 8) & 0xFF00);
+        return (short) value;
     }
 
     /**
@@ -67,7 +51,7 @@ public abstract class PacketBase implements Packet {
      * @param val value to encode
      * @return number of bytes written
      */
-    int encodeInt(byte[] data, int offset, long val) {
+    public static int encodeInt(byte[] data, int offset, long val) {
         int idx = offset;
         data[idx++] = (byte) (val & 0xFF);
         data[idx++] = (byte) ((val & 0xFF00) >> 8);
@@ -77,18 +61,46 @@ public abstract class PacketBase implements Packet {
     }
 
     /**
+     * Decode <code>long</code> from byte array as unsigned 4-byte value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded int value
+     */
+    public static int decodeInt(byte[] data, int offset) {
+        int value = (data[offset++] & 0xFF);
+        value += ((data[offset++] << 8) & 0xFF00);
+        value += ((data[offset++] << 16) & 0xFF0000);
+        value += ((data[offset] << 24) & 0xFF000000);
+        return value;
+    }
+
+
+    /**
      * Encode <code>int</code> to byte array as unsigned 3-byte value
      * @param data byte array
      * @param offset start offset in byte array
      * @param val value to encode
      * @return number of bytes written
      */
-    int encodeInt3(byte[] data, int offset, long val) {
+    public static int encodeInt3(byte[] data, int offset, long val) {
         int idx = offset;
         data[idx++] = (byte) (val & 0xFF);
         data[idx++] = (byte) ((val & 0xFF00) >> 8);
         data[idx++] = (byte) ((val & 0xFF0000) >> 16);
         return idx - offset;
+    }
+
+    /**
+     * Decode <code>int</code> from byte array as unsigned 3-byte value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded int value
+     */
+    public static int decodeInt3(byte[] data, int offset) {
+        int value = (data[offset++] & 0xFF);
+        value += ((data[offset++] << 8) & 0xFF00);
+        value += ((data[offset++] << 16) & 0xFF0000);
+        return value;
     }
 
 
@@ -99,7 +111,7 @@ public abstract class PacketBase implements Packet {
      * @param val value to encode
      * @return number of bytes written
      */
-    int encodeFloat(byte[] data, int offset, float val) {
+    public static int encodeFloat(byte[] data, int offset, float val) {
         int bits = Float.floatToIntBits(val);
         int idx = offset;
         data[idx++] = (byte) (bits & 0xFF);
@@ -110,16 +122,30 @@ public abstract class PacketBase implements Packet {
     }
 
     /**
+     * Decode <code>float</code> from byte array as unsigned 4-byte IEEE 754 value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded IEEE 754 value
+     */
+    public static float decodeFloat(byte[] data, int offset) {
+        int bits = (data[offset++] & 0xFF);
+        bits += ((data[offset++] << 8) & 0xFF00);
+        bits += ((data[offset++] << 16) & 0xFF0000);
+        bits += ((data[offset] << 24) & 0xFF000000);
+        return Float.intBitsToFloat(bits);
+    }
+
+    /**
      * Encode normalized <code>String</code> to byte array
      * as length (1 byte) followed by string characters as bytes.
      * <br>
-     * String must be normalized using {@link StringUtils#normalize}
+     * String must be normalized using {@code StringUtils#normalize}
      * @param data byte array
      * @param offset start offset in byte array
      * @param str string to encode
      * @return number of bytes written
      */
-    int encodeString(byte[] data, int offset, String str) {
+    public static int encodeString(byte[] data, int offset, String str) {
         int idx = offset;
         int len = getNullableStrLen(str);
         data[idx++] = (byte)len;
@@ -130,12 +156,34 @@ public abstract class PacketBase implements Packet {
     }
 
     /**
+     * Decode normalized <code>String</code> from byte array
+     * as length (1 byte) followed by 1-byte encoded characters.
+     * <br>
+     * String must be normalized using {@code StringUtils#normalize}
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded String
+     */
+    public static String decodeString(byte[] data, int offset) {
+        int len = (data[offset++] & 0xFF);
+        if (len == 0) {
+            return StringUtils.EMPTY_STRING;
+        }
+
+        StringBuffer sb = new StringBuffer(len);
+        for (int i=0; i < len; i++) {
+            int value = (data[offset++] & 0xFF);
+            sb.append((char)value);
+        }
+        return sb.toString();
+    }
+
+    /**
      * Returns length of string (may be null)
      * @param str - string or null
      * @return 0 if str is null, otherwise number of characters in string
      */
-    int getNullableStrLen(String str) {
+    public static int getNullableStrLen(String str) {
         return (str == null ? 0 : str.length());
     }
-
 }

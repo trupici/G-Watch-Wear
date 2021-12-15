@@ -18,6 +18,10 @@
 
 package sk.trupici.gwatch.wear.data;
 
+import java.util.Arrays;
+
+import sk.trupici.gwatch.wear.config.complications.ComplicationId;
+
 /**
  * Packet type enumeration.
  * Types ordinals must be equal in watch processor.
@@ -39,4 +43,9 @@ public enum PacketType {
     public byte getCodeAsByte() {
         return (byte) code;
     }
+
+    public static PacketType getByCode(int code) {
+        return Arrays.stream(values()).filter(x -> x.code == code).findFirst().orElseGet(null);
+    }
+
 }

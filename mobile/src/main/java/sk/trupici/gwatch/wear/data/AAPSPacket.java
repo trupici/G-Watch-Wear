@@ -90,10 +90,10 @@ public class AAPSPacket extends GlucosePacketBase {
         data[idx++] = getType().getCodeAsByte();
         data[idx++] = dataSize.byteValue();
 
-        idx += encodeLong(data, idx, receivedAt / 1000); // time in seconds
+        idx += encodeInt(data, idx, receivedAt / 1000); // time in seconds
 
         idx += encodeShort(data, idx, glucoseValue);
-        idx += encodeLong(data, idx, timestamp / 1000); // time in seconds
+        idx += encodeInt(data, idx, timestamp / 1000); // time in seconds
 
         idx += encodeFloat(data, idx, (cob == null ? 0f : cob.floatValue()));
         idx += encodeFloat(data, idx, (cobFuture == null ? 0f : cobFuture.floatValue()));
@@ -102,8 +102,8 @@ public class AAPSPacket extends GlucosePacketBase {
         idx += encodeFloat(data, idx, (iobBolus == null ? 0f : iobBolus.floatValue()));
         idx += encodeFloat(data, idx, (iobBasal == null ? 0f : iobBasal.floatValue()));
 
-        idx += encodeLong(data, idx, (basalTimestamp == null || basalTimestamp < 0 ? 0L : basalTimestamp/1000));
-        idx += encodeLong(data, idx, (pumpTimestamp == null || pumpTimestamp < 0 ? 0L : pumpTimestamp/1000));
+        idx += encodeInt(data, idx, (basalTimestamp == null || basalTimestamp < 0 ? 0L : basalTimestamp/1000));
+        idx += encodeInt(data, idx, (pumpTimestamp == null || pumpTimestamp < 0 ? 0L : pumpTimestamp/1000));
         idx += encodeShort(data, idx, (pumpReservoir == null ? 0 : pumpReservoir.shortValue()));
         data[idx++] = pumpBattery == null ? 0 : pumpBattery.byteValue();
 

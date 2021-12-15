@@ -23,6 +23,7 @@ import android.content.Context;
 import java.util.Arrays;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.PacketUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class GlucosePacket extends GlucosePacketBase {
@@ -56,26 +57,6 @@ public class GlucosePacket extends GlucosePacketBase {
         this.rawTrend = rawTrend;
     }
 
-    public static GlucosePacket of(byte[] data) {
-        if (data.length < PACKET_HEADER_SIZE) {
-            return null;
-        }
-
-        int idx = 0;
-        byte type = data[idx++];
-        byte size = data[idx++];
-
-        if (type != PacketType.GLUCOSE.ordinal() || size != PACKET_MIN_DATA_SIZE) {
-            return null;
-        }
-
-        short value = (short)((data[idx] & 0xFF) + ((data[idx+1] << 8) & 0xFF00));
-        long timestamp = ((data[idx+2] & 0xFF) + ((data[idx+3] << 8) & 0xFF00) + ((data[idx+4] << 16) & 0xFF0000) + ((data[idx+5] << 24) & 0xFF000000)) * 1000L;
-        Trend trend = Trend.valueOf(data[idx+6]);
-
-        return new GlucosePacket(value, timestamp, (byte)0, trend, trend.name(), null);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Packet implementation
 
@@ -88,10 +69,10 @@ public class GlucosePacket extends GlucosePacketBase {
         data[idx++] = getType().getCodeAsByte();
         data[idx++] = dataSize.byteValue();
 
-        idx += encodeShort(data, idx, glucoseValue);
+        idx += PacketUtils.encodeShort(data, idx, glucoseValue);
 
         long ts = (timestamp < receivedAt) ? timestamp : receivedAt;
-        idx += encodeLong(data, idx, ts / 1000); // time in seconds
+        idx += PacketUtils.encodeInt(data, idx, ts / 1000); // time in seconds
 
         data[idx] = (byte)trend.ordinal();
         return data;
@@ -103,6 +84,26 @@ public class GlucosePacket extends GlucosePacketBase {
         text.append(context.getString(R.string.packet_battery, battery)).append("\n");
         text.append(context.getString(R.string.packet_trend, UiUtils.getStringOrNoData(rawTrend)));
         return text.toString();
+    }
+
+    public static GlucosePacket of(byte[] data) {
+        if (data.length < PACKET_HEADER_SIZE) {
+            return null;
+        }
+
+        int idx = 0;
+        byte type = data[idx++];
+        byte size = data[idx++];
+
+        if (type != PacketType.GLUCOSE.getCodeAsByte() || size != PACKET_MIN_DATA_SIZE) {
+            return null;
+        }
+
+        short value = PacketUtils.decodeShort(data, idx);
+        long timestamp = PacketUtils.decodeInt(data, idx+2) * 1000L;
+        Trend trend = Trend.valueOf(data[idx+6]);
+
+        return new GlucosePacket(value, timestamp, (byte)0, trend, trend.name(), null);
     }
 
     ///////////////////////////////////////////////////////////////////////////

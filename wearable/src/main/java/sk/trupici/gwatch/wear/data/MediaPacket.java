@@ -21,6 +21,7 @@ package sk.trupici.gwatch.wear.data;
 import android.content.Context;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.PacketUtils;
 
 public class MediaPacket extends PacketBase {
 
@@ -66,13 +67,13 @@ public class MediaPacket extends PacketBase {
 
         int totalLen = 1 + 1 + name.length() + 3  + content.length;
         data[idx++] = getType().getCodeAsByte();
-        idx += encodeInt3(data, idx, totalLen);
+        idx += PacketUtils.encodeInt3(data, idx, totalLen);
 
         data[idx++] = mediaType.getCodeAsByte();
 
-        idx += encodeString(data, idx, name);
+        idx += PacketUtils.encodeString(data, idx, name);
 
-        idx += encodeInt3(data, idx, content.length);
+        idx += PacketUtils.encodeInt3(data, idx, content.length);
 
         System.arraycopy(content, 0, data, idx, content.length);
         return data;

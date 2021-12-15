@@ -63,7 +63,7 @@ public class GlucosePacket extends GlucosePacketBase {
         idx += encodeShort(data, idx, glucoseValue);
 
         long ts = (timestamp < receivedAt) ? timestamp : receivedAt;
-        idx += encodeLong(data, idx, ts / 1000); // time in seconds
+        idx += encodeInt(data, idx, ts / 1000); // time in seconds
 
         data[idx] = (byte)trend.ordinal();
         return data;

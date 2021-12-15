@@ -16,7 +16,9 @@
 
 package sk.trupici.gwatch.wear.components.bgchart;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -35,10 +37,12 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.ComponentPanel;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
+import sk.trupici.gwatch.wear.services.BgDataListenerService;
+import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
-public class SimpleBgChart implements ComponentPanel {
+public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     final private static String LOG_TAG = DumpUtils.class.getSimpleName();
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_background";
@@ -70,9 +74,6 @@ public class SimpleBgChart implements ComponentPanel {
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
     private static final float GRAPH_VALUE_INT = (GRAPH_MAX_VALUE-GRAPH_MIN_VALUE + 1);
-
-    private static final int MINUTE_IN_MS = 60000; // 60 * 1000
-    private static final int HOUR_IN_MINUTES = 60;
 
     private static final float DOT_RADIUS = 2f;
     private static final float DEF_DOT_PADDING = 1.5f;
@@ -232,9 +233,8 @@ public class SimpleBgChart implements ComponentPanel {
     }
 
     public void refresh(long timeMs, SharedPreferences sharedPrefs) {
-        long currentMinute = timeMs / MINUTE_IN_MS;
+        long currentMinute = timeMs / CommonConstants.MINUTE_IN_MILLIS;
         if (lastGraphUpdateMin != currentMinute) {
-            lastGraphUpdateMin = currentMinute;
             updateGraphData(null, timeMs, sharedPrefs);
         }
     }
@@ -244,7 +244,7 @@ public class SimpleBgChart implements ComponentPanel {
             Log.d(LOG_TAG, "updateGraphData: " + bgValue);
         }
 
-        final long now = System.currentTimeMillis() / (long)MINUTE_IN_MS; // minutes
+        final long now = System.currentTimeMillis() / (long)CommonConstants.MINUTE_IN_MILLIS; // minutes
         if (now < 0) {
             Log.e(LOG_TAG, "now is negative: " + now);
             return;
@@ -271,7 +271,7 @@ public class SimpleBgChart implements ComponentPanel {
 
         // set new data
         if (bgValue != null) {
-            long tsData = timestamp / MINUTE_IN_MS;
+            long tsData = timestamp / CommonConstants.MINUTE_IN_MILLIS;
             int diff = (int) Math.round((now - tsData)/(double)refreshRateMin);
             if (0 <= diff && diff < GRAPH_DATA_LEN) {
                 int newValue = bgValue.intValue();
@@ -285,9 +285,9 @@ public class SimpleBgChart implements ComponentPanel {
 //            lastGraphUpdateMin = now;
         }
 
-        drawChart();
 
         if (dataChanged) {
+            drawChart();
             storeChartData(sharedPrefs);
         }
     }
@@ -360,7 +360,7 @@ public class SimpleBgChart implements ComponentPanel {
         // draw hour interval (vertical) lines
         if (enableVertLines) {
             paint.setColor(vertLineColor);
-            for (int mins = HOUR_IN_MINUTES;; mins += HOUR_IN_MINUTES) {
+            for (int mins = CommonConstants.HOUR_IN_MINUTES;; mins += CommonConstants.HOUR_IN_MINUTES) {
                 float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) refreshRateMin);
                 if (lx < leftPadding) {
                     break;
@@ -504,8 +504,9 @@ public class SimpleBgChart implements ComponentPanel {
     }
 
     private void restoreChartData(SharedPreferences sharedPrefs) {
-        lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, 0);
-        if (lastGraphUpdateMin == 0) {
+        lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, -1);
+        if (lastGraphUpdateMin == -1) {
+            lastGraphUpdateMin = 0;
             return;
         }
 
@@ -529,6 +530,28 @@ public class SimpleBgChart implements ComponentPanel {
         }
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Bundle extras = intent.getExtras();
+        int bgValue = extras.getInt(BgDataListenerService.EXTRA_BG_VALUE, 0);
+        if (bgValue == 0) {
+            return;
+        }
+
+        long bgTimestamp = extras.getLong(BgDataListenerService.EXTRA_BG_TIMESTAMP, -1);
+        if (bgTimestamp == 0) {
+            bgTimestamp = extras.getLong(BgDataListenerService.EXTRA_BG_RECEIVEDAT, 0);
+            if (bgTimestamp == 0) {
+                bgTimestamp = System.currentTimeMillis();
+            }
+        }
+
+        SharedPreferences sharedPrefs = context.getSharedPreferences(
+                context.getString(R.string.standard_analog_complication_preferences_key),
+                Context.MODE_PRIVATE);
+
+        updateGraphData((double)bgValue, bgTimestamp, sharedPrefs);
+    }
 
     class GraphRange {
         final int min;

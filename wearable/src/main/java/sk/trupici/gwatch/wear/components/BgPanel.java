@@ -15,7 +15,9 @@
  */
 package sk.trupici.gwatch.wear.components;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,21 +30,14 @@ import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 
-import java.util.Objects;
-import java.util.function.BiConsumer;
-
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
-import sk.trupici.gwatch.wear.data.AAPSPacket;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.data.GlucosePacketBase;
-import sk.trupici.gwatch.wear.data.PacketBase;
-import sk.trupici.gwatch.wear.data.PacketType;
+import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.services.BgDataListenerService;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
@@ -55,12 +50,19 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 /**
  * Component showing BG value and related info (trend, delta, etc...)
  */
-public class BgPanel implements ComponentPanel {
+public class BgPanel extends BroadcastReceiver implements ComponentPanel{
 
     public static final String LOG_TAG = CommonConstants.LOG_TAG;
 
-    public interface BgValueCallback {
-        void accept(int bgValue, long bgTimestamp, SharedPreferences sharedPrefs);
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Bundle extras = intent.getExtras();
+        onDataUpdate(
+                extras.getInt(BgDataListenerService.EXTRA_BG_VALUE, 0),
+                extras.getLong(BgDataListenerService.EXTRA_BG_TIMESTAMP, 0),
+                (Trend)extras.get(BgDataListenerService.EXTRA_BG_TREND),
+                extras.getLong(BgDataListenerService.EXTRA_BG_RECEIVEDAT, 0)
+        );
     }
 
     public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
@@ -98,8 +100,6 @@ public class BgPanel implements ComponentPanel {
 
     boolean isUnitConversion;
     int samplePeriod;
-
-    private BgValueCallback callback;
 
     final private int refScreenWidth;
     final private int refScreenHeight;
@@ -308,76 +308,48 @@ public class BgPanel implements ComponentPanel {
         }
     }
 
-    public void onDataUpdate(byte[] bgData, Context context, SharedPreferences sharedPrefs) {
-        Log.d(CommonConstants.LOG_TAG, DumpUtils.dumpData(bgData, bgData.length));
+    public void onDataUpdate(int bgValue, long bgTimestamp, Trend trend, long receivedAt) {
 
-        if (bgData.length < PacketBase.PACKET_HEADER_SIZE) {
-            return;
+        if (bgTimestamp == 0) {
+            bgTimestamp = receivedAt != 0 ? receivedAt : System.currentTimeMillis();
         }
 
-        PacketType type = PacketType.getByCode(bgData[0]);
-        Log.d(CommonConstants.LOG_TAG, "PACKET TYPE: " + (type == null ? "null" : type.name()));
-        GlucosePacketBase glucosePacket;
-        if (type == PacketType.GLUCOSE) {
-            glucosePacket = GlucosePacket.of(bgData);
-        } else if (type == PacketType.AAPS) {
-            glucosePacket = AAPSPacket.of(bgData);
+        int bgDiff = this.bgValue == 0 ? 0 : bgValue - this.bgValue;
+        int bgTimestampDiff = this.bgTimestamp == 0 ? 0 : (int)(bgTimestamp-this.bgTimestamp) / CommonConstants.MINUTE_IN_MILLIS; // to minutes
+        if (bgTimestampDiff > CommonConstants.DAY_IN_MINUTES) {
+            bgTimestampDiff = -1;
+        }
+
+        if (trend == null || trend == Trend.UNKNOWN) {
+            trend = bgTimestampDiff <= 0 ? Trend.FLAT : calcTrend(bgDiff, samplePeriod);
+        }
+        char trendArrow = TREND_SET_1[trend.ordinal()];
+
+        if (isUnitConversion) {
+            bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgValue) + trendArrow;
+            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
         } else {
-            return; // TODO
+            bgLine1 = "" + bgValue + trendArrow;
+            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgDiff;
         }
-        Log.d(CommonConstants.LOG_TAG, "PACKET: " + (glucosePacket == null ? "null" : glucosePacket));
 
-        if (glucosePacket != null) {
-            Log.d(CommonConstants.LOG_TAG, glucosePacket.toText(context, ""));
+        Log.d(CommonConstants.LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
 
-            int bgDiff = bgValue == 0 ? 0 : (int)glucosePacket.getGlucoseValue() - bgValue;
-            int bgTimestampDiff = bgTimestamp == 0 ? 0 : (int)(glucosePacket.getTimestamp()-bgTimestamp) / 60000; // to minutes
-            if (bgTimestampDiff > 24 * 60) {
-                bgTimestampDiff = -1;
-            }
-            GlucosePacket.Trend trend = null;
-            if (glucosePacket instanceof GlucosePacket) {
-                trend = ((GlucosePacket)glucosePacket).getTrend();
-            }
-            if (trend == null || trend == GlucosePacket.Trend.UNKNOWN) {
-                trend = bgTimestampDiff <= 0 ? GlucosePacket.Trend.FLAT : calcTrend(bgDiff, samplePeriod);
-            }
-            char trendArrow = TREND_SET_1[trend.ordinal()];
-
-            if (isUnitConversion) {
-                bgLine1 = UiUtils.convertGlucoseToMmolLStr(glucosePacket.getGlucoseValue()) + trendArrow;
-                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
-            } else {
-                bgLine1 = "" + glucosePacket.getGlucoseValue() + trendArrow;
-                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgDiff;
-            }
-
-            Log.d(CommonConstants.LOG_TAG, "bgValue: " + bgLine1 + " / " + bgLine2);
-
-            bgValue = glucosePacket.getGlucoseValue();
-            bgTimestamp = glucosePacket.getTimestamp();
-
-            if (callback != null) {
-                callback.accept(bgValue, bgTimestamp, sharedPrefs);
-            }
-        }
+        this.bgValue = bgValue;
+        this.bgTimestamp = bgTimestamp;
     }
 
-    public void setBgValueCallback(BgValueCallback callback) {
-        this.callback = callback;
-    }
-
-    private GlucosePacket.Trend calcTrend(int glucoseDelta, int sampleTimeDelta) {
+    private Trend calcTrend(int glucoseDelta, int sampleTimeDelta) {
         if (glucoseDelta < -2 * sampleTimeDelta) {
-            return GlucosePacket.Trend.DOWN;
+            return Trend.DOWN;
         } else if (glucoseDelta < -sampleTimeDelta) {
-            return GlucosePacket.Trend.DOWN_SLOW;
+            return Trend.DOWN_SLOW;
         } else if (glucoseDelta < sampleTimeDelta) {
-            return GlucosePacket.Trend.FLAT;
+            return Trend.FLAT;
         } else if (glucoseDelta < 2 * sampleTimeDelta) {
-            return GlucosePacket.Trend.UP_SLOW;
+            return Trend.UP_SLOW;
         } else {
-            return GlucosePacket.Trend.UP;
+            return Trend.UP;
         }
     }
 }

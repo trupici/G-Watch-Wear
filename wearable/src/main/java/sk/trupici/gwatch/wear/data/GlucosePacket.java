@@ -20,31 +20,12 @@ package sk.trupici.gwatch.wear.data;
 
 import android.content.Context;
 
-import java.util.Arrays;
-
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PacketUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class GlucosePacket extends GlucosePacketBase {
     public static final int PACKET_MIN_DATA_SIZE = (2 + 4 + 1);
-
-    public enum Trend {
-        UNKNOWN,
-        UP_FAST,
-        UP,
-        UP_SLOW,
-        FLAT,
-        DOWN_SLOW,
-        DOWN,
-        DOWN_FAST
-        ;
-
-        public static Trend valueOf(int ordinal) {
-            return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElse(UNKNOWN);
-        }
-
-    }
 
     private final byte battery;
     private final Trend trend;

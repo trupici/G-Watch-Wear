@@ -16,7 +16,9 @@
 
 package sk.trupici.gwatch.wear.watchface;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -36,10 +38,12 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 
 import com.google.android.gms.wearable.MessageClient;
-import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgPanel;
@@ -51,6 +55,7 @@ import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.Config;
+import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_PREFIX;
@@ -136,11 +141,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private BackgroundPanel bkgPanel;
         private WatchHands watchHands;;
-        private SimpleBgChart chart;
+        private SimpleBgChart chartPanel;
         private BgPanel bgPanel;
         private DatePanel datePanel;
 
         private MessageClient messageClient;
+
+        private List<BroadcastReceiver> receivers = new ArrayList<>(5);
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -173,12 +180,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bgPanel = new BgPanel((int) screenWidth, (int) screenHeight);
             bgPanel.onCreate(context, sharedPrefs);
 
-            chart = new SimpleBgChart((int) screenWidth, (int) screenHeight);
-            chart.onCreate(context, sharedPrefs);
-
-            bgPanel.setBgValueCallback((bgValue, bgTimestamp, sharedPrefs) -> {
-                chart.updateGraphData((double) bgValue, bgTimestamp, sharedPrefs);
-            });
+            chartPanel = new SimpleBgChart((int) screenWidth, (int) screenHeight);
+            chartPanel.onCreate(context, sharedPrefs);
 
             leftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.layout_left_compl_left) / screenWidth,
@@ -197,14 +200,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             initializeComplications();
 
-            // Build a new MessageClient for the Wearable API
-            messageClient = Wearable.getMessageClient(context);
-            messageClient.addListener(messageEvent -> {
-                byte[] bgData = messageEvent.getData();
-                Log.d(LOG_TAG, "onReceive: " + bgData.length);
-                bgPanel.onDataUpdate(bgData, getApplicationContext(), sharedPrefs);
-            });
-
+            registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
+            registerReceiver(context, chartPanel, CommonConstants.BG_RECEIVER_ACTION);
         }
 
 
@@ -319,6 +316,12 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         @Override
         public void onDestroy() {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+
+            // unregister all receivers
+            if (receivers != null) {
+                receivers.forEach(r -> unregisterReceiver(r));
+            }
+
             super.onDestroy();
         }
 
@@ -394,7 +397,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
-            chart.onSizeChanged(context, width, height);
+            chartPanel.onSizeChanged(context, width, height);
             watchHands.onSizeChanged(context, width, height);
             datePanel.onSizeChanged(context, width, height);
             bgPanel.onSizeChanged(context, width, height);
@@ -464,10 +467,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             boolean isAmbientMode = isInAmbientMode();
 
-            chart.refresh(now, sharedPrefs);
+            chartPanel.refresh(now, sharedPrefs);
 
             bkgPanel.onDraw(canvas, isAmbientMode);
-            chart.onDraw(canvas, isAmbientMode);
+            chartPanel.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             bgPanel.onDraw(canvas, isAmbientMode);
@@ -540,6 +543,18 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 updateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
-    }
 
+        /**
+         * Register goven <code>BroadcastReceiver</code> for specified action
+         * @param receiver <code>BroadcastReceiver</code> to register
+         * @param action action to register receiver for
+         */
+        private void registerReceiver(Context context, BroadcastReceiver receiver, String action) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(action);
+            intentFilter.setPriority(100);
+            LocalBroadcastManager.getInstance(context).registerReceiver(receiver, intentFilter);
+            receivers.add(receiver);
+        }
+    }
 }

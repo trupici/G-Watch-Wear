@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2021 Juraj Antal
+ * Copyright (C) 2019 Juraj Antal
+ *
+ * Originally created in G-Watch App
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sk.trupici.gwatch.wear.data;
 
-package sk.trupici.gwatch.wear.util;
+import java.util.Arrays;
 
-public interface CommonConstants {
-    String LOG_TAG = "GWatchApp";
+public enum Trend {
+    UNKNOWN,
+    UP_FAST,
+    UP,
+    UP_SLOW,
+    FLAT,
+    DOWN_SLOW,
+    DOWN,
+    DOWN_FAST;
 
-    String BG_RECEIVER_ACTION = "BG_RECEIVER_ACTION";
-
-    int MINUTE_IN_MILLIS = 60000; // 60 * 1000
-    int DAY_IN_MINUTES = 1440; // 24 * 60
-    int HOUR_IN_MINUTES = 60;
-
+    public static Trend valueOf(int ordinal) {
+        return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElse(UNKNOWN);
+    }
 }

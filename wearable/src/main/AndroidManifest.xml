@@ -102,6 +102,13 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/bg_data"/>
             </intent-filter>
         </service>
+
+        <service android:name=".services.ConfigListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/config"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

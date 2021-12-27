@@ -24,16 +24,18 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import sk.trupici.gwatch.wear.data.AAPSPacket;
+import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.PacketBase;
 import sk.trupici.gwatch.wear.data.PacketType;
 import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 
-public class BgDataListenerService extends WearableListenerService {
+public class AapsDataListenerService extends WearableListenerService {
 
-    private static final String LOG_TAG = BgDataListenerService.class.getSimpleName();
+    private static final String LOG_TAG = AapsDataListenerService.class.getSimpleName();
 
-    private static final String WAKE_LOCK_TAG = "gwatch.wear:" + BgDataListenerService.class.getSimpleName() + ".wake_lock";
+    private static final String WAKE_LOCK_TAG = "gwatch.wear:" + AapsDataListenerService.class.getSimpleName() + ".wake_lock";
     private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 60s
 
     @Override
@@ -44,8 +46,7 @@ public class BgDataListenerService extends WearableListenerService {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
         try {
-
-            if (!messageEvent.getPath().equals("/bg_data")) {
+            if (!messageEvent.getPath().equals("/aaps_data")) {
                 super.onMessageReceived(messageEvent);
                 return;
             }
@@ -60,15 +61,36 @@ public class BgDataListenerService extends WearableListenerService {
 
             PacketType type = PacketType.getByCode(data[0]);
             Log.d(LOG_TAG, "PACKET TYPE: " + (type == null ? "null" : type.name()));
-            if (type != PacketType.GLUCOSE) {
+            if (type != PacketType.AAPS) {
                 Log.d(LOG_TAG, "Packet ignored" + (type == null ? "null" : type.name()));
                 return;
             }
 
+            AAPSPacket packet = AAPSPacket.of(data);
+            if (packet == null) {
+                Log.e(LOG_TAG, "failed to parse received data");
+                return;
+            }
+
+            Log.d(LOG_TAG, packet.toText(getApplicationContext(), ""));
+
+//        if (!ignoreAapsBg) {
+            GlucosePacket glucosePacket = new GlucosePacket(
+                    packet.getGlucoseValue(),
+                    packet.getTimestamp(),
+                    (byte) 0,
+                    null,
+                    null,
+                    packet.getSource());
+
             Intent intent = new Intent();
             intent.setAction(BgDataProcessor.BG_PROCESSOR_ACTION);
-            intent.putExtra(BgDataProcessor.EXTRA_DATA, data);
+            intent.putExtra(BgDataProcessor.EXTRA_DATA, glucosePacket.getData());
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        }
+
+            // TODO send AAPS data
+
         } finally {
             wakeLock.release();
         }

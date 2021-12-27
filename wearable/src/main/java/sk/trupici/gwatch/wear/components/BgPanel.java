@@ -34,8 +34,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
-import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.services.BgDataListenerService;
+import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -50,23 +49,17 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 /**
  * Component showing BG value and related info (trend, delta, etc...)
  */
-public class BgPanel extends BroadcastReceiver implements ComponentPanel{
+public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     public static final String LOG_TAG = CommonConstants.LOG_TAG;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        onDataUpdate(
-                extras.getInt(BgDataListenerService.EXTRA_BG_VALUE, 0),
-                extras.getLong(BgDataListenerService.EXTRA_BG_TIMESTAMP, 0),
-                (Trend)extras.get(BgDataListenerService.EXTRA_BG_TREND),
-                extras.getLong(BgDataListenerService.EXTRA_BG_RECEIVEDAT, 0)
-        );
+        onDataUpdate(BgData.fromBundle(extras));
     }
 
     public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
-    public static final String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
@@ -99,7 +92,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel{
     private long bgTimestamp = 0;
 
     boolean isUnitConversion;
-    int samplePeriod;
 
     final private int refScreenWidth;
     final private int refScreenHeight;
@@ -153,7 +145,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel{
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
         isUnitConversion = sharedPrefs.getBoolean(PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
-        samplePeriod = sharedPrefs.getInt(PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
+//        samplePeriod = sharedPrefs.getInt(PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
 
         // thresholds
         hyperThreshold = sharedPrefs.getInt(PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
@@ -308,48 +300,26 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel{
         }
     }
 
-    public void onDataUpdate(int bgValue, long bgTimestamp, Trend trend, long receivedAt) {
+    public void onDataUpdate(BgData bgData) {
 
-        if (bgTimestamp == 0) {
-            bgTimestamp = receivedAt != 0 ? receivedAt : System.currentTimeMillis();
-        }
-
-        int bgDiff = this.bgValue == 0 ? 0 : bgValue - this.bgValue;
-        int bgTimestampDiff = this.bgTimestamp == 0 ? 0 : (int)(bgTimestamp-this.bgTimestamp) / CommonConstants.MINUTE_IN_MILLIS; // to minutes
+        long bgTimestampDiff = bgData.getTimestampDiff() / CommonConstants.MINUTE_IN_MILLIS; // to minutes
         if (bgTimestampDiff > CommonConstants.DAY_IN_MINUTES) {
             bgTimestampDiff = -1;
         }
 
-        if (trend == null || trend == Trend.UNKNOWN) {
-            trend = bgTimestampDiff <= 0 ? Trend.FLAT : calcTrend(bgDiff, samplePeriod);
-        }
-        char trendArrow = TREND_SET_1[trend.ordinal()];
+        char trendArrow = TREND_SET_1[bgData.getTrend().ordinal()];
 
         if (isUnitConversion) {
-            bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgValue) + trendArrow;
-            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgDiff);
+            bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
+            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
         } else {
-            bgLine1 = "" + bgValue + trendArrow;
-            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgDiff;
+            bgLine1 = "" + bgData.getValue() + trendArrow;
+            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgData.getValueDiff();
         }
 
         Log.d(CommonConstants.LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
 
         this.bgValue = bgValue;
         this.bgTimestamp = bgTimestamp;
-    }
-
-    private Trend calcTrend(int glucoseDelta, int sampleTimeDelta) {
-        if (glucoseDelta < -2 * sampleTimeDelta) {
-            return Trend.DOWN;
-        } else if (glucoseDelta < -sampleTimeDelta) {
-            return Trend.DOWN_SLOW;
-        } else if (glucoseDelta < sampleTimeDelta) {
-            return Trend.FLAT;
-        } else if (glucoseDelta < 2 * sampleTimeDelta) {
-            return Trend.UP_SLOW;
-        } else {
-            return Trend.UP;
-        }
     }
 }

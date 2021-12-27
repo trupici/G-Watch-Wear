@@ -25,19 +25,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.android.gms.wearable.CapabilityClient;
-import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -67,7 +63,7 @@ import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
-public class GWatchApplication extends Application implements Dispatcher, OnSuccessListener, OnFailureListener {
+public class GWatchApplication extends Application implements Dispatcher, OnSuccessListener<Integer>, OnFailureListener {
 
     public static final String LOG_TAG = "G-Watch Wear";
 
@@ -86,7 +82,7 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
         return packetConsole;
     }
 
-    private List<BGReceiver> bgReceivers = new ArrayList<>(5);
+    private final List<BGReceiver> bgReceivers = new ArrayList<>(7);
 
     public static boolean isDebugEnabled() {
         if (BuildConfig.DEBUG && context != null) {
@@ -151,14 +147,12 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
 //            packetView.showText("Intent: " + intent.toString());
 //        }
 
-        if (bgReceivers != null) {
-            for (BGReceiver receiver : bgReceivers) {
-                if (receiver != null) {
-                    if (intent.getAction().equals(receiver.getAction())) {
-                        intent.setPackage(null); // clear package to pretend implicit filter
-                        receiver.onReceive(context, intent);
-                        break;
-                    }
+        for (BGReceiver receiver : bgReceivers) {
+            if (receiver != null) {
+                if (intent.getAction().equals(receiver.getAction())) {
+                    intent.setPackage(null); // clear package to pretend implicit filter
+                    receiver.onReceive(context, intent);
+                    break;
                 }
             }
         }
@@ -175,22 +169,37 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
         if (nodeId != null) {
             notifySendingPacket(packet);
 
+            String messagePath = getMessagePath(packet);
+            if (messagePath == null) {
+                Log.d(LOG_TAG, "dispatch: unsupported packet");
+                return false;
+            }
+
             Task<Integer> sendTask = Wearable.getMessageClient(context)
-                    .sendMessage(nodeId, "/bg_data", packet.getData());
+                    .sendMessage(nodeId, messagePath, packet.getData());
             // You can add success and/or failure listeners,
             // Or you can call Tasks.await() and catch ExecutionException
             sendTask.addOnSuccessListener(this);
             sendTask.addOnFailureListener(this);
-
-//        if (sapService != null) {
-//            if (sapService.sendData(packet)) {
-//                Log.i(GWatchApplication.LOG_TAG, "Data sent.");
-//                return true;
-//            }
         } else if (BuildConfig.DEBUG){
             Log.i(GWatchApplication.LOG_TAG, "Service not bound.");
         }
         return false;
+    }
+
+    private String getMessagePath(Packet packet) {
+        switch (packet.getType()) {
+            case GLUCOSE:
+                return "/bg_data";
+            case AAPS:
+                return "/aaps_data";
+            case CONFIG:
+            case DEVICE_INFO:
+            case SYNC:  // TODO obsolete
+            case MEDIA: // TODO obsolete
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -265,14 +274,13 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
     }
 
     @Override
-    public void onSuccess(@NonNull Object o) {
+    public void onSuccess(@NonNull Integer o) {
         Log.d(LOG_TAG, "onSuccess: " + o);
         notifyPacketSent();
     }
 
     ///////////////////////////////////////////////////////////////////////////
 
-    private static final String BG_DATA_VIEW_CAPABILITY_NAME = "bg_data_view";
     private String nodeId = null;
 
     private void setupWearClient() {
@@ -319,24 +327,19 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
     }
 
     private Set<Node> getNodes() {
-        HashSet<Node> results = new HashSet<>();
-        List<Node> nodes = null;
         try {
-            nodes = Tasks.await(Wearable.getNodeClient(context).getConnectedNodes());
+            List<Node> nodes = Tasks.await(Wearable.getNodeClient(context).getConnectedNodes());
+            return new HashSet<>(nodes);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             return null;
         }
 
-        for (Node node : nodes) {
-            results.add(node);
-        }
-        return results;
     }
 
     private void notifyPacketSent() {
         try {
-            if (packetConsole != null && context != null) {
+            if (context != null) {
                 String status = GWatchApplication.getAppContext().getString(R.string.packet_sent, UiUtils.formatTime(new Date()));
                 packetConsole.showPacketStatus(status);
             }
@@ -347,9 +350,7 @@ public class GWatchApplication extends Application implements Dispatcher, OnSucc
 
     private void notifySendingPacket(Packet packet) {
         try {
-            if (packetConsole != null) {
-                packetConsole.showPacket(GWatchApplication.getAppContext(), packet);
-            }
+            packetConsole.showPacket(GWatchApplication.getAppContext(), packet);
         } catch (Throwable e) {
             String errMsg = e.getLocalizedMessage();
             Log.e(GWatchApplication.LOG_TAG, errMsg == null ? e.getClass().getSimpleName() : errMsg, e);

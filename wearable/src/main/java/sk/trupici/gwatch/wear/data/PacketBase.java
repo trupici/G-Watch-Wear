@@ -18,6 +18,8 @@
 
 package sk.trupici.gwatch.wear.data;
 
+import java.io.Serializable;
+
 public abstract class PacketBase implements Packet {
     private static final String LOCAL_SOURCE = "G-Watch Service";
 

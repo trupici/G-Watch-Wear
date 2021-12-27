@@ -46,4 +46,13 @@
     <string name="border_type_dotted_rect">Dotted rect</string>
     <string name="border_type_dotted_round_rect">Dotted round rect</string>
     <string name="border_type_dotted_ring">Dotted ring</string>
+
+    <string name="alarm_critical_value">Critical glucose!</string>
+    <string name="alarm_high_value">High glucose!</string>
+    <string name="alarm_low_value">Low glucose!</string>
+    <string name="alarm_no_data">No data!</string>
+    <string name="alarm_fast_drop">Fast drop!</string>
+
+    <string name="invalid_value">Invalid value</string>
+
 </resources>

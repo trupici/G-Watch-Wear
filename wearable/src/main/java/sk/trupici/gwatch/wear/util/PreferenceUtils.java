@@ -58,4 +58,14 @@ public class PreferenceUtils {
         String strValue = prefs.getString(prefName, StringUtils.EMPTY_STRING);
         return strValue.trim().isEmpty() ? defValue : Integer.valueOf(strValue);
     }
+
+    public static void setLongValue(Context context, String prefName, long value) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putLong(prefName, value).commit();
+    }
+
+    public static long getLongValue(Context context, String prefName, long defValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getLong(prefName, defValue);
+    }
 }

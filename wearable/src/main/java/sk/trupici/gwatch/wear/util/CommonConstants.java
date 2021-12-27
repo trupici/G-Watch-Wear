@@ -21,7 +21,9 @@ public interface CommonConstants {
 
     String BG_RECEIVER_ACTION = "BG_RECEIVER_ACTION";
 
-    int MINUTE_IN_MILLIS = 60000; // 60 * 1000
+    long SECOND_IN_MILLIS = 1000L;
+    int MINUTE_IN_SECONDS = 60;
+    long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
     int DAY_IN_MINUTES = 1440; // 24 * 60
     int HOUR_IN_MINUTES = 60;
 

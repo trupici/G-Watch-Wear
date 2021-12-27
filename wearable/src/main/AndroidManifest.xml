@@ -18,10 +18,14 @@
     package="sk.trupici.gwatch.wear">
 
     <!-- Required to act as a custom watch face. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Required for complications to receive complication data and open the provider chooser. -->
     <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
+
+    <!--  Required for alarms -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -63,6 +67,10 @@
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="test.alarm.result" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </service>
 
         <activity
@@ -92,14 +100,29 @@
 
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity"/>
 
+        <activity android:name=".components.BgAlarmActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="sk.trupici.gwatch.wear.BG_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
 <!--        <meta-data-->
 <!--            android:name="com.google.android.gms.version"-->
 <!--            android:value="@integer/google_play_services_version" />-->
+
 
         <service android:name=".services.BgDataListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/bg_data"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".services.AapsDataListenerService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/aaps_data"/>
             </intent-filter>
         </service>
 
@@ -109,6 +132,7 @@
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/config"/>
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>

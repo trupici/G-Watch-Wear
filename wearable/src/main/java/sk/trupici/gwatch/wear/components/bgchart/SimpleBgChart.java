@@ -37,7 +37,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.ComponentPanel;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
-import sk.trupici.gwatch.wear.services.BgDataListenerService;
+import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
@@ -244,7 +244,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
             Log.d(LOG_TAG, "updateGraphData: " + bgValue);
         }
 
-        final long now = System.currentTimeMillis() / (long)CommonConstants.MINUTE_IN_MILLIS; // minutes
+        final long now = System.currentTimeMillis() / CommonConstants.MINUTE_IN_MILLIS; // minutes
         if (now < 0) {
             Log.e(LOG_TAG, "now is negative: " + now);
             return;
@@ -517,7 +517,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         }
 
         try {
-            int data[] = Arrays.stream(serialized.split(":"))
+            int[] data = Arrays.stream(serialized.split(":"))
                     .mapToInt(Integer::valueOf)
                     .toArray();
             if (data.length != GRAPH_DATA_LEN) {
@@ -533,27 +533,19 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        int bgValue = extras.getInt(BgDataListenerService.EXTRA_BG_VALUE, 0);
-        if (bgValue == 0) {
+        BgData bgData = BgData.fromBundle(extras);
+        if (bgData.getValue() == 0) {
             return;
-        }
-
-        long bgTimestamp = extras.getLong(BgDataListenerService.EXTRA_BG_TIMESTAMP, -1);
-        if (bgTimestamp == 0) {
-            bgTimestamp = extras.getLong(BgDataListenerService.EXTRA_BG_RECEIVEDAT, 0);
-            if (bgTimestamp == 0) {
-                bgTimestamp = System.currentTimeMillis();
-            }
         }
 
         SharedPreferences sharedPrefs = context.getSharedPreferences(
                 context.getString(R.string.standard_analog_complication_preferences_key),
                 Context.MODE_PRIVATE);
 
-        updateGraphData((double)bgValue, bgTimestamp, sharedPrefs);
+        updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
     }
 
-    class GraphRange {
+    static class GraphRange {
         final int min;
         final int max;
         final float scale;

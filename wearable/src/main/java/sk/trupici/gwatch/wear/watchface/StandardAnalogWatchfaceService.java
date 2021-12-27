@@ -16,8 +16,10 @@
 
 package sk.trupici.gwatch.wear.watchface;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -27,6 +29,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.SystemProviders;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
@@ -37,8 +40,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 
-import com.google.android.gms.wearable.MessageClient;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ import java.util.List;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
+import sk.trupici.gwatch.wear.components.BgAlarmController;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.ComponentsConfig;
 import sk.trupici.gwatch.wear.components.DatePanel;
@@ -55,6 +57,7 @@ import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.Config;
+import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
@@ -88,6 +91,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
     private static final int MSG_UPDATE_TIME = 0;
 
     private AnalogWatchfaceConfig watchfaceConfig;
+
 
     @Override
     public Engine onCreateEngine() {
@@ -144,10 +148,11 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         private SimpleBgChart chartPanel;
         private BgPanel bgPanel;
         private DatePanel datePanel;
-
-        private MessageClient messageClient;
+        private BgAlarmController bgAlarmController;
 
         private List<BroadcastReceiver> receivers = new ArrayList<>(5);
+
+        private long lastMinute = 0L;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -183,6 +188,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             chartPanel = new SimpleBgChart((int) screenWidth, (int) screenHeight);
             chartPanel.onCreate(context, sharedPrefs);
 
+            bgAlarmController = new BgAlarmController();
+            bgAlarmController.onCreate(context, sharedPrefs);
+
             leftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.layout_left_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.layout_left_compl_top) / screenHeight,
@@ -200,10 +208,24 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             initializeComplications();
 
+            registerReceiver(context, new BgDataProcessor(), BgDataProcessor.BG_PROCESSOR_ACTION);
             registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, chartPanel, CommonConstants.BG_RECEIVER_ACTION);
-        }
+            registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);
 
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+//                openOverlaySettings();
+                final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    context.startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Log.e(LOG_TAG, e.getMessage());
+                }
+//            }
+
+
+        }
 
         // Pulls all user's preferences for watch face appearance.
         private void loadSavedPreferences() {
@@ -220,9 +242,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             Context context = getApplicationContext();
             bkgPanel.onConfigChanged(context, sharedPrefs);
-            watchHands.onConfigChanged(getApplicationContext(), sharedPrefs);
-            bgPanel.onConfigChanged(getApplicationContext(), sharedPrefs);
-            datePanel.onConfigChanged(getApplicationContext(), sharedPrefs);
+            watchHands.onConfigChanged(context, sharedPrefs);
+            bgPanel.onConfigChanged(context, sharedPrefs);
+            datePanel.onConfigChanged(context, sharedPrefs);
+            bgAlarmController.onConfigChanged(context, sharedPrefs);
         }
 
         private void initializeComplications() {
@@ -319,7 +342,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             // unregister all receivers
             if (receivers != null) {
-                receivers.forEach(r -> unregisterReceiver(r));
+                receivers.forEach(r -> {
+                    try {
+                        unregisterReceiver(r);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Failed to unregister receiver: " + r.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                    }
+                });
             }
 
             super.onDestroy();
@@ -447,6 +476,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     // The user has started a different gesture or otherwise cancelled the tap.
                     break;
                 case TAP_TYPE_TAP:
+//                    bgAlarmController.test(getApplicationContext());
                     // The user has completed the tap gesture.
                     // If your background complication is the first item in your array, you need
                     // to walk backward through the array to make sure the tap isn't for a
@@ -476,6 +506,11 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bgPanel.onDraw(canvas, isAmbientMode);
             drawComplications(canvas, now);
             watchHands.onDraw(canvas, isAmbientMode);
+
+            if (now - lastMinute > CommonConstants.MINUTE_IN_MILLIS) {
+                bgAlarmController.handleAlarmTime(getApplicationContext());
+                lastMinute = now;
+            }
         }
 
         private void drawComplications(Canvas canvas, long currentTimeMillis) {
@@ -502,6 +537,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 watchHands.onConfigChanged(context, sharedPrefs);
                 bgPanel.onConfigChanged(context, sharedPrefs);
                 datePanel.onConfigChanged(context, sharedPrefs);
+                bgAlarmController.onConfigChanged(context, sharedPrefs);
 
                 adjustSize((int)screenWidth, (int)screenHeight);
 

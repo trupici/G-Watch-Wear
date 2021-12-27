@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+
+    <color name="alarms_urgent_color">#FFFC0709</color>
+    <color name="alarms_warn_color">#FFFFBB09</color>
+    <color name="alarms_no_data_color">#FF008BE4</color>
+
+    <bool name="def_notification_new_value_enabled">false</bool>
+    <!-- default notification vibration duration in seconds -->
+    <integer name="def_notification_new_value_duration">150</integer>
+    <!-- default notification vibration intensity 0-255, -1 for system defaults -->
+    <integer name="def_notification_new_value_amplitude">-1</integer>
+
+    <bool name="def_alarms_enabled">true</bool>
+    <!-- flag whether to use time range only -->
+    <bool name="def_alarms_time_range_enabled">false</bool>
+    <!-- active time range limits in minutes (22:00 - 7:00) -->
+    <integer name="def_alarms_enabled_from">1320</integer>
+    <integer name="def_alarms_enabled_to">420</integer>
+
+    <bool name="def_alarms_hyper_enabled">false</bool>
+    <bool name="def_alarms_high_enabled">false</bool>
+    <bool name="def_alarms_low_enabled">false</bool>
+    <bool name="def_alarms_hypo_enabled">false</bool>
+    <bool name="def_alarms_no_data_enabled">false</bool>
+    <bool name="def_alarms_fats_drop_enabled">false</bool>
+
+    <!-- default duration in seconds -->
+    <integer name="def_alarms_duration">60</integer>
+    <!-- default snooze time in minutes -->
+    <integer name="def_alarms_snooze_time">15</integer>
+    <!-- default vibration intensity 0-255, -1 for system defaults -->
+    <integer name="def_alarms_intensity">230</integer>
+    <!-- default minimal time between to alarms in minutes-->
+    <integer name="def_alarms_period">5</integer>
+
+    <bool name="def_alarms_sound_enabled">true</bool>
+    <!-- flag whether to use time range only -->
+    <bool name="def_alarms_sound_time_range_enabled">false</bool>
+    <!-- active time range limits in minutes (22:00 - 7:00) -->
+    <integer name="def_alarms_sound_enabled_from">1320</integer>
+    <integer name="def_alarms_sound_enabled_to">420</integer>
+    <!-- default sound volume (0 - 100%) -->
+    <integer name="def_alarms_sound_volume">100</integer>
+
+    <integer name="def_alarms_fast_drop_duration">30</integer>
+    <integer name="def_alarms_fast_drop_snooze_time">60</integer>
+    <integer name="def_alarms_fast_drop_threshold">18</integer>
+
+    <integer name="def_alarms_no_data_duration">30</integer>
+    <!-- minimal time between to no data alarms -->
+    <integer name="def_alarms_no_data_period">11</integer>
+
+
+    <bool name="def_alarms_critical_enabled">true</bool>
+    <integer name="def_alarms_critical_duration">150</integer>
+    <integer name="def_alarms_critical_period">5</integer>
+    <!-- default low critical alarm threshold -->
+    <integer name="def_alarms_critical_threshold_low">54</integer> <!-- 3 mmol/l -->
+    <!-- default high critical alarm threshold -->
+    <integer name="def_alarms_critical_threshold_high">360</integer> <!-- 20 mmol/l -->
+
+
+    <integer-array name="alarms_pattern_hyper">
+        <item>250</item><item>250</item>
+        <item>250</item><item>250</item>
+        <item>250</item><item>1750</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_high">
+        <item>250</item><item>250</item>
+        <item>250</item><item>1750</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_low">
+        <item>500</item><item>250</item>
+        <item>500</item><item>1500</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_hypo">
+        <item>500</item><item>250</item>
+        <item>500</item><item>250</item>
+        <item>500</item><item>1500</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_critical">
+        <item>150</item><item>150</item>
+        <item>150</item><item>150</item>
+        <item>150</item><item>150</item>
+        <item>500</item><item>150</item>
+        <item>500</item><item>150</item>
+        <item>500</item><item>150</item>
+        <item>150</item><item>150</item>
+        <item>150</item><item>150</item>
+        <item>150</item><item>1250</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_no_data">
+        <item>250</item><item>250</item>
+        <item>250</item><item>250</item>
+        <item>250</item><item>250</item>
+        <item>250</item><item>250</item>
+        <item>250</item><item>1250</item>
+    </integer-array>
+
+    <integer-array name="alarms_pattern_fast_drop">
+        <item>500</item><item>250</item>
+        <item>500</item><item>250</item>
+        <item>500</item><item>250</item>
+        <item>500</item><item>1500</item>
+    </integer-array>
+
+</resources>

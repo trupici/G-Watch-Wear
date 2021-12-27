@@ -72,12 +72,13 @@ public class DexcomShareFollowerService extends FollowerService {
     public static final String DEXCOM_PATH_GET_VALUE = "/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues";
     public static final String DEXCOM_PATH_GET_SESSION_ID = "/ShareWebServices/Services/General/LoginPublisherAccountByName";
 
-    public static final String USER_AGENT = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0";
+    public static final String USER_AGENT = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0"; //xdrip: "CGM-Store-1.2/22 CFNetwork/711.5.6 Darwin/14.0.0"
+
 
     private static final String INVALID_SESSION_ID = "00000000-0000-0000-0000-000000000000";
     private static final String[] DEXCOM_APP_IDS = new String[] {
             "d8665ade-9673-4e27-9ff6-92db4ce13d13",
-            "d89443d2-327c-4a6f-89e5-496bbb0317db"
+            "d89443d2-327c-4a6f-89e5-496bbb0317db" // xdrip
     };
 
     private static final int MAX_SAMPLE_HISTORY_TIME_MIN = 60; // 1hr

@@ -16,14 +16,19 @@
 
 package sk.trupici.gwatch.wear.services;
 
-import android.content.Intent;
 import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import java.time.Duration;
+
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
+import androidx.work.WorkManager;
 import sk.trupici.gwatch.wear.data.AAPSPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.PacketBase;
@@ -83,10 +88,19 @@ public class AapsDataListenerService extends WearableListenerService {
                     null,
                     packet.getSource());
 
-            Intent intent = new Intent();
-            intent.setAction(BgDataProcessor.BG_PROCESSOR_ACTION);
-            intent.putExtra(BgDataProcessor.EXTRA_DATA, glucosePacket.getData());
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            // schedule delivery to bg processor
+            // TODO consider to use expedited job here
+            Constraints constraints = new Constraints.Builder()
+                    .setTriggerContentMaxDelay(Duration.ofMillis(100))
+                    .build();
+            OneTimeWorkRequest workRequest =
+                    new OneTimeWorkRequest.Builder(BgDataProcessor.class)
+                            .setInputData(new Data.Builder().putByteArray(BgDataProcessor.EXTRA_DATA, data).build())
+                            .setConstraints(constraints)
+                            .build();
+
+            WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+            workManager.enqueue(workRequest);
 //        }
 
             // TODO send AAPS data

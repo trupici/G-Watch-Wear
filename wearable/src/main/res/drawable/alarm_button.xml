@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle" >
     <corners android:radius="64dp"/>
-<!--    <solid android:color="#7516F1" />-->
-    <solid android:color="@color/circular_button_normal" />
+    <solid android:color="#2C2C2C" />
 </shape>

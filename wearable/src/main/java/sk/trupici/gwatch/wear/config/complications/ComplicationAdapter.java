@@ -35,8 +35,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -280,7 +278,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     @Override
-    public void onDetachedFromRecyclerView(@NotNull RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         // Required to release retriever for active complication data on detach.
         providerInfoRetriever.release();

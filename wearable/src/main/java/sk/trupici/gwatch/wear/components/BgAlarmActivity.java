@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Juraj Antal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package sk.trupici.gwatch.wear.components;
 
 import android.content.Context;
@@ -21,7 +37,7 @@ import sk.trupici.gwatch.wear.util.StringUtils;
 
 public class BgAlarmActivity extends WearableDialogActivity {
 
-    public static final String LOG_TAG = CommonConstants.LOG_TAG;
+    public static final String LOG_TAG = BgAlarmActivity.class.getSimpleName();
 
     final public static String ACTION = "sk.trupici.gwatch.wear.BG_ALARM";
 
@@ -32,7 +48,7 @@ public class BgAlarmActivity extends WearableDialogActivity {
     final public static String EXTRAS_ALARM_TEXT_COLOR = "color";
 
     private static final String WAKE_LOCK_TAG = "gwatch.wear:" + BgAlarmActivity.class.getSimpleName() + ".wake_lock";
-    private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 60s
+    private static final long WAKE_LOCK_TIMEOUT_MS = 180000; // 3 minutes
     private PowerManager.WakeLock wakeLock;
 
 
@@ -51,6 +67,10 @@ public class BgAlarmActivity extends WearableDialogActivity {
     protected void onCreate(Bundle savedInstanceState) {
         PowerManager powerManager = (PowerManager)getApplicationContext().getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
+        if (wakeLock.isHeld()) {
+            Log.w(LOG_TAG, "AlarmActivity: wake log is already held, exiting...");
+            return;
+        }
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
 
         super.onCreate(savedInstanceState);
@@ -103,7 +123,7 @@ public class BgAlarmActivity extends WearableDialogActivity {
             stopAlarm();
             super.onStop();
         } finally {
-            if (wakeLock != null) {
+            if (wakeLock != null && wakeLock.isHeld()) {
                 wakeLock.release();
             }
         }

@@ -38,7 +38,7 @@
     <application
         android:allowBackup="true"
         android:fullBackupOnly="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_gwatch"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
@@ -112,7 +112,6 @@
 <!--            android:name="com.google.android.gms.version"-->
 <!--            android:value="@integer/google_play_services_version" />-->
 
-
         <service android:name=".services.BgDataListenerService" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
@@ -134,6 +133,29 @@
             </intent-filter>
         </service>
 
+        <!-- BG provider -->
+        <service android:name=".providers.BgDataProviderService" android:exported="true"
+            android:roundIcon="@mipmap/ic_gwatch"
+            android:label="@string/provider_name"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="SHORT_TEXT,LONG_TEXT,RANGED_VALUE" />
+
+             <meta-data
+                android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
+                android:value="0" />
+        </service>
+
+        <receiver android:name=".providers.ProviderDataUpdater" android:exported="true">
+            <intent-filter>
+                <action android:name="sk.trupici.gwatch.wear.BG_RECEIVER_ACTION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

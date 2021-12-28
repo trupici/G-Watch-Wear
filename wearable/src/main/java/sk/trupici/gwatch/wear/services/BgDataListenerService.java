@@ -27,12 +27,11 @@ import java.time.Duration;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 import sk.trupici.gwatch.wear.data.PacketBase;
 import sk.trupici.gwatch.wear.data.PacketType;
-import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.DumpUtils;
+import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
 public class BgDataListenerService extends WearableListenerService {
 

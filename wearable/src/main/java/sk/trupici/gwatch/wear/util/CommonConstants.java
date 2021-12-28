@@ -16,15 +16,26 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
+
 public interface CommonConstants {
     String LOG_TAG = "GWatchApp";
 
-    String BG_RECEIVER_ACTION = "BG_RECEIVER_ACTION";
+    String BG_RECEIVER_ACTION = "sk.trupici.gwatch.wear.BG_RECEIVER_ACTION";
 
     long SECOND_IN_MILLIS = 1000L;
     int MINUTE_IN_SECONDS = 60;
     long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
-    int DAY_IN_MINUTES = 1440; // 24 * 60
     int HOUR_IN_MINUTES = 60;
+    long HOUR_IN_MILLIS = 3600000l; // 60 * 60 * 1000
+    int DAY_IN_MINUTES = 1440; // 24 * 60
+
+    String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
+
+    String PREF_HYPER_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hyper";
+    String PREF_HIGH_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_high";
+    String PREF_LOW_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_low";
+    String PREF_HYPO_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hypo";
+    String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_no_data";
 
 }

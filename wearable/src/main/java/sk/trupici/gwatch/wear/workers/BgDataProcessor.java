@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sk.trupici.gwatch.wear.receivers;
+package sk.trupici.gwatch.wear.workers;
 
 import android.content.Context;
 import android.content.Intent;
@@ -114,6 +114,10 @@ public class BgDataProcessor extends Worker {
         Intent bgIntent = new Intent(CommonConstants.BG_RECEIVER_ACTION);
         bgIntent.putExtras(bgData.toBundle());
         LocalBroadcastManager.getInstance(context).sendBroadcast(bgIntent);
+
+        // send data to receivers registered in manifest and wait for processing
+        bgIntent.setPackage(context.getPackageName());
+        context.sendOrderedBroadcast(bgIntent, null);
 
         return Result.success();
     }

@@ -20,10 +20,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import androidx.preference.PreferenceManager;
 
 public class PreferenceUtils {
-    final private static String LOG_TAG = DumpUtils.class.getSimpleName();
+    final private static String LOG_TAG = PreferenceUtils.class.getSimpleName();
 
 
     public static void dumpPreferences(SharedPreferences prefs) {
@@ -67,5 +70,39 @@ public class PreferenceUtils {
     public static long getLongValue(Context context, String prefName, long defValue) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getLong(prefName, defValue);
+    }
+
+    public static int[] getIntArrayValue(Context context, String prefName) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String serialized = prefs.getString(prefName, null);
+        if (serialized == null) {
+            Log.w(LOG_TAG, "getIntArrayValue: no data to restore");
+            return null;
+        }
+
+        try {
+            return Arrays.stream(serialized.split(":"))
+                    .mapToInt(Integer::valueOf)
+                    .toArray();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "getIntArrayValue: failed to restore data: " + e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    public static boolean setIntArrayValue(Context context, String prefName, int[] value) {
+        try {
+            String serialized = Arrays.stream(value)
+                    .mapToObj(Integer::toString)
+                    .collect(Collectors.joining(":"));
+
+            SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            edit.putString(prefName, serialized);
+            edit.commit();
+            return true;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "getIntArrayValue: failed to store data: " + e.getLocalizedMessage());
+            return false;
+        }
     }
 }

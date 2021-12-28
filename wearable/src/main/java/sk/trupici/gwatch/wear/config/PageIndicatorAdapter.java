@@ -22,8 +22,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import org.jetbrains.annotations.NotNull;
-
+import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.R;
 
@@ -33,7 +32,7 @@ public class PageIndicatorAdapter extends ViewPager2.OnPageChangeCallback {
     final private ViewPager2 pager;
     final private int numElements;
 
-    public PageIndicatorAdapter(@NotNull ViewGroup indicatorView, int numElements, ViewPager2 pager) {
+    public PageIndicatorAdapter(@NonNull ViewGroup indicatorView, int numElements, ViewPager2 pager) {
         this.indicatorView = indicatorView;
         this.numElements = numElements;
         this.pager = pager;

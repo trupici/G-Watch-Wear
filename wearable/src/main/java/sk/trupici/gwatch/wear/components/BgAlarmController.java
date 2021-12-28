@@ -34,10 +34,10 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
 import static android.content.Context.POWER_SERVICE;
 
@@ -240,12 +240,11 @@ public class BgAlarmController extends BroadcastReceiver {
         Resources res = context.getResources();
 
         // thresholds
-        // FIXME
-        hyperThreshold = sharedPrefs.getInt(BgPanel.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
-        highThreshold = sharedPrefs.getInt(BgPanel.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
-        lowThreshold = sharedPrefs.getInt(BgPanel.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
-        hypoThreshold = sharedPrefs.getInt(BgPanel.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
-        isUnitConv = sharedPrefs.getBoolean(BgPanel.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
+        hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+        highThreshold = sharedPrefs.getInt(CommonConstants.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
+        lowThreshold = sharedPrefs.getInt(CommonConstants.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
+        hypoThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
+        isUnitConv = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
 
         newBgValueNotificationEnabled = sharedPrefs.getBoolean(PREF_NEW_VALUE_NOTIFICATION_ENABLED, res.getBoolean(R.bool.def_notification_new_value_enabled));
 

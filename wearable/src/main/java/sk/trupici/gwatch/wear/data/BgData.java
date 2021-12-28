@@ -17,8 +17,7 @@
 package sk.trupici.gwatch.wear.data;
 
 import android.os.Bundle;
-
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
 
 public class BgData {
     private final static String KEY_VALUE = "value";
@@ -41,7 +40,7 @@ public class BgData {
         this.trend = trend;
     }
 
-    public static BgData fromBundle(@NotNull Bundle bundle) {
+    public static BgData fromBundle(@NonNull Bundle bundle) {
         return new BgData(
                 bundle.getInt(KEY_VALUE, 0),
                 bundle.getLong(KEY_TIMESTAMP, 0L),

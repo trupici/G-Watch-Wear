@@ -18,7 +18,7 @@ package sk.trupici.gwatch.wear.config.complications;
 
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
 
 public class ComplicationConfig {
 
@@ -50,7 +50,7 @@ public class ComplicationConfig {
         }
     }
 
-    public ComplicationConfig(ComplicationId id, ComplicationLocation location, @NotNull int[] supportedTypes) {
+    public ComplicationConfig(ComplicationId id, ComplicationLocation location, @NonNull int[] supportedTypes) {
         this.id = id;
         this.location = location;
         this.supportedTypes = supportedTypes;

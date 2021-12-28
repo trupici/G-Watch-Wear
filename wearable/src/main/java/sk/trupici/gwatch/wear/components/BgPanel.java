@@ -59,19 +59,11 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         onDataUpdate(BgData.fromBundle(extras));
     }
 
-    public static final String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
-
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
     public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_warn";
     public static final String PREF_IN_RANGE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_in_range";
     public static final String PREF_NO_DATA_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_no_data";
-
-    public static final String PREF_HYPER_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hyper";
-    public static final String PREF_HIGH_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_high";
-    public static final String PREF_LOW_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_low";
-    public static final String PREF_HYPO_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hypo";
-    public static final String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_no_data";
 
     public static final String PREF_BORDER_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_color";
     public static final String PREF_BORDER_TYPE = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_type";
@@ -144,15 +136,15 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
-        isUnitConversion = sharedPrefs.getBoolean(PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
-//        samplePeriod = sharedPrefs.getInt(PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
+        isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
+//        samplePeriod = sharedPrefs.getInt(CommonConstants.PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
 
         // thresholds
-        hyperThreshold = sharedPrefs.getInt(PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
-        highThreshold = sharedPrefs.getInt(PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
-        lowThreshold = sharedPrefs.getInt(PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
-        hypoThreshold = sharedPrefs.getInt(PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
-        noDataThreshold = sharedPrefs.getInt(PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
+        hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+        highThreshold = sharedPrefs.getInt(CommonConstants.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
+        lowThreshold = sharedPrefs.getInt(CommonConstants.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
+        hypoThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
+        noDataThreshold = sharedPrefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
 
         // colors
         backgroundColor = sharedPrefs.getInt(PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));

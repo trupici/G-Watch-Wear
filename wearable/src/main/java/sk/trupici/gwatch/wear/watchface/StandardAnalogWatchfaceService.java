@@ -213,7 +213,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             initializeComplications();
 
-//            registerReceiver(context, new BgDataProcessor(), BgDataProcessor.BG_PROCESSOR_ACTION);
             registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, chartPanel, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);

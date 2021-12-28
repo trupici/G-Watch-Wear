@@ -15,8 +15,8 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">G-Watch Wear App</string>
-    <string name="message">Watch face tapped</string>
+    <string name="app_name" translatable="false">G-Watch Wear App</string>
+    <string name="provider_name" translatable="false">G-Watch BG Provider</string>
 
     <string name="standard_analog_name">G-Watch</string>
     <string name="standard_analog_config_name">G-Watch Config</string>

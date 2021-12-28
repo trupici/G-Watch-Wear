@@ -40,11 +40,10 @@ import sk.trupici.gwatch.wear.components.ComponentPanel;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
-    final private static String LOG_TAG = DumpUtils.class.getSimpleName();
+    final private static String LOG_TAG = SimpleBgChart.class.getSimpleName();
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical";
@@ -169,9 +168,8 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         ambientPaint.setAntiAlias(false);
         ambientPaint.setColorFilter(filter);
 
-        onConfigChanged(context, sharedPrefs);
-
         restoreChartData(sharedPrefs);
+        onConfigChanged(context, sharedPrefs);
     }
 
     @Override
@@ -218,6 +216,8 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         lowThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
         highThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
         hyperThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, BgPanel.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+
+        drawChart();
     }
 
     @Override
@@ -242,12 +242,12 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
 
     public void updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs) {
         if (BuildConfig.DEBUG && bgValue != null) {
-            Log.d(LOG_TAG, "updateGraphData: " + bgValue);
+            Log.d(LOG_TAG, "graph: updateGraphData: " + bgValue);
         }
 
         final long now = System.currentTimeMillis() / CommonConstants.MINUTE_IN_MILLIS; // minutes
         if (now < 0) {
-            Log.e(LOG_TAG, "now is negative: " + now);
+            Log.e(LOG_TAG, "graph: now is negative: " + now);
             return;
         }
 
@@ -258,6 +258,9 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
             int roll = (int) ((now - lastGraphUpdateMin) / refreshRateMin);
             if (roll > 0) {
                 lastGraphUpdateMin = now;
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "graph: clearing data buffer: " + roll);
+                }
                 if (roll >= GRAPH_DATA_LEN) {
                     Arrays.fill(graphData, 0);
                 } else {
@@ -297,7 +300,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         if (value > 0) {
             minValue = minValue == 0 ? value : Math.min(minValue, value);
             maxValue = maxValue == 0 ? value : Math.max(maxValue, value);
-            Log.d(LOG_TAG, "updateDynamicRange: min=" + minValue + ", max=" + maxValue);
+            Log.d(LOG_TAG, "graph: updateDynamicRange: min=" + minValue + ", max=" + maxValue);
         }
     }
 
@@ -309,7 +312,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         for (int i = offset; i < GRAPH_DATA_LEN; i++) {
             updateDynamicRange(graphData[i]);
         }
-        Log.d(LOG_TAG, "recalculateDynamicRange: min=" + minValue + ", max=" + maxValue);
+        Log.d(LOG_TAG, "graph: recalculateDynamicRange: min=" + minValue + ", max=" + maxValue);
     }
 
     private int getVisibleDataLen() {
@@ -322,8 +325,8 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Bitmap size: " + bitmap.getWidth() + " x " + bitmap.getHeight());
-            Log.d(LOG_TAG, "Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
+            Log.d(LOG_TAG, "graph: Bitmap size: " + bitmap.getWidth() + " x " + bitmap.getHeight());
+            Log.d(LOG_TAG, "graph: Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
         }
 
         bitmap.eraseColor(backgroundColor);
@@ -336,7 +339,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         int width = (int)bounds.width() - leftPadding - rightPadding;
         int height = (int)bounds.height() - topPadding - bottomPadding;
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "Paint size: " + width + " x " + height);
+            Log.d(LOG_TAG, "graph: Paint size: " + width + " x " + height);
         }
 
         float padding = DEF_DOT_PADDING; // FIXME horizontal scale
@@ -402,7 +405,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         int valueOffset = GRAPH_DATA_LEN - count;
 
         // draw values
-        int color = 0, prevColor = 0;
+        int color;
         float prevX = 0, prevY = 0;
         for (int i = valueOffset; i < GRAPH_DATA_LEN; i++) {
             int value = graphData[i];
@@ -418,8 +421,6 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
 
             x = xOffset + (2 * DOT_RADIUS + padding) * (i - valueOffset);
             y = yOffset - ((value - graphRange.min) * graphRange.scale);
-
-            prevColor = color;
 
             if (value <= hypoThreshold) {
                 color = criticalColor;
@@ -500,7 +501,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
             edit.putInt(PREF_DATA_LAST_UPD_MIN, (int) lastGraphUpdateMin);
             edit.apply();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "storeChartData: failed to store data: " + e.getLocalizedMessage());
+            Log.e(LOG_TAG, "graph: storeChartData: failed to store data: " + e.getLocalizedMessage());
         }
     }
 
@@ -508,11 +509,13 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, -1);
         if (lastGraphUpdateMin == -1) {
             lastGraphUpdateMin = 0;
+            Log.w(LOG_TAG, "graph: no data timestamp to restore");
             return;
         }
 
         String serialized = sharedPrefs.getString(PREF_DATA, null);
         if (serialized == null) {
+            Log.w(LOG_TAG, "graph: no data to restore");
             lastGraphUpdateMin = 0;
             return;
         }
@@ -522,12 +525,14 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
                     .mapToInt(Integer::valueOf)
                     .toArray();
             if (data.length != GRAPH_DATA_LEN) {
+                Log.w(LOG_TAG, "graph: failed to deserialize data");
                 lastGraphUpdateMin = 0;
                 return;
             }
-            System.arraycopy(data, 0, graphData, data.length, Math.min(GRAPH_DATA_LEN, data.length));
+            System.arraycopy(data, 0, graphData, 0, Math.min(GRAPH_DATA_LEN, data.length));
+            recalculateDynamicRange();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "restoreChartData: failed to restore data: " + e.getLocalizedMessage());
+            Log.e(LOG_TAG, "graph: failed to restore data: " + e.getLocalizedMessage());
         }
     }
 

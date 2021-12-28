@@ -348,9 +348,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
 
             // unregister all receivers
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
             receivers.forEach(r -> {
                 try {
-                    unregisterReceiver(r);
+                    localBroadcastManager.unregisterReceiver(r);
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Failed to unregister receiver: " + r.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
                 }

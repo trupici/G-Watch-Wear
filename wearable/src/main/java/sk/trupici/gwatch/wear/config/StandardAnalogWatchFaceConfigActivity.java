@@ -23,7 +23,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MotionEvent;
 
+import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
@@ -48,7 +50,7 @@ public class StandardAnalogWatchFaceConfigActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        prefs = getSharedPreferences(getString(R.string.standard_analog_complication_preferences_key), Context.MODE_PRIVATE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         config = new AnalogWatchfaceConfig();
 
         onCreatePageView(this);
@@ -67,14 +69,14 @@ public class StandardAnalogWatchFaceConfigActivity extends Activity {
                 viewPager.getAdapter().getItemCount(),
                 viewPager);
 
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.standard_analog_complication_preferences_key), Context.MODE_PRIVATE);
-        PreferenceUtils.dumpPreferences(sharedPref);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        if (BuildConfig.DEBUG) {
+            PreferenceUtils.dumpPreferences(sharedPref);
+        }
     }
 
     @Override
     protected void onDestroy() {
-        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.standard_analog_complication_preferences_key), Context.MODE_PRIVATE);
-
         super.onDestroy();
 
         configAdapter.destroy();

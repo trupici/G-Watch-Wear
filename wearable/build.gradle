@@ -7,11 +7,10 @@ android {
 
     defaultConfig {
         applicationId "sk.trupici.gwatch.wear"
-        minSdk 26
+        minSdk 30
         targetSdk 30
         versionCode 1
         versionName "1.0"
-
     }
 
     buildTypes {

@@ -40,8 +40,8 @@ public class BgDataProcessor extends Worker {
 
     public final static String EXTRA_DATA = "BG_DATA";
 
+    public final static String PREF_LAST_BG_TIMESTAMP = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_ts";
     private final static String PREF_LAST_BG_VALUE = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_value";
-    private final static String PREF_LAST_BG_TIMESTAMP = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_ts";
     private final static String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
 
     public BgDataProcessor(@NonNull Context context, @NonNull WorkerParameters workerParams) {

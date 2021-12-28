@@ -5,11 +5,13 @@ import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.wearable.view.WearableDialogActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import sk.trupici.gwatch.wear.R;
@@ -38,7 +40,7 @@ public class BgAlarmActivity extends WearableDialogActivity {
     private Vibrator vibrator;
 
     // timer to finish the alarm after configured time
-    private final Handler timerHandler = new Handler();
+    private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private final Runnable timerRunnable = () -> {
         stopAlarm();
         finish();
@@ -75,14 +77,24 @@ public class BgAlarmActivity extends WearableDialogActivity {
 
         startAlarm(alarmConfig, sounds);
 
-        findViewById(R.id.snooze_button).setOnClickListener(view -> {
-            PreferenceUtils.setLongValue(this, BgAlarmController.PREF_LAST_SNOOZED_AT, System.currentTimeMillis());
-            finish();
-        });
+        if (alarmConfig.type == BgAlarmController.Type.CRITICAL) {
+            findViewById(R.id.snooze_button).setVisibility(View.INVISIBLE);
+        } else {
+            findViewById(R.id.snooze_button).setOnClickListener(view -> {
+                String prefName;
+                if (alarmConfig.type == BgAlarmController.Type.NO_DATA) {
+                    prefName = BgAlarmController.PREF_NO_DATA_LAST_SNOOZED_AT;
+                } else if (alarmConfig.type == BgAlarmController.Type.FAST_DROP) {
+                    prefName = BgAlarmController.PREF_FAST_DROP_LAST_SNOOZED_AT;
+                } else {
+                    prefName = BgAlarmController.PREF_LAST_SNOOZED_AT;
+                }
+                PreferenceUtils.setLongValue(getApplicationContext(), prefName,  System.currentTimeMillis());
+                finish();
+            });
+        }
 
-        findViewById(R.id.dismiss_button).setOnClickListener(view -> {
-            finish();
-        });
+        findViewById(R.id.dismiss_button).setOnClickListener(view -> finish());
     }
 
     @Override
@@ -99,7 +111,14 @@ public class BgAlarmActivity extends WearableDialogActivity {
 
     private void startAlarm(BgAlarmController.AlarmConfig alarmConfig, BgAlarmController.AlarmBasicConfig sounds) {
 
-        PreferenceUtils.setLongValue(this, BgAlarmController.PREF_LAST_TRIGGERED_AT, System.currentTimeMillis());
+        if (alarmConfig.type == BgAlarmController.Type.NO_DATA) {
+            PreferenceUtils.setLongValue(getApplicationContext(), BgAlarmController.PREF_NO_DATA_LAST_TRIGGERED_AT, System.currentTimeMillis());
+        } else if (alarmConfig.type == BgAlarmController.Type.FAST_DROP) {
+            PreferenceUtils.setLongValue(getApplicationContext(), BgAlarmController.PREF_FAST_DROP_LAST_TRIGGERED_AT, System.currentTimeMillis());
+        } else {
+            PreferenceUtils.setLongValue(getApplicationContext(), BgAlarmController.PREF_LAST_TRIGGERED_AT, System.currentTimeMillis());
+            PreferenceUtils.setStringValue(getApplicationContext(), BgAlarmController.PREF_LAST_ALARM_TYPE, alarmConfig.type.name());
+        }
 
         AudioAttributes aa = new AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)

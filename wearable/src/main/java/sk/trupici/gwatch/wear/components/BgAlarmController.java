@@ -28,11 +28,13 @@ import android.util.Log;
 
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.Date;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
+import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -102,6 +104,7 @@ public class BgAlarmController extends BroadcastReceiver {
     public static final String PREF_NO_DATA_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_period";
     public static final String PREF_NO_DATA_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_sound_enabled";
     public static final String PREF_NO_DATA_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_sound_volume";
+    public static final String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_threshold";
 
     public static final String PREF_FAST_DROP_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_enabled";
     public static final String PREF_FAST_DROP_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_duration";
@@ -118,6 +121,9 @@ public class BgAlarmController extends BroadcastReceiver {
 
     public static final String PREF_NO_DATA_LAST_SNOOZED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_last_snoozed_at";
     public static final String PREF_NO_DATA_LAST_TRIGGERED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_last_triggered_at";
+
+    public static final String PREF_FAST_DROP_LAST_SNOOZED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_last_snoozed_at";
+    public static final String PREF_FAST_DROP_LAST_TRIGGERED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_last_triggered_at";
 
     private static final String WAKE_LOCK_TAG = "gwatch.wear:" + BgAlarmController.class.getSimpleName() + ".wake_lock";
     private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 60s
@@ -163,7 +169,6 @@ public class BgAlarmController extends BroadcastReceiver {
     private int highThreshold;
     private int lowThreshold;
     private int hypoThreshold;
-    private int noDataThreshold;
     private boolean isUnitConv;
 
     private int warnColor;
@@ -240,8 +245,7 @@ public class BgAlarmController extends BroadcastReceiver {
         highThreshold = sharedPrefs.getInt(BgPanel.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
         lowThreshold = sharedPrefs.getInt(BgPanel.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
         hypoThreshold = sharedPrefs.getInt(BgPanel.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
-        noDataThreshold = sharedPrefs.getInt(BgPanel.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
-        isUnitConv = sharedPrefs.getBoolean(BgPanel.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));;
+        isUnitConv = sharedPrefs.getBoolean(BgPanel.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
 
         newBgValueNotificationEnabled = sharedPrefs.getBoolean(PREF_NEW_VALUE_NOTIFICATION_ENABLED, res.getBoolean(R.bool.def_notification_new_value_enabled));
 
@@ -302,6 +306,7 @@ public class BgAlarmController extends BroadcastReceiver {
         noDataConfig.intensity = sharedPrefs.getInt(PREF_NO_DATA_ALARM_INTENSITY, defaultIntensity);
         noDataConfig.soundEnabled = sharedPrefs.getBoolean(PREF_NO_DATA_ALARM_SOUND_ENABLED, defaultSoundEnabled);
         noDataConfig.volume = sharedPrefs.getInt(PREF_NO_DATA_ALARM_SOUND_VOLUME, defaultVolume) / 100f;
+        noDataConfig.threshold = sharedPrefs.getInt(PREF_NO_DATA_THRESHOLD, res.getInteger(R.integer.def_bg_threshold_no_data));
 
         fastDropConfig.enabled = sharedPrefs.getBoolean(PREF_FAST_DROP_ALARM_ENABLED, res.getBoolean(R.bool.def_alarms_hyper_enabled));
         fastDropConfig.duration = sharedPrefs.getInt(PREF_FAST_DROP_ALARM_DURATION, res.getInteger(R.integer.def_alarms_fast_drop_duration));
@@ -313,29 +318,17 @@ public class BgAlarmController extends BroadcastReceiver {
         fastDropConfig.threshold = sharedPrefs.getInt(PREF_FAST_DROP_ALARM_THRESHOLD, res.getInteger(R.integer.def_alarms_fast_drop_threshold));
     }
 
-    private VibrationEffect createVibrationEffect(Resources res, int resId, int intensity) {
-        if (intensity <= 0) {
-            intensity = VibrationEffect.DEFAULT_AMPLITUDE;
-        }
-
-        int[] pattern = res.getIntArray(resId);
-        long[] timings = new long[pattern.length];
-        int[] amps = new int[pattern.length];
-        for (int i=0; i < pattern.length; i++) {
-            timings[i] = pattern[i];
-            if ((i & 0x01) == 0) {
-                amps[i] = intensity;
-            }
-        }
-        return VibrationEffect.createWaveform(timings, amps, 0);
-    }
-
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (!alarms.enabled) {
+            return;
+        }
+
         PowerManager powerManager = (PowerManager)context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
         try {
+
             String action = intent.getAction();
             Log.i(LOG_TAG, "alarms: " + action);
 
@@ -347,7 +340,16 @@ public class BgAlarmController extends BroadcastReceiver {
                 return;
             }
 
-            long now = System.currentTimeMillis();
+            long lastTriggeredAt = PreferenceUtils.getLongValue(context, PREF_LAST_TRIGGERED_AT, 0L);
+            if (BuildConfig.DEBUG) {
+                Log.e(LOG_TAG, "alarms: last alarm triggered at: " + new Date(lastTriggeredAt));
+            }
+            if (bgData.getTimestamp() < lastTriggeredAt) {
+                Log.w(LOG_TAG, "alarms: old bg data received: " + new Date(lastTriggeredAt)
+                        + " -> " + new Date(bgData.getTimestamp()) + ", ignored...");
+                return;
+            }
+
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
             if (newBgValueNotificationEnabled && bgData.getTimestampDiff() > 0) {
@@ -363,104 +365,62 @@ public class BgAlarmController extends BroadcastReceiver {
                 isFastDrop = bgData.getValueDiff() > 0 && bgData.getValueDiff() <= -fastDropConfig.threshold;
             }
 
-            if (!alarms.enabled) {
-                return;
-            }
-
             if (!isFastDrop && lowThreshold < bgData.getValue() && bgData.getValue() < highThreshold) {
-                Log.d(LOG_TAG, "alarms: glucose in range");
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: glucose in range");
+                }
                 PreferenceUtils.setLongValue(context, PREF_LAST_TRIGGERED_AT, 0L);
                 return;
             }
 
-            if (!isAlarmTime(bgData.getTimestamp())) {
+            long now = System.currentTimeMillis();
+            if (BuildConfig.DEBUG) {
+                Log.e(LOG_TAG, "alarms: trigger alarm at: " + new Date(now));
+            }
+            if (!isAlarmTime(now)) {
                 PreferenceUtils.setLongValue(context, PREF_LAST_TRIGGERED_AT, 0L);
                 return;
             }
 
-
-            if (isAlarmActive) {
-                Log.d(LOG_TAG, "alarms: another alarm is already running");
-                return;
-            }
-
-            if (isFastDrop) {
-                triggerAlarm(context, fastDropConfig, bgData.getValueDiff(), isSoundAlarmTime(now));
-                return;
-            }
-
-
-            boolean isCritical = false;
-            boolean snoozeOption = true;
-            boolean isLow = false;
-
+            // TODO consider lazy alarm config loading
             AlarmConfig alarmConfig;
-
-
-            if (criticalHighThreshold <= bgData.getValue()) {
-                isCritical = true;
+            if (isFastDrop) {
+                alarmConfig = fastDropConfig;
+            } else if (criticalHighThreshold <= bgData.getValue()) {
                 alarmConfig = criticalConfig;
             } else if (hyperThreshold <= bgData.getValue()) {
                 alarmConfig = hyperConfig;
             } else if (highThreshold <= bgData.getValue()) {
                 alarmConfig = highConfig;
             } else if (bgData.getValue() <= criticalLowThreshold) {
-                isLow = true;
-                isCritical = true;
                 alarmConfig = criticalConfig;
             } else if (bgData.getValue() <= hypoThreshold) {
-                isLow = true;
                 alarmConfig = hypoConfig;
             } else if (bgData.getValue() <= lowThreshold) {
-                isLow = true;
                 alarmConfig = lowConfig;
             } else {
-                Log.d(LOG_TAG, "alarms: alarm for this value is not configured: " + bgData.getValue());
+                Log.e(LOG_TAG, "alarms: alarm for this value is not configured: " + bgData.getValue());
                 return;
             }
 
-            if (!alarmConfig.enabled) {
-                return;
-            }
-
-            if (!isCritical) {
-                long snoozedAt = PreferenceUtils.getLongValue(context, PREF_LAST_SNOOZED_AT, 0L);
-                long snoozeTime = now - snoozedAt;
-                if (snoozeTime < alarmConfig.snoozeTime * CommonConstants.MINUTE_IN_MILLIS) {
-                    Log.d(LOG_TAG, "alarms: alarms are snoozed for next seconds: " + ((long) alarmConfig.snoozeTime * CommonConstants.MINUTE_IN_SECONDS - snoozeTime/CommonConstants.SECOND_IN_MILLIS));
-                    return;
-                }
-            }
-
-            long lastTriggeredAt = PreferenceUtils.getLongValue(context, PREF_LAST_TRIGGERED_AT, 0L);
-            String lastAlarmTypeName = PreferenceUtils.getStringValue(context, PREF_LAST_ALARM_TYPE, Type.UNKNOWN.name());
-            Type lastAlarmType = Type.valueOf(lastAlarmTypeName);
-
-            if (BuildConfig.DEBUG) {
-                Log.d(LOG_TAG, "alarms: last alarm " + lastAlarmType.name() + " triggered at: " + LocalTime.ofSecondOfDay(lastTriggeredAt/CommonConstants.SECOND_IN_MILLIS));
-            }
-
-            // do not trigger alarm if configured period has not elapsed yet
-            if (lastAlarmType == alarmConfig.type) {
-                if (lastTriggeredAt != 0) {
-                    long elapsed = now - lastTriggeredAt;
-                    if (elapsed < alarmConfig.period) {
-                        Log.d(LOG_TAG, "alarms: " + alarmConfig.type.name() + " alarm period has not elapsed yet: " + elapsed);
-                    }
-                }
+            long lastSnoozedAt;
+            if (alarmConfig.type == Type.FAST_DROP) {
+                lastSnoozedAt = PreferenceUtils.getLongValue(context, PREF_FAST_DROP_LAST_SNOOZED_AT, 0L);
+                lastTriggeredAt = PreferenceUtils.getLongValue(context, PREF_FAST_DROP_LAST_TRIGGERED_AT, 0L);
             } else {
-                PreferenceUtils.setStringValue(context, PREF_LAST_ALARM_TYPE, alarmConfig.type.name());
+                lastSnoozedAt = PreferenceUtils.getLongValue(context, PREF_LAST_SNOOZED_AT, 0L);
             }
-
-            triggerAlarm(context, alarmConfig, bgData.getValue(), isSoundAlarmTime(now));
+            checkAndTriggerAlarm(context, alarmConfig, isFastDrop ? bgData.getValueDiff() : bgData.getValue(), lastTriggeredAt, lastSnoozedAt);
         } finally {
             wakeLock.release();
         }
     }
 
-    public void handleAlarmTime(Context context) {
-        if (isAlarmActive) {
-            Log.w(LOG_TAG, "alarms: another alarm is already running");
+    public void handleNoDataAlarm(Context context) {
+        if (!alarms.enabled) {
+            if (BuildConfig.DEBUG) {
+                Log.w(LOG_TAG, "alarms: disabled");
+            }
             return;
         }
 
@@ -468,57 +428,119 @@ public class BgAlarmController extends BroadcastReceiver {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
         try {
+            if (isAlarmActive) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "alarms: another alarm is already running");
+                }
+                return;
+            }
+
             long now = System.currentTimeMillis();
-            if (!noDataConfig.enabled || !isAlarmTime(now)) {
+            if (!isAlarmTime(now)) {
                 PreferenceUtils.setLongValue(context, PREF_NO_DATA_LAST_TRIGGERED_AT, 0L);
                 return;
             }
 
-            // do not trigger alarm if previous alarm was snoozed and snooze time has not elapsed yet
-            long snoozedAt = PreferenceUtils.getLongValue(context, PREF_NO_DATA_LAST_SNOOZED_AT, 0L);
-            long snoozeTime = now - snoozedAt;
-            if (snoozeTime < noDataConfig.snoozeTime * CommonConstants.MINUTE_IN_MILLIS) {
-                Log.d(LOG_TAG, "alarms: no data alarm is snoozed for next seconds: " + ((long) noDataConfig.snoozeTime * CommonConstants.MINUTE_IN_SECONDS - snoozeTime / CommonConstants.SECOND_IN_MILLIS));
+            long lastBgTimestamp = PreferenceUtils.getLongValue(context, BgDataProcessor.PREF_LAST_BG_TIMESTAMP, 0L);
+            if (lastBgTimestamp == 0 || now - lastBgTimestamp < noDataConfig.threshold * CommonConstants.MINUTE_IN_MILLIS) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: last bg timestamp is in range");
+                }
                 return;
             }
 
             long lastTriggeredAt = PreferenceUtils.getLongValue(context, PREF_NO_DATA_LAST_TRIGGERED_AT, 0L);
-            String lastAlarmTypeName = PreferenceUtils.getStringValue(context, PREF_LAST_ALARM_TYPE, Type.UNKNOWN.name());
-
-            if (BuildConfig.DEBUG) {
-                Log.d(LOG_TAG, "alarms: last alarm NO_DATA triggered at: " + LocalTime.ofSecondOfDay(lastTriggeredAt / CommonConstants.SECOND_IN_MILLIS));
-            }
-
-            // do not trigger alarm if configured period has not elapsed yet
-            if (lastTriggeredAt != 0) {
-                long elapsed = now - lastTriggeredAt;
-                if (elapsed < noDataConfig.period) {
-                    Log.d(LOG_TAG, "alarms: NO_DATA alarm period has not elapsed yet: " + elapsed);
-                }
-            }
-
-            triggerAlarm(context, noDataConfig, 0, isSoundAlarmTime(now));
+            long lastSnoozedAt = PreferenceUtils.getLongValue(context, PREF_NO_DATA_LAST_SNOOZED_AT, 0L);
+            checkAndTriggerAlarm(context, noDataConfig, 0, lastTriggeredAt, lastSnoozedAt);
         } finally {
             wakeLock.release();
         }
     }
 
+    private void checkAndTriggerAlarm(Context context, AlarmConfig alarmConfig, int bgValue, long lastTriggeredAt, long lastSnoozedAt) {
+        Log.d(LOG_TAG, "alarms: check and trigger alarm type: " + alarmConfig.type);
+
+        if (!alarmConfig.enabled) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "alarms: not enabled: " + alarmConfig.type);
+            }
+            return;
+        }
+
+        if (isAlarmActive) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "alarms: another alarm is already running");
+            }
+            return;
+        }
+
+        String lastAlarmTypeName = PreferenceUtils.getStringValue(context, PREF_LAST_ALARM_TYPE, Type.UNKNOWN.name());
+        Type lastAlarmType = Type.valueOf(lastAlarmTypeName);
+
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "alarms: last alarm " + (alarmConfig.type == Type.NO_DATA ? Type.NO_DATA : lastAlarmType.name()) + " triggered at: " + new Date(lastTriggeredAt));
+        }
+
+        long now = System.currentTimeMillis();
+
+        if (alarmConfig.type == Type.NO_DATA || alarmConfig.type == Type.FAST_DROP || lastAlarmType == alarmConfig.type) {
+            if (alarmConfig.type != Type.CRITICAL) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: last alarm snoozed at: " + new Date(lastSnoozedAt));
+                }
+                long snoozeTime = now - lastSnoozedAt;
+                if (snoozeTime < alarmConfig.snoozeTime * CommonConstants.MINUTE_IN_MILLIS) {
+                    if (BuildConfig.DEBUG) {
+                        Log.i(LOG_TAG, "alarms: " + alarmConfig.type.name() + " alarm snooze time " + alarmConfig.snoozeTime
+                                + " has not elapsed yet: " + snoozeTime / CommonConstants.MINUTE_IN_MILLIS);
+                    }
+                    return;
+                }
+            }
+
+            // do not trigger alarm if configured period has not elapsed yet
+            if (lastTriggeredAt != 0) {
+                long elapsed = now - lastTriggeredAt;
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: elapsed from last alarm: " + elapsed / CommonConstants.MINUTE_IN_MILLIS);
+                }
+                if (elapsed < alarmConfig.period * CommonConstants.MINUTE_IN_MILLIS) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "alarms: " + alarmConfig.type.name() + " alarm period " + alarmConfig.period
+                                + " has not elapsed yet: " + elapsed / CommonConstants.MINUTE_IN_MILLIS);
+                    }
+                    return;
+                }
+            }
+        }
+
+        triggerAlarm(context, alarmConfig, bgValue, isSoundAlarmTime(now));
+    }
+
     private boolean isAlarmTime(long timestamp) {
-        Log.d(LOG_TAG, "isAlarmTime: " + timestamp);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "alarms: isAlarmTime: " + new Date(timestamp));
+        }
 
         if (!alarms.timed) {
             if (alarms.enabled) {
-                Log.d(LOG_TAG, "isAlarmTime: alarms always active");
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: isAlarmTime: alarms always active");
+                }
                 return true;
             } else {
-                Log.d(LOG_TAG, "isAlarmTime: alarms off");
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: isAlarmTime: alarms off");
+                }
                 return false;
             }
         }
 
         // do not fire alarms for samples older than DEF_MAX_ALARM_SAMPLE_TIME
         if (timestamp + MAX_ALARMS_SAMPLE_TIME < System.currentTimeMillis()) {
-            Log.d(LOG_TAG, "isAlarmTime: too old sample");
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "alarms: isAlarmTime: too old sample");
+            }
             return false;
         }
 
@@ -526,16 +548,22 @@ public class BgAlarmController extends BroadcastReceiver {
     }
 
     private boolean isSoundAlarmTime(long timestamp) {
-        Log.d(LOG_TAG, "isSoundAlarmTime: " + timestamp);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "alarms: isSoundAlarmTime: " + timestamp);
+        }
 
         if (sounds.timed) {
             return isTimeInAlarmRange(sounds.from, sounds.to);
         } else {
             if (sounds.enabled) {
-                Log.d(LOG_TAG, "isSoundAlarmTime: sound always active");
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: isSoundAlarmTime: sound always active");
+                }
                 return true;
             } else {
-                Log.d(LOG_TAG, "isSoundAlarmTime: sounds off");
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "alarms: isSoundAlarmTime: sounds off");
+                }
                 return false;
             }
         }
@@ -543,7 +571,7 @@ public class BgAlarmController extends BroadcastReceiver {
 
     private boolean isTimeInAlarmRange(LocalTime from, LocalTime to) {
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "isAlarmTime: " + from + " - " + to);
+            Log.d(LOG_TAG, "alarms: isAlarmTime: " + from + " - " + to);
         }
 
         LocalTime now = LocalTime.now();
@@ -556,8 +584,8 @@ public class BgAlarmController extends BroadcastReceiver {
         }
 
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "isAlarmTime: " + (result ? "" : "NOT ") + "in active time");
-            Log.d(LOG_TAG, "isAlarmTime: from=" + from + ", to=" + to + ", time=" + now);
+            Log.d(LOG_TAG, "alarms: isAlarmTime: " + (result ? "" : "NOT ") + "in active time");
+            Log.d(LOG_TAG, "alarms: isAlarmTime: from=" + from + ", to=" + to + ", time=" + now);
         }
         return result;
     }
@@ -638,12 +666,4 @@ public class BgAlarmController extends BroadcastReceiver {
             this.type = type;
         }
     }
-
-
-//    public void test(Context context) {
-//        AlarmConfig alarmConfig = highConfig;
-//        int bgValue = 180;
-//
-//        triggerAlarm(context, alarmConfig, bgValue, isSoundAlarmTime(System.currentTimeMillis()));
-//    }
 }

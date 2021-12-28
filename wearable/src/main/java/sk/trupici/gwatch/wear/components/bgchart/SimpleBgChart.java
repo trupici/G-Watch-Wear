@@ -32,6 +32,7 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BgPanel;
@@ -534,14 +535,11 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
         BgData bgData = BgData.fromBundle(extras);
-        if (bgData.getValue() == 0) {
+        if (bgData.getValue() == 0 || bgData.getTimestamp() == 0) {
             return;
         }
 
-        SharedPreferences sharedPrefs = context.getSharedPreferences(
-                context.getString(R.string.standard_analog_complication_preferences_key),
-                Context.MODE_PRIVATE);
-
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
     }
 

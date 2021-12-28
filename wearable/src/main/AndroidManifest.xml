@@ -37,6 +37,7 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupOnly="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -112,21 +113,21 @@
 <!--            android:value="@integer/google_play_services_version" />-->
 
 
-        <service android:name=".services.BgDataListenerService">
+        <service android:name=".services.BgDataListenerService" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/bg_data"/>
             </intent-filter>
         </service>
 
-        <service android:name=".services.AapsDataListenerService">
+        <service android:name=".services.AapsDataListenerService" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/aaps_data"/>
             </intent-filter>
         </service>
 
-        <service android:name=".services.ConfigListenerService">
+        <service android:name=".services.ConfigListenerService" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/config"/>

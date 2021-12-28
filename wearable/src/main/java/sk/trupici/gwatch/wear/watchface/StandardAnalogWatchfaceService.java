@@ -29,6 +29,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.Settings;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.SystemProviders;
@@ -45,6 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
@@ -57,7 +61,6 @@ import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.Config;
-import sk.trupici.gwatch.wear.receivers.BgDataProcessor;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
@@ -144,13 +147,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         private RectF rightComplCoefs;
 
         private BackgroundPanel bkgPanel;
-        private WatchHands watchHands;;
+        private WatchHands watchHands;
         private SimpleBgChart chartPanel;
         private BgPanel bgPanel;
         private DatePanel datePanel;
         private BgAlarmController bgAlarmController;
 
-        private List<BroadcastReceiver> receivers = new ArrayList<>(5);
+        private final List<BroadcastReceiver> receivers = new ArrayList<>(8);
 
         private long lastMinute = 0L;
 
@@ -160,15 +163,17 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             super.onCreate(holder);
 
+            // signal restart
+            ((Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE))
+                    .vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK));
+
             setWatchFaceStyle(new WatchFaceStyle.Builder(StandardAnalogWatchfaceService.this)
                     .setAcceptsTapEvents(true)
                     .build());
 
             // Used throughout watch face to pull user's preferences.
             Context context = getApplicationContext();
-            sharedPrefs = context.getSharedPreferences(
-                    getString(R.string.standard_analog_complication_preferences_key),
-                    Context.MODE_PRIVATE);
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
             screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
             screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
@@ -229,7 +234,9 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         // Pulls all user's preferences for watch face appearance.
         private void loadSavedPreferences() {
-            PreferenceUtils.dumpPreferences(sharedPrefs);
+            if (BuildConfig.DEBUG) {
+                PreferenceUtils.dumpPreferences(sharedPrefs);
+            }
 
             leftComplSettings = new ComponentsConfig();
             leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
@@ -341,15 +348,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
 
             // unregister all receivers
-            if (receivers != null) {
-                receivers.forEach(r -> {
-                    try {
-                        unregisterReceiver(r);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "Failed to unregister receiver: " + r.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
-                    }
-                });
-            }
+            receivers.forEach(r -> {
+                try {
+                    unregisterReceiver(r);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "Failed to unregister receiver: " + r.getClass().getSimpleName() + ": " + e.getLocalizedMessage());
+                }
+            });
 
             super.onDestroy();
         }
@@ -404,7 +409,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             /* Dim display in mute mode. */
             if (muted != inMuteMode) {
                 muted = inMuteMode;
-                int alpha = inMuteMode ? 100 : 255;
+//                int alpha = inMuteMode ? 100 : 255;
 //                handsPaint.setAlpha(alpha);
 //                datePaint.setAlpha(alpha);
 //                invalidate();
@@ -508,7 +513,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             watchHands.onDraw(canvas, isAmbientMode);
 
             if (now - lastMinute > CommonConstants.MINUTE_IN_MILLIS) {
-                bgAlarmController.handleAlarmTime(getApplicationContext());
+                bgAlarmController.handleNoDataAlarm(getApplicationContext());
                 lastMinute = now;
             }
         }

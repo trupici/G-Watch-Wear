@@ -319,7 +319,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
         Log.d(CommonConstants.LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
 
-        this.bgValue = bgValue;
-        this.bgTimestamp = bgTimestamp;
+        this.bgValue = bgData.getValue();
+        this.bgTimestamp = bgData.getTimestamp();
     }
 }

@@ -53,12 +53,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     public static final String LOG_TAG = CommonConstants.LOG_TAG;
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Bundle extras = intent.getExtras();
-        onDataUpdate(BgData.fromBundle(extras));
-    }
-
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
     public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_warn";
@@ -109,6 +103,12 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     }
 
     @Override
+    public void onReceive(Context context, Intent intent) {
+        Bundle extras = intent.getExtras();
+        onDataUpdate(BgData.fromBundle(extras));
+    }
+
+    @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
         sizeFactors = new RectF(
                 context.getResources().getDimension(R.dimen.layout_bg_pnel_left) / (float)refScreenWidth,
@@ -137,7 +137,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
         isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
-//        samplePeriod = sharedPrefs.getInt(CommonConstants.PREF_SAMPLE_PERIOD_MIN, context.getResources().getInteger(R.integer.def_bg_sample_period));
 
         // thresholds
         hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
@@ -229,28 +228,33 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
                 x, bounds.bottom - height / 10f, paint);
 
+//        if (!isAmbientMode) {
+//            drawRangeIndicator(canvas);
+//        }
+    }
 
-        // range indicator - EXPERIMENTAL
-        if (!isAmbientMode) {
+    // range indicator - EXPERIMENTAL
+    private void drawRangeIndicator(Canvas canvas) {
+        float height = bounds.height() - topOffset;
+
 //            Log.d(LOG_TAG, "onDraw: " + bounds);
-            Paint indicatorPaint = new Paint();
-            int padding = 10;
-            height = (bounds.height() - padding) / 3f - padding;
-            RectF indicatorBounds = new RectF();
-            indicatorBounds.left = bounds.left + 6;
-            indicatorBounds.right = indicatorBounds.left + 10;
-            indicatorBounds.bottom = bounds.bottom - padding;
-            indicatorBounds.top = indicatorBounds.bottom - height;
-            boolean isCritical = isBgCritical(bgValue);
-            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isCritical ? criticalColor : criticalColor & 0x60FFFFFF);
-            indicatorBounds.bottom = indicatorBounds.top - padding;
-            indicatorBounds.top = indicatorBounds.bottom - height;
-            boolean isInRange = !isCritical && isBgInRange(bgValue);
-            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isInRange ? inRangeColor : inRangeColor & 0x60FFFFFF);
-            indicatorBounds.top = bounds.top + padding;
-            indicatorBounds.bottom = indicatorBounds.top + height;
-            paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, !isInRange && !isCritical ? warnColor : warnColor & 0x60FFFFFF);
-        }
+        Paint indicatorPaint = new Paint();
+        int padding = 10;
+        height = (bounds.height() - padding) / 3f - padding;
+        RectF indicatorBounds = new RectF();
+        indicatorBounds.left = bounds.left + 6;
+        indicatorBounds.right = indicatorBounds.left + 10;
+        indicatorBounds.bottom = bounds.bottom - padding;
+        indicatorBounds.top = indicatorBounds.bottom - height;
+        boolean isCritical = isBgCritical(bgValue);
+        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isCritical ? criticalColor : criticalColor & 0x60FFFFFF);
+        indicatorBounds.bottom = indicatorBounds.top - padding;
+        indicatorBounds.top = indicatorBounds.bottom - height;
+        boolean isInRange = !isCritical && isBgInRange(bgValue);
+        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isInRange ? inRangeColor : inRangeColor & 0x60FFFFFF);
+        indicatorBounds.top = bounds.top + padding;
+        indicatorBounds.bottom = indicatorBounds.top + height;
+        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, !isInRange && !isCritical ? warnColor : warnColor & 0x60FFFFFF);
     }
 
     private void paintIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {

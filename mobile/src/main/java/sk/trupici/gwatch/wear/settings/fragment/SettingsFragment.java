@@ -32,7 +32,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
-import sk.trupici.gwatch.wear.settings.PreferenceMap;
 import sk.trupici.gwatch.wear.settings.TimePreference;
 import sk.trupici.gwatch.wear.settings.TimePreferenceDialog;
 import sk.trupici.gwatch.wear.view.SettingsActivity;
@@ -122,8 +121,7 @@ public abstract class SettingsFragment extends PreferenceFragmentCompat implemen
                 setOnClickCallback(((PreferenceGroup) preference).getPreference(i));
             }
         } else {
-            if (preference instanceof TwoStatePreference /*&& !PreferenceMap.data.containsKey(preference.getKey()) */
-                    || PreferenceMap.mappedOnClickPrefs.contains(preference.getKey())) {
+            if (preference instanceof TwoStatePreference) {
                 preference.setOnPreferenceClickListener(this);
             }
         }

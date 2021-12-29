@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.View;
 
@@ -67,12 +66,15 @@ import sk.trupici.gwatch.wear.data.TLV;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
+import sk.trupici.gwatch.wear.settings.ConfigData;
+import sk.trupici.gwatch.wear.settings.ConfigType;
 import sk.trupici.gwatch.wear.settings.GlucoseLevelPreference;
 import sk.trupici.gwatch.wear.settings.PreferenceMap;
 import sk.trupici.gwatch.wear.settings.TimePreference;
 import sk.trupici.gwatch.wear.settings.ValuePreference;
 import sk.trupici.gwatch.wear.settings.fragment.MainFragment;
 import sk.trupici.gwatch.wear.util.LangUtils;
+import sk.trupici.gwatch.wear.util.PacketUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -446,10 +448,11 @@ public class SettingsActivity extends LocalizedActivityBase implements
                 dexcomSharePrefsUpdated = true;
             }
 
-            Pair<Byte, PreferenceMap.PreferenceType> mapping = PreferenceMap.data.get(pref.getKey());
+            ConfigData mapping = PreferenceMap.data.get(pref.getKey());
             if (mapping != null) { // direct cfg mapping
                 Integer value = null;
                 String strValue = null;
+                Boolean boolValue = null;
                 if (pref instanceof ValuePreference) {
                     value = ((ValuePreference) pref).getValue();
                 } else if (pref instanceof TimePreference) {
@@ -459,71 +462,58 @@ public class SettingsActivity extends LocalizedActivityBase implements
                 } else {
                     Object tmpValue = PreferenceUtils.getValue(pref);
                     if (tmpValue instanceof String) {
-                        if (mapping.second == PreferenceMap.PreferenceType.STRING) {
+                        if (mapping.getType() == ConfigType.STRING) {
                             strValue = (String) tmpValue;
                         } else {
                             value = Integer.valueOf((String) tmpValue);
                         }
                     } else if (tmpValue instanceof Boolean) {
-                        value = ((Boolean)tmpValue) ? 1 : 0;
+                        boolValue = (Boolean)tmpValue;
                     } else {
                         value = (Integer) tmpValue;
                     }
                 }
-                if (value == null && strValue == null && mapping.second != PreferenceMap.PreferenceType.STRING) {
+                if (value == null && strValue == null && mapping.getType() != ConfigType.STRING) {
                     Log.w(LOG_TAG, "Null preference value: " + pref.getKey());
                     continue;
                 }
 
                 byte[] data;
-                if (mapping.second == PreferenceMap.PreferenceType.BYTE) {
+                if (mapping.getType() == ConfigType.BYTE) {
                     data = new byte[1];
                     data[0] = value.byteValue();
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send BYTE: " + pref.getKey() + ": " + value);
                     }
-                } else if (mapping.second == PreferenceMap.PreferenceType.WORD) {
+                } else if (mapping.getType() == ConfigType.WORD) {
                     data = new byte[2];
-                    data[0] = (byte) ((value & 0xFF00) >> 8);
-                    data[1] = (byte) (value & 0xFF);
+                    PacketUtils.encodeShort(data, 0, value.shortValue());
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send WORD: " + pref.getKey() + ": " + value);
                     }
-                } else if (mapping.second == PreferenceMap.PreferenceType.DWORD) {
+                } else if (mapping.getType() == ConfigType.DWORD) {
                     data = new byte[4];
-                    data[0] = (byte) ((value & 0xFF000000) >> 24);
-                    data[1] = (byte) ((value & 0xFF0000) >> 16);
-                    data[2] = (byte) ((value & 0xFF00) >> 8);
-                    data[3] = (byte) (value & 0xFF);
+                    PacketUtils.encodeInt(data, 0, value);
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send DWORD: " + pref.getKey() + ": " + value);
                     }
-                } else if (mapping.second == PreferenceMap.PreferenceType.COLOR) {
+                } else if (mapping.getType() == ConfigType.COLOR) {
                     data = new byte[4];
-                    data[0] = (byte) ((value & 0xFF000000) >> 24);
-                    data[1] = (byte) ((value & 0xFF0000) >> 16);
-                    data[2] = (byte) ((value & 0xFF00) >> 8);
-                    data[3] = (byte) (value & 0xFF);
+                    PacketUtils.encodeInt(data, 0, value);
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send COLOR: " + pref.getKey() + ": " + value);
                     }
-                } else if (mapping.second == PreferenceMap.PreferenceType.BOOLEAN) {
+                } else if (mapping.getType() == ConfigType.BOOLEAN) {
                     data = new byte[1];
-                    data[0] = value.byteValue();
+                    PacketUtils.encodeBoolean(data, 0, boolValue);
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send BOOLEAN: " + pref.getKey() + ": "
                                 + (value == 0 ? "false" : "true"));
                     }
-                } else if (mapping.second == PreferenceMap.PreferenceType.STRING) {
-                    int len = 0;
-                    if (strValue != null) {
-                        strValue = StringUtils.normalize(strValue);
-                        len = strValue.length();
-                    }
+                } else if (mapping.getType() == ConfigType.STRING) {
+                    int len = PacketUtils.getNullableStrLen(strValue);
                     data = new byte[len];
-                    for (int i=0; i<len; i++) {
-                        data[i] = (byte)strValue.charAt(i);
-                    }
+                    PacketUtils.encodeString(data, 0, strValue);
                     if (BuildConfig.DEBUG) {
                         Log.d(GWatchApplication.LOG_TAG,"Send STRING: " + pref.getKey() + ": "
                                 + strValue);
@@ -532,7 +522,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
                     Log.w(LOG_TAG, "Skipping preference: " + pref.getKey());
                     continue;
                 }
-                TLV tlv = new TLV(mapping.first, (byte)data.length, data);
+                TLV tlv = new TLV(mapping.getTag(), (byte)data.length, data);
                 config.add(tlv);
                 totalLen += tlv.getTotalLen();
             } else { // indirect cfg mapping - try to apply dedicated cfg logic

@@ -15,31 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package sk.trupici.gwatch.wear.data;
 
-import sk.trupici.gwatch.wear.util.StringUtils;
+import java.util.Arrays;
 
-public abstract class PacketBase implements Packet {
-    private static final String LOCAL_SOURCE = "G-Watch Service";
+public enum Trend {
+    UNKNOWN,
+    UP_FAST,
+    UP,
+    UP_SLOW,
+    FLAT,
+    DOWN_SLOW,
+    DOWN,
+    DOWN_FAST;
 
-    private final PacketType type;
-    private final String source;
-
-    public PacketBase(PacketType type, String source) {
-        this.type = type;
-        this.source = source == null ? LOCAL_SOURCE : source;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Packet implementation
-
-    @Override
-    public PacketType getType() {
-        return type;
-    }
-
-    public String getSource() {
-        return source;
+    public static Trend valueOf(int ordinal) {
+        return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElse(UNKNOWN);
     }
 }

@@ -35,6 +35,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
+import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.HttpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
@@ -236,27 +237,27 @@ public class NightScoutFollowerService extends FollowerService {
     /**
      * Translates NS trend value to G-Watch internal trend representation
      */
-    private static GlucosePacket.Trend toTrend(String value) {
+    private static Trend toTrend(String value) {
         if (value == null) {
             return null;
         }
         value = value.trim();
         if ("DoubleUp".equals(value)) {
-            return GlucosePacket.Trend.UP_FAST;
+            return Trend.UP_FAST;
         } else if ("SingleUp".equals(value)) {
-            return GlucosePacket.Trend.UP;
+            return Trend.UP;
         } else if ("FortyFiveUp".equals(value)) {
-            return GlucosePacket.Trend.UP_SLOW;
+            return Trend.UP_SLOW;
         } else if ("Flat".equals(value)) {
-            return GlucosePacket.Trend.FLAT;
+            return Trend.FLAT;
         } else if ("FortyFiveDown".equals(value)) {
-            return GlucosePacket.Trend.DOWN_SLOW;
+            return Trend.DOWN_SLOW;
         } else if ("SingleDown".equals(value)) {
-            return GlucosePacket.Trend.DOWN;
+            return Trend.DOWN;
         } else if ("DoubleDown".equals(value)) {
-            return GlucosePacket.Trend.DOWN_FAST;
+            return Trend.DOWN_FAST;
         } else {
-            return GlucosePacket.Trend.UNKNOWN;
+            return Trend.UNKNOWN;
         }
     }
 }

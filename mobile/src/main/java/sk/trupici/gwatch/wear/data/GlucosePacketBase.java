@@ -32,10 +32,14 @@ public abstract class GlucosePacketBase extends PacketBase {
     protected final long timestamp;
 
     public GlucosePacketBase(PacketType type, String source, short glucoseValue, long timestamp) {
+        this(type, source, glucoseValue, timestamp, new Date().getTime());
+    }
+
+    protected GlucosePacketBase(PacketType type, String source, short glucoseValue, long timestamp, long receivedAt) {
         super(type, source);
-        this.receivedAt = new Date().getTime();
         this.glucoseValue = glucoseValue;
         this.timestamp = timestamp;
+        this.receivedAt = receivedAt;
     }
 
     @Override

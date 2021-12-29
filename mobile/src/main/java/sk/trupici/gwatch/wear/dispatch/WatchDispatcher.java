@@ -39,6 +39,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
@@ -53,6 +54,11 @@ public class WatchDispatcher implements Dispatcher, OnSuccessListener<Integer>, 
     public boolean dispatch(Packet packet) {
         Log.d(LOG_TAG, "dispatch: " + packet);
         WidgetUpdateService.updateWidget(packet);
+
+        if (BuildConfig.DEBUG) {
+            byte[] data = packet.getData();
+            Log.i(LOG_TAG, DumpUtils.dumpData(packet.getData(), data.length));
+        }
 
         if (nodeId != null) {
             notifySendingPacket(packet);

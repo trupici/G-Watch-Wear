@@ -19,8 +19,10 @@
 package sk.trupici.gwatch.wear.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.PacketUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 /**
@@ -28,6 +30,8 @@ import sk.trupici.gwatch.wear.util.UiUtils;
  * glucose value, IOB, COB, TBR, etc...
  */
 public class AAPSPacket extends GlucosePacketBase {
+    private final static String LOG_TAG = AAPSPacket.class.getSimpleName();
+
     private static final String SOURCE_NAME = "AAPS";
     public static final int PACKET_DATA_SIZE = 43; // + N1 + N2 + N3
 
@@ -49,6 +53,10 @@ public class AAPSPacket extends GlucosePacketBase {
 
     public AAPSPacket(short bgValue, long bgTimestamp) {
         super(PacketType.AAPS, SOURCE_NAME, bgValue, bgTimestamp);
+    }
+
+    private AAPSPacket(short bgValue, long bgTimestamp, long receivedAt) {
+        super(PacketType.AAPS, SOURCE_NAME, bgValue, bgTimestamp, receivedAt);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -81,35 +89,35 @@ public class AAPSPacket extends GlucosePacketBase {
     @Override
     public byte[] getData() {
         Integer dataSize = PACKET_DATA_SIZE
-                + 1 + getNullableStrLen(basalProfile)
-                + 1 + getNullableStrLen(tempBasalString)
-                + 1 + getNullableStrLen(pumpStatus);
+                + 1 + PacketUtils.getNullableStrLen(basalProfile)
+                + 1 + PacketUtils.getNullableStrLen(tempBasalString)
+                + 1 + PacketUtils.getNullableStrLen(pumpStatus);
         byte[] data = new byte[PACKET_HEADER_SIZE + dataSize];
         int idx = 0;
 
         data[idx++] = getType().getCodeAsByte();
         data[idx++] = dataSize.byteValue();
 
-        idx += encodeInt(data, idx, receivedAt / 1000); // time in seconds
+        idx += PacketUtils.encodeInt(data, idx, receivedAt / 1000); // time in seconds
 
-        idx += encodeShort(data, idx, glucoseValue);
-        idx += encodeInt(data, idx, timestamp / 1000); // time in seconds
+        idx += PacketUtils.encodeShort(data, idx, glucoseValue);
+        idx += PacketUtils.encodeInt(data, idx, timestamp / 1000); // time in seconds
 
-        idx += encodeFloat(data, idx, (cob == null ? 0f : cob.floatValue()));
-        idx += encodeFloat(data, idx, (cobFuture == null ? 0f : cobFuture.floatValue()));
+        idx += PacketUtils.encodeFloat(data, idx, (cob == null ? 0f : cob.floatValue()));
+        idx += PacketUtils.encodeFloat(data, idx, (cobFuture == null ? 0f : cobFuture.floatValue()));
 
-        idx += encodeFloat(data, idx, (iob == null ? 0f : iob.floatValue()));
-        idx += encodeFloat(data, idx, (iobBolus == null ? 0f : iobBolus.floatValue()));
-        idx += encodeFloat(data, idx, (iobBasal == null ? 0f : iobBasal.floatValue()));
+        idx += PacketUtils.encodeFloat(data, idx, (iob == null ? 0f : iob.floatValue()));
+        idx += PacketUtils.encodeFloat(data, idx, (iobBolus == null ? 0f : iobBolus.floatValue()));
+        idx += PacketUtils.encodeFloat(data, idx, (iobBasal == null ? 0f : iobBasal.floatValue()));
 
-        idx += encodeInt(data, idx, (basalTimestamp == null || basalTimestamp < 0 ? 0L : basalTimestamp/1000));
-        idx += encodeInt(data, idx, (pumpTimestamp == null || pumpTimestamp < 0 ? 0L : pumpTimestamp/1000));
-        idx += encodeShort(data, idx, (pumpReservoir == null ? 0 : pumpReservoir.shortValue()));
+        idx += PacketUtils.encodeInt(data, idx, (basalTimestamp == null || basalTimestamp < 0 ? 0L : basalTimestamp/1000));
+        idx += PacketUtils.encodeInt(data, idx, (pumpTimestamp == null || pumpTimestamp < 0 ? 0L : pumpTimestamp/1000));
+        idx += PacketUtils.encodeShort(data, idx, (pumpReservoir == null ? 0 : pumpReservoir.shortValue()));
         data[idx++] = pumpBattery == null ? 0 : pumpBattery.byteValue();
 
-        idx += encodeString(data, idx, basalProfile);
-        idx += encodeString(data, idx, tempBasalString);
-        idx += encodeString(data, idx, pumpStatus);
+        idx += PacketUtils.encodeString(data, idx, basalProfile);
+        idx += PacketUtils.encodeString(data, idx, tempBasalString);
+        idx += PacketUtils.encodeString(data, idx, pumpStatus);
 
         return data;
     }
@@ -124,6 +132,50 @@ public class AAPSPacket extends GlucosePacketBase {
         text.append(context.getString(R.string.aaps_packet_tbr, UiUtils.getStringOrNoData(tempBasalString))).append("\n");
         text.append(context.getString(R.string.aaps_packet_pump, UiUtils.getStringOrNoData(pumpStatus))).append("\n");
         return text.toString();
+    }
+
+    public static AAPSPacket of(byte[] data) {
+        if (data.length < PACKET_HEADER_SIZE) {
+            Log.d(LOG_TAG, "AAPS: Invalid length: " + data.length);
+            return null;
+        }
+
+        int idx = 0;
+        byte type = data[idx++];
+        int dataSize = (data[idx++] & 0xFF);
+
+        if (type != PacketType.AAPS.getCodeAsByte() || dataSize < 38) {
+            Log.d(LOG_TAG, "AAPS: Invalid type or data: " + type + " vs " + PacketType.AAPS.getCodeAsByte() + ", dataSize: " + dataSize);
+            return null;
+        }
+
+        long receivedAt = PacketUtils.decodeInt(data, idx) * 1000L;
+
+        short glucoseValue = PacketUtils.decodeShort(data, idx+4);
+        long timestamp = PacketUtils.decodeInt(data, idx+6) * 1000L;
+        AAPSPacket packet = new AAPSPacket(glucoseValue, timestamp, receivedAt);
+
+        packet.cob = (double) PacketUtils.decodeFloat(data, idx+10);
+        packet.cobFuture = (double) PacketUtils.decodeFloat(data, idx+14);
+
+        packet.iob = (double) PacketUtils.decodeFloat(data, idx+18);
+        packet.iobBolus = (double)PacketUtils.decodeFloat(data, idx+22);
+        packet.iobBasal = (double) PacketUtils.decodeFloat(data, idx+26);
+
+        packet.basalTimestamp = PacketUtils.decodeInt(data, idx+30) * 1000L;
+        packet.pumpTimestamp = PacketUtils.decodeInt(data, idx+34) * 1000L;
+        packet.pumpReservoir = (double) PacketUtils.decodeShort(data, idx+38);
+        packet.pumpBattery = (int) (data[idx+40] & 0xFF);
+
+        idx += 41;
+        packet.basalProfile = PacketUtils.decodeString(data, idx);
+        idx += 1 + packet.basalProfile.length();
+        packet.tempBasalString = PacketUtils.decodeString(data, idx);
+        idx += 1 + packet.tempBasalString.length();
+        packet.pumpStatus = PacketUtils.decodeString(data, idx);
+        idx += 1 + packet.pumpStatus.length();
+
+        return packet;
     }
 
     ///////////////////////////////////////////////////////////////////////////

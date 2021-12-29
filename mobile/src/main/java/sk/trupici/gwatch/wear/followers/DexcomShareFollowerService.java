@@ -41,6 +41,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
+import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -322,6 +323,7 @@ public class DexcomShareFollowerService extends FollowerService {
             long timestamp = Long.valueOf(wt);
             Integer trend = null;
             try {
+                // FIXME - new String trend
                 trend = json.optInt("Trend");
             } catch (Exception e) {
                 Log.e(LOG_TAG, "parseDexcomValue: " + e.getLocalizedMessage());
@@ -344,27 +346,27 @@ public class DexcomShareFollowerService extends FollowerService {
     /**
      * Translates DexCom trend value to G-Watch internal trend representation
      */
-    private static GlucosePacket.Trend toTrend(Integer value) {
+    private static Trend toTrend(Integer value) {
         if (value == null) {
             return null;
         }
         switch (value) {
             case 1:
-                return GlucosePacket.Trend.UP_FAST;
+                return Trend.UP_FAST;
             case 2:
-                return GlucosePacket.Trend.UP;
+                return Trend.UP;
             case 3:
-                return GlucosePacket.Trend.UP_SLOW;
+                return Trend.UP_SLOW;
             case 4:
-                return GlucosePacket.Trend.FLAT;
+                return Trend.FLAT;
             case 5:
-                return GlucosePacket.Trend.DOWN_SLOW;
+                return Trend.DOWN_SLOW;
             case 6:
-                return GlucosePacket.Trend.DOWN;
+                return Trend.DOWN;
             case 7:
-                return GlucosePacket.Trend.DOWN_FAST;
+                return Trend.DOWN_FAST;
             default:
-                return GlucosePacket.Trend.UNKNOWN;
+                return Trend.UNKNOWN;
         }
     }
 

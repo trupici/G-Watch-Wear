@@ -27,8 +27,8 @@ public class PacketUtils {
      */
     public static int encodeShort(byte[] data, int offset, short value) {
         int idx = offset;
-        data[offset++] = (byte) ((value & 0xFF00) >> 8);
-        data[offset++] = (byte) (value & 0xFF);
+        data[idx++] = (byte) ((value & 0xFF00) >> 8);
+        data[idx++] = (byte) (value & 0xFF);
         return idx - offset;
     }
 
@@ -39,7 +39,8 @@ public class PacketUtils {
      * @return decoded short value
      */
     public static short decodeShort(byte[] data, int offset) {
-        int value = ((data[offset++] << 8) & 0xFF00);
+        int value;
+        value = ((data[offset++] << 8) & 0xFF00);
         value += (data[offset] & 0xFF);
         return (short) value;
     }
@@ -53,10 +54,10 @@ public class PacketUtils {
      */
     public static int encodeInt(byte[] data, int offset, long value) {
         int idx = offset;
-        data[offset++] = (byte) ((value & 0xFF000000) >> 24);
-        data[offset++] = (byte) ((value & 0xFF0000) >> 16);
-        data[offset++] = (byte) ((value & 0xFF00) >> 8);
-        data[offset++] = (byte) (value & 0xFF);
+        data[idx++] = (byte) ((value & 0xFF000000) >> 24);
+        data[idx++] = (byte) ((value & 0xFF0000) >> 16);
+        data[idx++] = (byte) ((value & 0xFF00) >> 8);
+        data[idx++] = (byte) (value & 0xFF);
         return idx - offset;
     }
 
@@ -67,7 +68,8 @@ public class PacketUtils {
      * @return decoded int value
      */
     public static int decodeInt(byte[] data, int offset) {
-        int value = ((data[offset++] << 24) & 0xFF000000);
+        int value;
+        value = ((data[offset++] << 24) & 0xFF000000);
         value += ((data[offset++] << 16) & 0xFF0000);
         value += ((data[offset++] << 8) & 0xFF00);
         value += (data[offset] & 0xFF);
@@ -158,7 +160,7 @@ public class PacketUtils {
      */
     public static int encodeBoolean(byte[] data, int offset, boolean value) {
         int idx = offset;
-        data[offset++] = value ? (byte)0 : (byte)1;
+        data[idx++] = value ? (byte)0 : (byte)1;
         return idx - offset;
     }
 

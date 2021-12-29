@@ -474,7 +474,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
                         value = (Integer) tmpValue;
                     }
                 }
-                if (value == null && strValue == null && mapping.getType() != ConfigType.STRING) {
+                if (value == null && strValue == null && boolValue == null && mapping.getType() != ConfigType.STRING) {
                     Log.w(LOG_TAG, "Null preference value: " + pref.getKey());
                     continue;
                 }
@@ -508,8 +508,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
                     data = new byte[1];
                     PacketUtils.encodeBoolean(data, 0, boolValue);
                     if (BuildConfig.DEBUG) {
-                        Log.d(GWatchApplication.LOG_TAG,"Send BOOLEAN: " + pref.getKey() + ": "
-                                + (value == 0 ? "false" : "true"));
+                        Log.d(GWatchApplication.LOG_TAG,"Send BOOLEAN: " + pref.getKey() + ": " + boolValue);
                     }
                 } else if (mapping.getType() == ConfigType.STRING) {
                     int len = PacketUtils.getNullableStrLen(strValue);
@@ -539,7 +538,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
                 if (BuildConfig.DEBUG) {
                     Log.d(LOG_TAG, "Config Packet sent: " + config.size() + " in " + totalLen + " bytes");
                 }
-                UiUtils.showToast(this, R.string.cfg_transfer_ok);
+//                UiUtils.showToast(this, R.string.cfg_transfer_ok);
                 result = true;
             } else {
                 UiUtils.showToast(this, R.string.cfg_transfer_failed);

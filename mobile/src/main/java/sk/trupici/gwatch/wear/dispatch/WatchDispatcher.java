@@ -20,9 +20,6 @@ package sk.trupici.gwatch.wear.dispatch;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.wearable.MessageClient;
 import com.google.android.gms.wearable.Node;
@@ -34,16 +31,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import androidx.annotation.NonNull;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.data.ConfigPacket;
 import sk.trupici.gwatch.wear.data.Packet;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
-public class WatchDispatcher implements Dispatcher, OnSuccessListener<Integer>, OnFailureListener {
+public class WatchDispatcher implements Dispatcher {
     public static final String LOG_TAG = GWatchApplication.LOG_TAG;
 
     public void init(Context context) {
@@ -69,12 +66,22 @@ public class WatchDispatcher implements Dispatcher, OnSuccessListener<Integer>, 
                 return false;
             }
 
-            Task<Integer> sendTask = Wearable.getMessageClient(GWatchApplication.getAppContext())
-                    .sendMessage(nodeId, messagePath, packet.getData());
-            // You can add success and/or failure listeners,
-            // Or you can call Tasks.await() and catch ExecutionException
-            sendTask.addOnSuccessListener(this);
-            sendTask.addOnFailureListener(this);
+            Wearable.getMessageClient(GWatchApplication.getAppContext())
+                    .sendMessage(nodeId, messagePath, packet.getData())
+                    .addOnSuccessListener(i -> {
+                        Log.d(LOG_TAG, "onSuccess: " + i);
+                        notifyPacketSent(GWatchApplication.getAppContext());
+                        if (packet instanceof ConfigPacket) {
+                            UiUtils.showToast(GWatchApplication.getAppContext(), R.string.cfg_transfer_ok);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d(LOG_TAG, "onFailure: " + e.getLocalizedMessage());
+                        if (packet instanceof ConfigPacket) {
+                            UiUtils.showToast(GWatchApplication.getAppContext(), R.string.cfg_transfer_failed);
+                        }
+                    });
+            return true;
         } else if (BuildConfig.DEBUG){
             Log.i(GWatchApplication.LOG_TAG, "Service not bound.");
         }
@@ -94,17 +101,6 @@ public class WatchDispatcher implements Dispatcher, OnSuccessListener<Integer>, 
             default:
                 return null;
         }
-    }
-
-    @Override
-    public void onFailure(@NonNull Exception e) {
-        Log.d(LOG_TAG, "onFailure: " + e.getLocalizedMessage());
-    }
-
-    @Override
-    public void onSuccess(@NonNull Integer o) {
-        Log.d(LOG_TAG, "onSuccess: " + o);
-        notifyPacketSent(GWatchApplication.getAppContext());
     }
 
     private String nodeId = null;
@@ -170,5 +166,4 @@ public class WatchDispatcher implements Dispatcher, OnSuccessListener<Integer>, 
             Log.e(GWatchApplication.LOG_TAG, errMsg == null ? e.getClass().getSimpleName() : errMsg, e);
         }
     }
-
 }

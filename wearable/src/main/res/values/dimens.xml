@@ -47,14 +47,14 @@
     <dimen name="layout_ref_screen_width">450px</dimen>
     <dimen name="layout_ref_screen_height">450px</dimen>
 
-    <dimen name="layout_left_compl_left">61px</dimen>
-    <dimen name="layout_left_compl_top">219px</dimen>
-    <dimen name="layout_left_compl_right">161px</dimen>
-    <dimen name="layout_left_compl_bottom">319px</dimen>
+    <dimen name="layout_left_compl_left">55px</dimen>
+    <dimen name="layout_left_compl_top">213px</dimen>
+    <dimen name="layout_left_compl_right">167px</dimen>
+    <dimen name="layout_left_compl_bottom">325px</dimen>
 
-    <dimen name="layout_right_compl_left">289px</dimen>
-    <dimen name="layout_right_compl_top">219px</dimen>
-    <dimen name="layout_right_compl_right">389px</dimen>
-    <dimen name="layout_right_compl_bottom">319px</dimen>
+    <dimen name="layout_right_compl_left">283px</dimen>
+    <dimen name="layout_right_compl_top">213px</dimen>
+    <dimen name="layout_right_compl_right">395px</dimen>
+    <dimen name="layout_right_compl_bottom">325px</dimen>
 
 </resources>

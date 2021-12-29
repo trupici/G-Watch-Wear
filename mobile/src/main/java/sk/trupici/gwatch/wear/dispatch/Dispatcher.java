@@ -21,19 +21,6 @@ package sk.trupici.gwatch.wear.dispatch;
 import sk.trupici.gwatch.wear.data.Packet;
 
 public interface Dispatcher {
-
-    /** send given packet if possible, enqueue packet if not connected */
+    /* dispatch packet to the watch */
     boolean dispatch(Packet packet);
-
-    /** send given packet if possible, regardless of waiting packets */
-    boolean dispatchNow(Packet packet);
-
-    /** send given packet if possible. If failed, enqueue packet and force reconnect */
-    boolean sync(Packet packet);
-
-    /** resend last glucose packet if available */
-    boolean repeatLastGlucosePacket();
-
-    boolean isConnected();
-    void connectionChangedCallback(boolean isConnected);
 }

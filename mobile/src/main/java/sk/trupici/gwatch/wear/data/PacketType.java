@@ -26,9 +26,8 @@ public enum PacketType {
     SYNC(0),
     CONFIG(1),
     GLUCOSE(2),
-    AAPS(3),
-    DEVICE_INFO(4),
-    MEDIA(10);
+    AAPS(3)
+    ;
 
     private final int code;
 

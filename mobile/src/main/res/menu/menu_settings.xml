@@ -22,19 +22,19 @@
     tools:context=".MainActivity">
 
     <group android:id="@+id/menu_standard">
-<!--        <item android:id="@+id/action_apply"-->
-<!--            android:title="@string/action_apply"-->
-<!--            android:icon="@drawable/ic_send"-->
-<!--            app:iconTint="@color/toolbar_button"-->
-<!--            android:orderInCategory="100"-->
-<!--            app:showAsAction="always" />-->
+        <item android:id="@+id/action_apply"
+            android:title="@string/action_apply"
+            android:icon="@drawable/ic_send"
+            app:iconTint="@color/toolbar_button"
+            android:orderInCategory="100"
+            app:showAsAction="always" />
 
-<!--        <item android:id="@+id/action_apply_all"-->
-<!--            android:title="@string/action_apply_all"-->
-<!--            android:icon="@drawable/ic_send"-->
-<!--            app:iconTint="@color/toolbar_button"-->
-<!--            android:orderInCategory="200"-->
-<!--            app:showAsAction="never" />-->
+        <item android:id="@+id/action_apply_all"
+            android:title="@string/action_apply_all"
+            android:icon="@drawable/ic_send"
+            app:iconTint="@color/toolbar_button"
+            android:orderInCategory="200"
+            app:showAsAction="never" />
 
         <item android:id="@+id/action_reset_all"
             android:title="@string/action_reset_all"

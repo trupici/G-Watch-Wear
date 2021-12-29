@@ -46,7 +46,6 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.dispatch.Dispatcher;
 import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
@@ -134,7 +133,7 @@ public abstract class FollowerService extends Service {
                             }
 
                             for (int i = packets.size() - 1; i >= 0; i--) {
-                                ((Dispatcher) context.getApplicationContext()).dispatch(packets.get(i));
+                                GWatchApplication.getDispatcher().dispatch(packets.get(i));
                             }
                         }
                     }

@@ -21,32 +21,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item android:id="@+id/action_status"
-        android:title="@string/action_status"
-        android:icon="@drawable/ic_watch"
-        app:iconTint="@color/def_white"
-        android:orderInCategory="100"
-        app:showAsAction="always" />
+<!--    <item android:id="@+id/action_status"-->
+<!--        android:title="@string/action_status"-->
+<!--        android:icon="@drawable/ic_watch"-->
+<!--        app:iconTint="@color/def_white"-->
+<!--        android:orderInCategory="100"-->
+<!--        app:showAsAction="always" />-->
 
-    <item android:id="@+id/action_sync"
-        android:title="@string/action_sync"
-        android:icon="@drawable/ic_sync_problem"
-        app:iconTint="@color/def_white"
-        android:orderInCategory="200"
-        app:showAsAction="never" />
+<!--    <item android:id="@+id/action_sync"-->
+<!--        android:title="@string/action_sync"-->
+<!--        android:icon="@drawable/ic_sync_problem"-->
+<!--        app:iconTint="@color/def_white"-->
+<!--        android:orderInCategory="200"-->
+<!--        app:showAsAction="never" />-->
 
-    <item android:id="@+id/action_send"
-        android:title="@string/action_send"
-        android:icon="@drawable/ic_send"
-        app:iconTint="@color/def_white"
-        android:orderInCategory="300"
-        app:showAsAction="never" />
+<!--    <item android:id="@+id/action_send"-->
+<!--        android:title="@string/action_send"-->
+<!--        android:icon="@drawable/ic_send"-->
+<!--        app:iconTint="@color/def_white"-->
+<!--        android:orderInCategory="300"-->
+<!--        app:showAsAction="never" />-->
 
     <item android:id="@+id/action_clear"
         android:title="@string/action_clear"
-        android:icon="@drawable/ic_close_black_24dp"
+        android:icon="@drawable/delete_24"
         app:iconTint="@color/def_white"
         android:orderInCategory="400"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 
 </menu>

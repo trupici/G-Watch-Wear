@@ -80,7 +80,7 @@ public class ConsoleBuffer implements PacketConsole {
 
     @Override
     public synchronized String getText() {
-        StringBuffer strBuffer = new StringBuffer();
+        StringBuilder strBuffer = new StringBuilder();
         Iterator<String> it = buffer.iterator();
         while (it.hasNext()) {
             strBuffer.append(it.next()).append("\n");
@@ -109,7 +109,7 @@ public class ConsoleBuffer implements PacketConsole {
         }
 
         // calculate the number of lines of text to add
-        String textLines[] = text.split("\n");
+        String[] textLines = text.split("\n");
 
         // recycle lines from the top of the content if necessary
         while (MAX_CONSOLE_LINES - buffer.size() < textLines.length + 1) {

@@ -33,7 +33,6 @@ import android.graphics.Paint;
 import android.os.PersistableBundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import java.util.Arrays;
@@ -211,13 +210,13 @@ public class WidgetUpdateService extends JobService {
         color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_source", ContextCompat.getColor(context, R.color.def_widget_graph_bkg));
         views.setTextColor(R.id.widget_source, color);
 
-        views.setViewVisibility(R.id.widget_offline_indicator, ((GWatchApplication)context).isConnected() ? View.GONE : View.VISIBLE);
+//        views.setViewVisibility(R.id.widget_offline_indicator, ((GWatchApplication)context).isConnected() ? View.GONE : View.VISIBLE);
 
         if (widgetData.getGlucose() != 0) {
 
             int colorByGlucose = getColorByGlucose(context, widgetData.getGlucose());
 
-            boolean isUnitConv = PreferenceUtils.isConfigured(context, "cfg_glucose_units", false);
+            boolean isUnitConv = PreferenceUtils.isConfigured(context, "cfg_glucose_units_conversion", false);
             views.setTextViewText(R.id.widget_glucose, getValueStrInUnits(widgetData.getGlucose(), isUnitConv));
             views.setTextColor(R.id.widget_glucose, colorByGlucose);
 

@@ -33,7 +33,6 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.dispatch.Dispatcher;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
@@ -81,7 +80,7 @@ public abstract class BGReceiver extends BroadcastReceiver {
                     UiUtils.showMessage(appContext, appContext.getString(R.string.glucose_packet_received, getSourceLabel(), UiUtils.formatTime(new Date())));
                     Packet packet = processIntent(appContext, intent);
                     if (packet != null) {
-                        ((Dispatcher) appContext.getApplicationContext()).dispatch(packet);
+                        GWatchApplication.getDispatcher().dispatch(packet);
                     } else {
                         UiUtils.showMessage(appContext, appContext.getString(R.string.glucose_packet_invalid));
                     }

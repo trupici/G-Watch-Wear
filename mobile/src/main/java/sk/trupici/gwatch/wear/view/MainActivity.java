@@ -29,19 +29,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import java.lang.reflect.Method;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
@@ -170,23 +166,6 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
         toolbar.setTitleTextAppearance(this, R.style.textAppearanceTitleBold);
 
         setSupportActionBar(toolbar);
-    }
-
-    public void setConectionStatus(final Boolean isConnected) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView statusView = (TextView) findViewById(R.id.status);
-                if (isConnected == null) {
-                    statusView.setText(StringUtils.EMPTY_STRING);
-                } else {
-                    int textId = isConnected ? R.string.conn_status_connected: R.string.conn_status_disconnected;
-                    statusView.setText(getResources().getString(textId));
-                    int colorId = isConnected ? R.color.status_indicator_connected : R.color.status_indicator_disconnected;
-                    statusView.setTextColor(ContextCompat.getColor(MainActivity.this, colorId));
-                }
-            }
-        });
     }
 
     public void showPacketView(boolean anim) {

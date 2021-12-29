@@ -18,7 +18,6 @@
 
 package sk.trupici.gwatch.wear.view;
 
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -27,7 +26,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,14 +38,10 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.console.PacketConsole;
 import sk.trupici.gwatch.wear.console.PacketConsoleView;
-import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.data.SyncPacket;
-import sk.trupici.gwatch.wear.dispatch.Dispatcher;
 
 public class PacketViewActivity extends LocalizedActivityBase implements PacketConsoleView, HorizontalSwipeDetector.SwipeListener {
 
     protected Menu menu;
-    protected Dispatcher dispatcher;
 
     private TextView packetView;
     protected GestureDetector gestureDetector;
@@ -59,18 +53,12 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.packet_console_layout);
 
-        dispatcher = (Dispatcher) getApplication();
-
         setupToolBar();
 
         this.consoleBuffer = GWatchApplication.getPacketConsole();
 
         gestureDetector = new GestureDetector(this, new HorizontalSwipeDetector(this));
-        View.OnTouchListener gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
+        View.OnTouchListener gestureListener = (v, event) -> gestureDetector.onTouchEvent(event);
 
         findViewById(R.id.text_scroll).setOnTouchListener(gestureListener);
     }
@@ -104,12 +92,7 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
 
     private void setupToolBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
         setSupportActionBar(toolbar);
     }
 
@@ -134,7 +117,7 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_packet_view, menu);
 
-        setConnectionStatus(dispatcher.isConnected());
+//        setConnectionStatus(dispatcher.isConnected());
         return true;
     }
 
@@ -162,17 +145,8 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        switch (id) {
-            case R.id.action_send:
-                dispatcher.repeatLastGlucosePacket();
-                break;
-            case R.id.action_sync:
-                Packet packet = new SyncPacket();
-                dispatcher.sync(packet);
-                break;
-            case R.id.action_clear:
-                consoleBuffer.init();
-                break;
+        if (id == R.id.action_clear) {
+            consoleBuffer.init();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -193,12 +167,7 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
 
     private void scrollToBottom() {
         // scroll to the end (newest text)
-        packetView.post(new Runnable() {
-            @Override
-            public void run() {
-                ((ScrollView)findViewById(R.id.text_scroll)).fullScroll(View.FOCUS_DOWN);
-            }
-        });
+        packetView.post(() -> ((ScrollView)findViewById(R.id.text_scroll)).fullScroll(View.FOCUS_DOWN));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -206,37 +175,33 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
 
     @Override
     public void setConnectionStatus(final Boolean isConnected) {
-        if (menu == null) {
-            return;
-        }
-        int id;
-        if (isConnected == null) {
-            id = android.R.color.darker_gray;
-        } else {
-            id = isConnected ? R.color.status_indicator_connected : R.color.status_indicator_disconnected;
-        }
-
-        final int colorId = id;
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                MenuItem item = menu.findItem(R.id.action_status);
-                Drawable icon = item.getIcon().mutate();
-                icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(PacketViewActivity.this, colorId), PorterDuff.Mode.SRC_ATOP));
-                item.setIcon(icon);
-            }
-        }, 10);
+//        if (menu == null) {
+//            return;
+//        }
+//        int id;
+//        if (isConnected == null) {
+//            id = android.R.color.darker_gray;
+//        } else {
+//            id = isConnected ? R.color.status_indicator_connected : R.color.status_indicator_disconnected;
+//        }
+//
+//        final int colorId = id;
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        toolbar.postDelayed(() -> {
+//            MenuItem item = menu.findItem(R.id.action_status);
+//            if (item != null) {
+//                Drawable icon = item.getIcon().mutate();
+//                icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(PacketViewActivity.this, colorId), PorterDuff.Mode.SRC_ATOP));
+//                item.setIcon(icon);
+//            }
+//        }, 10);
     }
 
     @Override
     public void setText(final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                packetView.setText(text);
-                scrollToBottom();
-            }
+        runOnUiThread(() -> {
+            packetView.setText(text);
+            scrollToBottom();
         });
     }
     ///////////////////////////////////////////////////////////////////////////

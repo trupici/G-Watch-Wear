@@ -28,7 +28,7 @@
         android:title="@string/pref_glucose_level_units"
         android:summaryOn="@string/pref_glucose_level_units_mmoll"
         android:summaryOff="@string/pref_glucose_level_units_mgdl"
-        android:key="cfg_glucose_units"
+        android:key="cfg_glucose_units_conversion"
         android:defaultValue="false"
         app:iconSpaceReserved="false"
         />
@@ -42,7 +42,7 @@
         minValue="36"
         maxValue="90"
         maxPreferenceKey="cfg_glucose_level_low"
-        unitsPreferenceKey="cfg_glucose_units"
+        unitsPreferenceKey="cfg_glucose_units_conversion"
         app:iconSpaceReserved="false"
         />
     <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
@@ -55,7 +55,7 @@
         maxValue="100"
         minPreferenceKey="cfg_glucose_level_hypo"
         maxPreferenceKey="cfg_glucose_level_high"
-        unitsPreferenceKey="cfg_glucose_units"
+        unitsPreferenceKey="cfg_glucose_units_conversion"
         app:iconSpaceReserved="false"
         />
     <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
@@ -68,7 +68,7 @@
         maxValue="254"
         minPreferenceKey="cfg_glucose_level_low"
         maxPreferenceKey="cfg_glucose_level_hyper"
-        unitsPreferenceKey="cfg_glucose_units"
+        unitsPreferenceKey="cfg_glucose_units_conversion"
         app:iconSpaceReserved="false"
         />
     <sk.trupici.gwatch.wear.settings.GlucoseLevelPreference
@@ -80,7 +80,7 @@
         minValue="200"
         maxValue="360"
         minPreferenceKey="cfg_glucose_level_high"
-        unitsPreferenceKey="cfg_glucose_units"
+        unitsPreferenceKey="cfg_glucose_units_conversion"
         app:iconSpaceReserved="false"
         />
 </androidx.preference.PreferenceScreen>

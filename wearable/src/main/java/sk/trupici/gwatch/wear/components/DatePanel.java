@@ -46,7 +46,6 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.util.BorderUtils;
-import sk.trupici.gwatch.wear.util.CommonConstants;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -56,7 +55,7 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
 public class DatePanel implements ComponentPanel {
-    public static final String LOG_TAG = CommonConstants.LOG_TAG;
+    public static final String LOG_TAG = DatePanel.class.getSimpleName();
 
     public static final String PREF_SHOW_MONTH = AnalogWatchfaceConfig.PREF_PREFIX + "date_show_month";
 
@@ -137,6 +136,7 @@ public class DatePanel implements ComponentPanel {
                 context.getResources().getDimension(R.dimen.layout_date_panel_right) / refScreenWidth,
                 context.getResources().getDimension(R.dimen.layout_date_panel_bottom) / refScreenHeight
         );
+
     }
 
     @Override
@@ -179,7 +179,7 @@ public class DatePanel implements ComponentPanel {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "drawDate: ");
         }
-        if (bitmap == null) {
+        if (bitmap == null || dayOfMonthFormat == null) {
             return; // not ready yet
         }
 
@@ -211,7 +211,7 @@ public class DatePanel implements ComponentPanel {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "drawBackgroundAndBorder: ");
         }
-        if (bkgBitmap == null) {
+        if (bkgBitmap == null || dayOfMonthFormat == null) {
             return; // not ready yet
         }
         bkgBitmap.eraseColor(Color.TRANSPARENT);
@@ -285,6 +285,10 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onPropertiesChanged(Context context, Bundle properties) {
+        calendar.setTimeZone(TimeZone.getDefault());
+        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
+        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
+        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
     }
 
     public void registerReceiver(WatchFaceService watchFaceService) {

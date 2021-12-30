@@ -35,6 +35,7 @@ import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.BgData;
+import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -51,7 +52,7 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
  */
 public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
-    public static final String LOG_TAG = CommonConstants.LOG_TAG;
+    public static final String LOG_TAG = BgPanel.class.getSimpleName();
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
@@ -74,8 +75,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private String bgLine1;
     private String bgLine2;
 
-    private int bgValue = 0;
-    private long bgTimestamp = 0;
+    private BgData lastBgData;
 
     boolean isUnitConversion;
 
@@ -100,12 +100,13 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public BgPanel(int screenWidth, int screenHeight) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
+        lastBgData = new BgData(0, 0, 0 , 0, Trend.UNKNOWN);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
-        onDataUpdate(BgData.fromBundle(extras));
+        onDataUpdate(context, BgData.fromBundle(extras));
     }
 
     @Override
@@ -117,7 +118,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
                 context.getResources().getDimension(R.dimen.layout_bg_panel_bottom) / (float)refScreenHeight
         );
         topOffset = context.getResources().getDimension(R.dimen.layout_bg_panel_top_offset);
-        Log.w(CommonConstants.LOG_TAG, "Rect: " + sizeFactors);
+        Log.w(LOG_TAG, "Rect: " + sizeFactors);
 
         paint = new TextPaint();
         paint.setAntiAlias(true);
@@ -135,6 +136,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
+        Log.d(LOG_TAG, "onConfigChanged: ");
 
         isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
 
@@ -155,6 +157,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         // border
         borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
+
+        onDataUpdate(context, lastBgData);
     }
 
     @Override
@@ -208,12 +212,12 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         float x = bounds.left + bounds.width() / 2f; // text will be centered around
         float top = bounds.top + topOffset;
         float height = bounds.height() - topOffset;
-        long bgTimeDiff = System.currentTimeMillis() / 60000 - bgTimestamp;
+        long bgTimeDiff = System.currentTimeMillis() / 60000 - lastBgData.getTimestamp();
         if (isAmbientMode) {
             paint.setColor(Color.LTGRAY);
 //            paint.setAntiAlias(false);
         } else {
-            paint.setColor(getRangedColor(bgValue, bgTimeDiff));
+            paint.setColor(getRangedColor(lastBgData.getValue(), bgTimeDiff));
 //            paint.setAntiAlias(true);
         }
         paint.setTextAlign(Paint.Align.CENTER);
@@ -235,22 +239,21 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     // range indicator - EXPERIMENTAL
     private void drawRangeIndicator(Canvas canvas) {
-        float height = bounds.height() - topOffset;
 
 //            Log.d(LOG_TAG, "onDraw: " + bounds);
         Paint indicatorPaint = new Paint();
         int padding = 10;
-        height = (bounds.height() - padding) / 3f - padding;
+        float height = (bounds.height() - padding) / 3f - padding;
         RectF indicatorBounds = new RectF();
         indicatorBounds.left = bounds.left + 6;
         indicatorBounds.right = indicatorBounds.left + 10;
         indicatorBounds.bottom = bounds.bottom - padding;
         indicatorBounds.top = indicatorBounds.bottom - height;
-        boolean isCritical = isBgCritical(bgValue);
+        boolean isCritical = isBgCritical(lastBgData.getValue());
         paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isCritical ? criticalColor : criticalColor & 0x60FFFFFF);
         indicatorBounds.bottom = indicatorBounds.top - padding;
         indicatorBounds.top = indicatorBounds.bottom - height;
-        boolean isInRange = !isCritical && isBgInRange(bgValue);
+        boolean isInRange = !isCritical && isBgInRange(lastBgData.getValue());
         paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isInRange ? inRangeColor : inRangeColor & 0x60FFFFFF);
         indicatorBounds.top = bounds.top + padding;
         indicatorBounds.bottom = indicatorBounds.top + height;
@@ -296,26 +299,32 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         }
     }
 
-    public void onDataUpdate(BgData bgData) {
+    public void onDataUpdate(Context context, BgData bgData) {
+
+        boolean noData = bgData.getValue() == 0;
 
         long bgTimestampDiff = bgData.getTimestampDiff() / CommonConstants.MINUTE_IN_MILLIS; // to minutes
         if (bgTimestampDiff > CommonConstants.DAY_IN_MINUTES) {
-            bgTimestampDiff = -1;
+            noData = true;
         }
 
-        char trendArrow = TREND_SET_1[bgData.getTrend().ordinal()];
-
-        if (isUnitConversion) {
-            bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
-            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
+        if (noData) {
+            bgLine1 = "--";
+            bgLine2 = "--";
         } else {
-            bgLine1 = "" + bgData.getValue() + trendArrow;
-            bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgData.getValueDiff();
+            char trendArrow = TREND_SET_1[bgData.getTrend().ordinal()];
+
+            if (isUnitConversion) {
+                bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
+                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
+            } else {
+                bgLine1 = "" + bgData.getValue() + trendArrow;
+                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgData.getValueDiff();
+            }
         }
 
-        Log.d(CommonConstants.LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
+        Log.d(LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
 
-        this.bgValue = bgData.getValue();
-        this.bgTimestamp = bgData.getTimestamp();
+        this.lastBgData = bgData;
     }
 }

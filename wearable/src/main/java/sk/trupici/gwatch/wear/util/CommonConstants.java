@@ -38,4 +38,6 @@ public interface CommonConstants {
     String PREF_HYPO_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hypo";
     String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_no_data";
 
+    String PREF_CONFIG_CHANGED = AnalogWatchfaceConfig.PREF_PREFIX + "config_changed";
+
 }

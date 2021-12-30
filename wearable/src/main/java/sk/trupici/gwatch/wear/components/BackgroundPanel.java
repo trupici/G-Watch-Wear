@@ -30,11 +30,10 @@ import android.support.wearable.watchface.WatchFaceService;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
-import sk.trupici.gwatch.wear.util.CommonConstants;
 
 public class BackgroundPanel implements ComponentPanel {
 
-    public static final String LOG_TAG = CommonConstants.LOG_TAG;
+    public static final String LOG_TAG = BackgroundPanel.class.getSimpleName();
 
 
     private Paint backgroundPaint;

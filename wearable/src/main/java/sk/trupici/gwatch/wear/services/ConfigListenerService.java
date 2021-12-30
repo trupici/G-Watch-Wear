@@ -16,14 +16,32 @@
 
 package sk.trupici.gwatch.wear.services;
 
+import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
-import sk.trupici.gwatch.wear.data.PacketBase;
+import java.util.HashMap;
+import java.util.Map;
+
+import androidx.preference.PreferenceManager;
+import sk.trupici.gwatch.wear.BuildConfig;
+import sk.trupici.gwatch.wear.data.ConfigData;
+import sk.trupici.gwatch.wear.data.ConfigPacket;
+import sk.trupici.gwatch.wear.data.ConfigType;
+import sk.trupici.gwatch.wear.data.TLV;
+import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.DumpUtils;
+import sk.trupici.gwatch.wear.util.PacketUtils;
+
+import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HIGH;
+import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HYPER;
+import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HYPO;
+import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_LOW;
+import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_UNIT_CONVERSION;
+import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
 
 public class ConfigListenerService extends WearableListenerService {
 
@@ -31,6 +49,16 @@ public class ConfigListenerService extends WearableListenerService {
 
     private static final String WAKE_LOCK_TAG = "gwatch.wear:" + ConfigListenerService.class.getSimpleName() + ".wake_lock";
     private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 60s
+
+    public final static Map<Byte, ConfigData> preferenceMap = new HashMap<Byte, ConfigData>() {{
+        // glucose levels
+        put(TAG_GL_THRESHOLD_HYPO, new ConfigData(TAG_GL_THRESHOLD_HYPO, ConfigType.BYTE, CommonConstants.PREF_HYPO_THRESHOLD));
+        put(TAG_GL_THRESHOLD_LOW, new ConfigData(TAG_GL_THRESHOLD_LOW, ConfigType.BYTE, CommonConstants.PREF_LOW_THRESHOLD));
+        put(TAG_GL_THRESHOLD_HIGH, new ConfigData(TAG_GL_THRESHOLD_HIGH, ConfigType.BYTE, CommonConstants.PREF_HIGH_THRESHOLD));
+        put(TAG_GL_THRESHOLD_HYPER, new ConfigData(TAG_GL_THRESHOLD_HYPER, ConfigType.WORD, CommonConstants.PREF_HYPER_THRESHOLD));
+        put(TAG_GL_UNIT_CONVERSION, new ConfigData(TAG_GL_UNIT_CONVERSION, ConfigType.BOOLEAN, CommonConstants.PREF_IS_UNIT_CONVERSION));
+    }};
+
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
@@ -46,17 +74,66 @@ public class ConfigListenerService extends WearableListenerService {
             }
 
             final byte[] data = messageEvent.getData();
-            Log.v("myTag", "Message received:\n" + DumpUtils.dumpData(data, data.length));
-            Log.d(LOG_TAG, DumpUtils.dumpData(data, data.length));
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, DumpUtils.dumpData(data, data.length));
+            }
 
-            if (data.length < PacketBase.PACKET_HEADER_SIZE) {
+            ConfigPacket packet = ConfigPacket.of(data);
+            if (packet == null || packet.getTlvList().size() == 0) {
+                Log.e(LOG_TAG, "Failed to decode packet: " + (packet == null ? "null" : packet.getTlvList().size()));
                 return;
             }
 
-            // TODO decode config packet
+            // decode and persist configuration
+            SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+            for (TLV tlv : packet.getTlvList()) {
+                ConfigData cfg = preferenceMap.get(tlv.getTag());
+                if (cfg == null) {
+                    Log.e(LOG_TAG, "Unknown configuration type: " + Integer.toHexString((tlv.getTag() & 0xFF)));
+                    continue;
+                }
+                persistConfig(tlv, cfg, edit);
+            }
 
+            // notify watchface that config has changed
+            edit.putLong(PREF_CONFIG_CHANGED, System.currentTimeMillis());
+            edit.apply();
         } finally {
             wakeLock.release();
+        }
+    }
+
+    private void persistConfig(TLV tlv, ConfigData cfg, SharedPreferences.Editor edit) {
+        int intValue;
+        switch (cfg.getType()) {
+            case BYTE:
+                intValue = (tlv.getValue()[0] & 0xFF);
+                edit.putInt(cfg.getPrefName(), intValue);
+                break;
+            case WORD:
+                intValue = PacketUtils.decodeShort(tlv.getValue(), 0);
+                edit.putInt(cfg.getPrefName(), intValue);
+                break;
+            case DWORD:
+            case COLOR:
+                intValue = PacketUtils.decodeInt(tlv.getValue(), 0);
+                edit.putInt(cfg.getPrefName(), intValue);
+                break;
+            case BOOLEAN:
+                boolean boolValue = (tlv.getValue()[0] != 0);
+                edit.putBoolean(cfg.getPrefName(), boolValue);
+                break;
+            case FLOAT:
+                float floatValue = PacketUtils.decodeFloat(tlv.getValue(), 0);
+                edit.putFloat(cfg.getPrefName(), floatValue);
+                break;
+            case STRING:
+                String strValue = new String(tlv.getValue());
+                edit.putString(cfg.getPrefName(), strValue);
+                break;
+            default:
+                Log.e(LOG_TAG, "persistConfig: unsupported type: " + cfg.getType());
+                break;
         }
     }
 }

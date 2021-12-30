@@ -43,7 +43,7 @@ import static android.content.Context.POWER_SERVICE;
 
 public class BgAlarmController extends BroadcastReceiver {
 
-    private static final String LOG_TAG = CommonConstants.LOG_TAG;
+    private static final String LOG_TAG = BgAlarmController.class.getSimpleName();
 
     public static final String PREF_NEW_VALUE_NOTIFICATION_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "notification_new_value_enabled";
 

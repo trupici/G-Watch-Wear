@@ -20,8 +20,6 @@ package sk.trupici.gwatch.wear.data;
 
 import java.util.Arrays;
 
-import sk.trupici.gwatch.wear.config.complications.ComplicationId;
-
 /**
  * Packet type enumeration.
  * Types ordinals must be equal in watch processor.
@@ -31,8 +29,7 @@ public enum PacketType {
     CONFIG(1),
     GLUCOSE(2),
     AAPS(3),
-    DEVICE_INFO(4),
-    MEDIA(10);
+    ;
 
     private final int code;
 

@@ -20,25 +20,25 @@
     <color name="alarms_warn_color">#FFFFBB09</color>
     <color name="alarms_no_data_color">#FF008BE4</color>
 
-    <bool name="def_notification_new_value_enabled">false</bool>
+    <bool name="def_notification_new_value_enabled">true</bool>
     <!-- default notification vibration duration in seconds -->
     <integer name="def_notification_new_value_duration">150</integer>
     <!-- default notification vibration intensity 0-255, -1 for system defaults -->
-    <integer name="def_notification_new_value_amplitude">-1</integer>
+    <integer name="def_notification_new_value_amplitude">150</integer>
 
-    <bool name="def_alarms_enabled">true</bool>
+    <bool name="def_alarms_enabled">false</bool>
     <!-- flag whether to use time range only -->
     <bool name="def_alarms_time_range_enabled">false</bool>
     <!-- active time range limits in minutes (22:00 - 7:00) -->
     <integer name="def_alarms_enabled_from">1320</integer>
     <integer name="def_alarms_enabled_to">420</integer>
 
-    <bool name="def_alarms_hyper_enabled">false</bool>
-    <bool name="def_alarms_high_enabled">false</bool>
-    <bool name="def_alarms_low_enabled">false</bool>
-    <bool name="def_alarms_hypo_enabled">false</bool>
-    <bool name="def_alarms_no_data_enabled">false</bool>
-    <bool name="def_alarms_fats_drop_enabled">false</bool>
+    <bool name="def_alarms_hyper_enabled">true</bool>
+    <bool name="def_alarms_high_enabled">true</bool>
+    <bool name="def_alarms_low_enabled">true</bool>
+    <bool name="def_alarms_hypo_enabled">true</bool>
+    <bool name="def_alarms_no_data_enabled">true</bool>
+    <bool name="def_alarms_fats_drop_enabled">true</bool>
 
     <!-- default duration in seconds -->
     <integer name="def_alarms_duration">60</integer>

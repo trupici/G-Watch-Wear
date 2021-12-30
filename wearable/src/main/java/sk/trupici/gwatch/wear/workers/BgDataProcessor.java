@@ -44,6 +44,8 @@ public class BgDataProcessor extends Worker {
     private final static String PREF_LAST_BG_VALUE = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_value";
     private final static String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
 
+    private final static int MAX_VALUE_DIFF = 100;
+
     public BgDataProcessor(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -92,8 +94,11 @@ public class BgDataProcessor extends Worker {
             }
         }
 
-        int valueDiff = lastBgValue == 0 ? 0 : bgValue - lastBgValue;
-        long timestampDiff = lastBgTimestamp == 0 ? 0 : bgTimestamp - lastBgTimestamp;
+        int valueDiff = lastBgValue <= 0 ? 0 : bgValue - lastBgValue;
+        if (valueDiff > MAX_VALUE_DIFF) {
+            valueDiff = 0;
+        }
+        long timestampDiff = lastBgTimestamp <= 0 ? 0 : bgTimestamp - lastBgTimestamp;
 
         Trend trend = packet.getTrend();
         if (trend == null || trend == Trend.UNKNOWN) {
@@ -101,7 +106,7 @@ public class BgDataProcessor extends Worker {
         }
 
         // store received values
-        if (timestampDiff > 0) {
+        if (timestampDiff >= 0) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt(PREF_LAST_BG_VALUE, bgValue);
             editor.putLong(PREF_LAST_BG_TIMESTAMP, bgTimestamp);

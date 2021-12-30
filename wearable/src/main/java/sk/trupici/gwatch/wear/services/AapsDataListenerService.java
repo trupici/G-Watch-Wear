@@ -28,6 +28,7 @@ import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.data.AAPSPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.PacketBase;
@@ -56,8 +57,9 @@ public class AapsDataListenerService extends WearableListenerService {
             }
 
             final byte[] data = messageEvent.getData();
-            Log.v(LOG_TAG, "Message received:\n" + DumpUtils.dumpData(data, data.length));
-            Log.d(LOG_TAG, DumpUtils.dumpData(data, data.length));
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, DumpUtils.dumpData(data, data.length));
+            }
 
             if (data.length < PacketBase.PACKET_HEADER_SIZE) {
                 return;

@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -65,19 +66,11 @@ import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_PREFIX;
+import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
 
 /**
- * Analog watch face with a ticking second hand. In ambient mode, the second hand isn"t
- * shown. On devices with low-bit ambient mode, the hands are drawn without anti-aliasing in ambient
- * mode. The watch face is drawn with less contrast in mute mode.
- * <p>
- * Important Note: Because watch face apps do not have a default Activity in
- * their project, you will need to set your Configurations to
- * "Do not launch Activity" for both the Wear and/or Application modules. If you
- * are unsure how to do this, please review the "Run Starter project" section
- * in the Google Watch Face Code Lab:
- * https://codelabs.developers.google.com/codelabs/watchface/index.html#0
- */
+ * Analog watch face with a ticking second hand.
+ **/
 public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
     public static final String LOG_TAG = "StdAnalogGWatchface";
@@ -86,7 +79,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
      * Updates rate in milliseconds for interactive mode. We update once a second to advance the
      * second hand.
      */
-    private static final long INTERACTIVE_UPDATE_RATE_MS = 1000; //TimeUnit.SECONDS.toMillis(1);
+    private static final long INTERACTIVE_UPDATE_RATE_MS = CommonConstants.SECOND_IN_MILLIS;
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -121,7 +114,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    private class Engine extends CanvasWatchFaceService.Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         /* Handler to update the time once a second in interactive mode. */
         private final Handler updateTimeHandler = new EngineHandler(this);
@@ -174,6 +167,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             // Used throughout watch face to pull user's preferences.
             Context context = getApplicationContext();
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+            sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+            if (BuildConfig.DEBUG) {
+                PreferenceUtils.dumpPreferences(sharedPrefs);
+            }
 
             screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
             screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
@@ -202,14 +199,17 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     getResources().getDimension(R.dimen.layout_left_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.layout_left_compl_bottom) / screenHeight
             );
+            leftComplSettings = new ComponentsConfig();
+            leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
+
             rightComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.layout_right_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.layout_right_compl_top) / screenHeight,
                     getResources().getDimension(R.dimen.layout_right_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.layout_right_compl_bottom) / screenHeight
             );
-
-            loadSavedPreferences();
+            rightComplSettings = new ComponentsConfig();
+            rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
 
             initializeComplications();
 
@@ -217,41 +217,13 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             registerReceiver(context, chartPanel, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);
 
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
-//                openOverlaySettings();
-                final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                try {
-                    context.startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    Log.e(LOG_TAG, e.getMessage());
-                }
-//            }
-
-
-        }
-
-        // Pulls all user's preferences for watch face appearance.
-        private void loadSavedPreferences() {
-            if (BuildConfig.DEBUG) {
-                PreferenceUtils.dumpPreferences(sharedPrefs);
+            final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                context.startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Log.e(LOG_TAG, e.getMessage());
             }
-
-            leftComplSettings = new ComponentsConfig();
-            leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
-//            Log.d(LOG_TAG, "LEFT: " + leftComplSettings.toString());
-
-            rightComplSettings = new ComponentsConfig();
-            rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
-//            Log.d(LOG_TAG, "RIGHT: " + rightComplSettings.toString());
-
-
-            Context context = getApplicationContext();
-            bkgPanel.onConfigChanged(context, sharedPrefs);
-            watchHands.onConfigChanged(context, sharedPrefs);
-            bgPanel.onConfigChanged(context, sharedPrefs);
-            datePanel.onConfigChanged(context, sharedPrefs);
-            bgAlarmController.onConfigChanged(context, sharedPrefs);
         }
 
         private void initializeComplications() {
@@ -345,6 +317,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
         @Override
         public void onDestroy() {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
 
             // unregister all receivers
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
@@ -369,6 +342,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bkgPanel.onPropertiesChanged(context, properties);
             watchHands.onPropertiesChanged(context, properties);
             bgPanel.onPropertiesChanged(context, properties);
+            chartPanel.onPropertiesChanged(context, properties);
             datePanel.onPropertiesChanged(context, properties);
         }
 
@@ -391,9 +365,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
 //            if (lowBitAmbient) {
 //                boolean antiAlias = !inAmbientMode;
-//                datePaint.setAntiAlias(antiAlias);
-//                handsPaint.setAntiAlias(antiAlias);
-//                backgroundPaint.setAntiAlias(antiAlias);
+//                FIXME propagate antiAlias to all components
 //            }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
@@ -410,8 +382,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             if (muted != inMuteMode) {
                 muted = inMuteMode;
 //                int alpha = inMuteMode ? 100 : 255;
-//                handsPaint.setAlpha(alpha);
-//                datePaint.setAlpha(alpha);
+//                FIXME propagate alpha to all components (corresponding paints)
 //                invalidate();
             }
         }
@@ -532,16 +503,21 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             if (visible) {
                 // Preferences might have changed since last time watch face was visible.
-                loadSavedPreferences();
 
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID).getComplicationDrawable(), leftComplSettings);
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID).getComplicationDrawable(), rightComplSettings);
+                leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
+                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)
+                        .getComplicationDrawable(), leftComplSettings);
+
+                rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
+                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
+                        .getComplicationDrawable(), rightComplSettings);
 
                 Context context = getApplicationContext();
                 bkgPanel.onConfigChanged(context, sharedPrefs);
-                watchHands.onConfigChanged(context, sharedPrefs);
-                bgPanel.onConfigChanged(context, sharedPrefs);
                 datePanel.onConfigChanged(context, sharedPrefs);
+                bgPanel.onConfigChanged(context, sharedPrefs);
+                chartPanel.onConfigChanged(context, sharedPrefs);
+                watchHands.onConfigChanged(context, sharedPrefs);
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
                 adjustSize((int)screenWidth, (int)screenHeight);
@@ -596,6 +572,17 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             intentFilter.setPriority(100);
             LocalBroadcastManager.getInstance(context).registerReceiver(receiver, intentFilter);
             receivers.add(receiver);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d(LOG_TAG, "onSharedPreferenceChanged: " + key);
+            if (PREF_CONFIG_CHANGED.equals(key)) {
+                Log.d(LOG_TAG, "onSharedPreferenceChanged: signaled config change");
+                Context context = getApplicationContext();
+                bgPanel.onConfigChanged(context, sharedPrefs);
+                chartPanel.onConfigChanged(context, sharedPrefs);
+            }
         }
     }
 }

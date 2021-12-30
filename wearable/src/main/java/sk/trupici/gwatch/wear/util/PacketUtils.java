@@ -22,13 +22,13 @@ public class PacketUtils {
      * Encode <code>short</code> to byte array as unsigned 2-byte value
      * @param data byte array
      * @param offset start offset in byte array
-     * @param val value to encode
+     * @param value value to encode
      * @return number of bytes written
      */
-    public static int encodeShort(byte[] data, int offset, short val) {
+    public static int encodeShort(byte[] data, int offset, short value) {
         int idx = offset;
-        data[idx++] = (byte) (val & 0xFF);
-        data[idx++] = (byte) ((val & 0xFF00) >> 8);
+        data[idx++] = (byte) ((value & 0xFF00) >> 8);
+        data[idx++] = (byte) (value & 0xFF);
         return idx - offset;
     }
 
@@ -39,8 +39,9 @@ public class PacketUtils {
      * @return decoded short value
      */
     public static short decodeShort(byte[] data, int offset) {
-        int value = (data[offset++] & 0xFF);
-        value += ((data[offset++] << 8) & 0xFF00);
+        int value;
+        value = ((data[offset++] << 8) & 0xFF00);
+        value += (data[offset] & 0xFF);
         return (short) value;
     }
 
@@ -48,15 +49,15 @@ public class PacketUtils {
      * Encode <code>int</code> to byte array as unsigned 4-byte value
      * @param data byte array
      * @param offset start offset in byte array
-     * @param val value to encode
+     * @param value value to encode
      * @return number of bytes written
      */
-    public static int encodeInt(byte[] data, int offset, long val) {
+    public static int encodeInt(byte[] data, int offset, long value) {
         int idx = offset;
-        data[idx++] = (byte) (val & 0xFF);
-        data[idx++] = (byte) ((val & 0xFF00) >> 8);
-        data[idx++] = (byte) ((val & 0xFF0000) >> 16);
-        data[idx++] = (byte) ((val & 0xFF000000) >> 24);
+        data[idx++] = (byte) ((value & 0xFF000000) >> 24);
+        data[idx++] = (byte) ((value & 0xFF0000) >> 16);
+        data[idx++] = (byte) ((value & 0xFF00) >> 8);
+        data[idx++] = (byte) (value & 0xFF);
         return idx - offset;
     }
 
@@ -67,58 +68,24 @@ public class PacketUtils {
      * @return decoded int value
      */
     public static int decodeInt(byte[] data, int offset) {
-        int value = (data[offset++] & 0xFF);
-        value += ((data[offset++] << 8) & 0xFF00);
+        int value;
+        value = ((data[offset++] << 24) & 0xFF000000);
         value += ((data[offset++] << 16) & 0xFF0000);
-        value += ((data[offset] << 24) & 0xFF000000);
+        value += ((data[offset++] << 8) & 0xFF00);
+        value += (data[offset] & 0xFF);
         return value;
     }
-
-
-    /**
-     * Encode <code>int</code> to byte array as unsigned 3-byte value
-     * @param data byte array
-     * @param offset start offset in byte array
-     * @param val value to encode
-     * @return number of bytes written
-     */
-    public static int encodeInt3(byte[] data, int offset, long val) {
-        int idx = offset;
-        data[idx++] = (byte) (val & 0xFF);
-        data[idx++] = (byte) ((val & 0xFF00) >> 8);
-        data[idx++] = (byte) ((val & 0xFF0000) >> 16);
-        return idx - offset;
-    }
-
-    /**
-     * Decode <code>int</code> from byte array as unsigned 3-byte value
-     * @param data byte array
-     * @param offset start offset in byte array
-     * @return decoded int value
-     */
-    public static int decodeInt3(byte[] data, int offset) {
-        int value = (data[offset++] & 0xFF);
-        value += ((data[offset++] << 8) & 0xFF00);
-        value += ((data[offset++] << 16) & 0xFF0000);
-        return value;
-    }
-
 
     /**
      * Encode <code>float</code> to byte array as unsigned 4-byte IEEE 754 value
      * @param data byte array
      * @param offset start offset in byte array
-     * @param val value to encode
+     * @param value value to encode
      * @return number of bytes written
      */
-    public static int encodeFloat(byte[] data, int offset, float val) {
-        int bits = Float.floatToIntBits(val);
-        int idx = offset;
-        data[idx++] = (byte) (bits & 0xFF);
-        data[idx++] = (byte) ((bits & 0xFF00) >> 8);
-        data[idx++] = (byte) ((bits & 0xFF0000) >> 16);
-        data[idx++] = (byte) ((bits & 0xFF000000) >> 24);
-        return idx - offset;
+    public static int encodeFloat(byte[] data, int offset, float value) {
+        int bits = Float.floatToIntBits(value);
+        return encodeInt(data, offset, bits);
     }
 
     /**
@@ -128,10 +95,7 @@ public class PacketUtils {
      * @return decoded IEEE 754 value
      */
     public static float decodeFloat(byte[] data, int offset) {
-        int bits = (data[offset++] & 0xFF);
-        bits += ((data[offset++] << 8) & 0xFF00);
-        bits += ((data[offset++] << 16) & 0xFF0000);
-        bits += ((data[offset] << 24) & 0xFF000000);
+        int bits = decodeInt(data, offset);
         return Float.intBitsToFloat(bits);
     }
 
@@ -185,5 +149,28 @@ public class PacketUtils {
      */
     public static int getNullableStrLen(String str) {
         return (str == null ? 0 : str.length());
+    }
+
+    /**
+     * Encode <code>boolean</code> to byte array as unsigned 1-byte value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @param value value to encode
+     * @return number of bytes written
+     */
+    public static int encodeBoolean(byte[] data, int offset, boolean value) {
+        int idx = offset;
+        data[idx++] = value ? (byte)0 : (byte)1;
+        return idx - offset;
+    }
+
+    /**
+     * Decode <code>boolean</code> from byte array as unsigned 1-byte value
+     * @param data byte array
+     * @param offset start offset in byte array
+     * @return decoded boolean value
+     */
+    public static boolean decodeBoolean(byte[] data, int offset) {
+        return  data[offset] != 0;
     }
 }

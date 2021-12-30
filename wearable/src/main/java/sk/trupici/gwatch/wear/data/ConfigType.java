@@ -15,21 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package sk.trupici.gwatch.wear.data;
 
-import java.util.List;
-
-public class DeviceInfoPacket extends TLVPacket {
-
-    public static final byte TAG_BATTERY_STATUS = 0x01;
-
-    public DeviceInfoPacket(List<TLV> tlvList, int totalLen) {
-        super(tlvList, totalLen, PacketType.DEVICE_INFO);
-    }
-
-    @Override
-    protected String getPacketName() {
-        return "DEVICE INFO";
-    }
+public enum ConfigType {
+    BYTE,
+    WORD,
+    DWORD,
+    COLOR,
+    BOOLEAN,
+    STRING,
+    FLOAT
 }

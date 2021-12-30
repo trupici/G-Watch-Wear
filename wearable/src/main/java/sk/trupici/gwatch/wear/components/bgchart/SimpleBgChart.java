@@ -39,7 +39,6 @@ import sk.trupici.gwatch.wear.components.ComponentPanel;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     final private static String LOG_TAG = SimpleBgChart.class.getSimpleName();
@@ -211,10 +210,10 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
         refreshRateMin = sharedPrefs.getInt(PREF_REFRESH_RATE, context.getResources().getInteger(R.integer.def_graph_refresh_rate));
 
         // levels - external BG panel settings dependency !
-        hypoThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
-        lowThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, CommonConstants.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
-        highThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, CommonConstants.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
-        hyperThreshold = PreferenceUtils.getStringValueAsInt(sharedPrefs, CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+        hypoThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
+        lowThreshold = sharedPrefs.getInt(CommonConstants.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
+        highThreshold = sharedPrefs.getInt(CommonConstants.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
+        hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
 
         drawChart();
     }

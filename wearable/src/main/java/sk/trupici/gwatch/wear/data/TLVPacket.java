@@ -19,12 +19,17 @@
 package sk.trupici.gwatch.wear.data;
 
 import android.content.Context;
+import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.PacketUtils;
 
 public abstract class TLVPacket extends PacketBase {
+    private static final String LOG_TAG = TLVPacket.class.getSimpleName();
+
     private List<TLV> tlvList;
     private int totalLen; // in bytes
 
@@ -45,20 +50,15 @@ public abstract class TLVPacket extends PacketBase {
         int idx = 0;
 
         data[idx++] = getType().getCodeAsByte();
-        if (totalLen > 255) {
-            data[idx++] = (byte) ((totalLen & 0xFF00) >> 8);
-        } else {
-            data[idx++] = 0;
-        }
-        data[idx++] = (byte)(totalLen & 0xFF);
+        idx += PacketUtils.encodeShort(data, idx, (short)totalLen);
 
         for (TLV tlv : tlvList) {
             if (tlv.getTotalLen() + idx > data.length) {
                 throw new RuntimeException("Buffer too small: " + (tlv.getTotalLen() + idx) + " > " + data.length);
             }
             data[idx++] = tlv.getTag();
-            data[idx++] = (byte)(tlv.getLen() & 0xFF);
-            System.arraycopy(tlv.getValue(), 0, data, idx, tlv.getLen());
+            data[idx++] = tlv.getLen();
+            System.arraycopy(tlv.getValue(), 0, data, idx, tlv.getLen() & 0xFF);
             idx += tlv.getLen();
         }
 
@@ -80,9 +80,37 @@ public abstract class TLVPacket extends PacketBase {
         return text.toString();
     }
 
+    protected static List<TLV> decodeTLVs(byte[] data, int offset) {
+        if (data.length < PACKET_HEADER_SIZE) {
+            return null;
+        }
+
+        int idx = offset;
+        List<TLV> tlvList = new ArrayList<>();
+
+        while (idx < data.length) {
+            byte tag = data[idx++];
+            byte len = data[idx++];
+            int intLen = (len & 0xFF);
+            byte[] value = new byte[intLen];
+            if (data.length < idx + intLen) {
+                Log.e(LOG_TAG, "decodeTLVs: invalid TLV data");
+                throw new ArrayIndexOutOfBoundsException("data buffer size exceeded: " + (idx + intLen) + " of " + data.length);
+            }
+            System.arraycopy(data, idx, value, 0, value.length);
+            idx += intLen;
+            tlvList.add(new TLV(tag, len, value));
+        }
+        return tlvList;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     private int getPacketLen() {
         return 1 + 2 + totalLen;
+    }
+
+    public List<TLV> getTlvList() {
+        return tlvList;
     }
 }

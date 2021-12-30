@@ -20,6 +20,8 @@ package sk.trupici.gwatch.wear.data;
 
 import java.util.List;
 
+import sk.trupici.gwatch.wear.util.PacketUtils;
+
 public class ConfigPacket extends TLVPacket {
     public ConfigPacket(List<TLV> tlvList, int totalLen) {
         super(tlvList, totalLen, PacketType.CONFIG);
@@ -29,4 +31,27 @@ public class ConfigPacket extends TLVPacket {
     protected String getPacketName() {
         return "CONFIG";
     }
+
+    public static ConfigPacket of(byte[] data) {
+        if (data.length < PACKET_HEADER_SIZE) {
+            return null;
+        }
+
+        byte type = data[0];
+
+        if (type != PacketType.CONFIG.getCodeAsByte()) {
+            return null;
+        }
+
+        short shortLen = PacketUtils.decodeShort(data, 1);
+        int totalLen = (shortLen & 0xFFFF);
+
+        try {
+            List<TLV> tlvList = decodeTLVs(data, 3);
+            return new ConfigPacket(tlvList, totalLen);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
 }

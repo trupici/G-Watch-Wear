@@ -30,10 +30,9 @@ import java.util.Calendar;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
-import sk.trupici.gwatch.wear.util.CommonConstants;
 
 public class WatchHands implements ComponentPanel {
-    public static final String LOG_TAG = CommonConstants.LOG_TAG;
+    public static final String LOG_TAG = WatchHands.class.getSimpleName();
 
     // offsets for watch hands shadows - currently we use the same value for X and Y
     private static final float HOUR_HAND_SHADOW_OFFSET = 3;

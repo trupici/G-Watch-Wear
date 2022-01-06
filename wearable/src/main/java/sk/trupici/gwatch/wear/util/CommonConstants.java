@@ -19,8 +19,6 @@ package sk.trupici.gwatch.wear.util;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 
 public interface CommonConstants {
-    String LOG_TAG = "GWatchApp";
-
     String BG_RECEIVER_ACTION = "sk.trupici.gwatch.wear.BG_RECEIVER_ACTION";
 
     long SECOND_IN_MILLIS = 1000L;

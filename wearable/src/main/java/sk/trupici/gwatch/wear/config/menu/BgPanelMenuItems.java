@@ -28,8 +28,6 @@ public class BgPanelMenuItems {
     final public static ConfigItem[] items = {
             new BoolConfigItem(
                     R.string.config_item_is_unit_conversion,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     CommonConstants.PREF_IS_UNIT_CONVERSION,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_bg_is_unit_conversion),

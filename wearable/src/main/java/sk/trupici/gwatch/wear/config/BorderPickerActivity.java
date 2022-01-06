@@ -111,7 +111,6 @@ public class BorderPickerActivity extends Activity {
 
             holder.setId(item.getId());
             holder.getButton().setText(context.getString(item.getLabelResourceId()));
-// 1,2           holder.getButton().setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(item.getIconResourceId()), null, null, null);
             holder.getButton().setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(item.getIconResourceId()), null);
         }
 

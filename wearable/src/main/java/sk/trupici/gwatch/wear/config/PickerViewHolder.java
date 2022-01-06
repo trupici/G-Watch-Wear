@@ -54,7 +54,6 @@ public class PickerViewHolder extends RecyclerView.ViewHolder implements View.On
 
     public void setIcon(int resourceId) {
         Context context = button.getContext();
-// 1,2       button.setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(resourceId), null, null, null);
         button.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(resourceId), null);
     }
 

@@ -27,22 +27,16 @@ public class BgGraphMenuItems {
     final public static ConfigItem[] items = {
             new BoolConfigItem(
                     R.string.config_item_graph_enable_dynamic_range,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_ENABLE_DYNAMIC_RANGE,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_dynamic_range),
             new BoolConfigItem(
                     R.string.config_item_graph_draw_dots,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_TYPE_DOTS,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_type_draw_dots),
             new BoolConfigItem(
                     R.string.config_item_graph_draw_line,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_TYPE_LINE,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_type_draw_line),
@@ -72,8 +66,6 @@ public class BgGraphMenuItems {
 //                        R.color.def_graph_color_background),
             new BoolConfigItem(
                     R.string.config_item_graph_show_vert_lines,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_ENABLE_VERT_LINES,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_vert_lines),
@@ -85,8 +77,6 @@ public class BgGraphMenuItems {
                     R.color.def_graph_color_vert_line),
             new BoolConfigItem(
                     R.string.config_item_graph_show_critical_lines,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_ENABLE_CRITICAL_LINES,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_critical_lines),
@@ -98,8 +88,6 @@ public class BgGraphMenuItems {
                     R.color.def_graph_color_critical_line),
             new BoolConfigItem(
                     R.string.config_item_graph_show_high_line,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_ENABLE_HIGH_LINE,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_high_line),
@@ -111,8 +99,6 @@ public class BgGraphMenuItems {
                     R.color.def_graph_color_high_line),
             new BoolConfigItem(
                     R.string.config_item_graph_show_low_line,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     BgGraph.PREF_ENABLE_LOW_LINE,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_low_line),

@@ -254,10 +254,6 @@ public class AnalogWatchfaceService extends CanvasWatchFaceService {
             drawable.setIconColorActive(settings.getDataColor());
             drawable.setTextColorActive(settings.getDataColor());
             drawable.setTitleColorActive(settings.getDataColor());
-//            if (settings.getFontSize() != -1) {
-//                drawable.setTextSizeActive(settings.getFontSize());
-//                drawable.setTitleSizeActive(settings.getFontSize());
-//            }
 
             int borderStyle = settings.getBorderDrawableStyle();
             drawable.setBorderStyleActive(borderStyle);

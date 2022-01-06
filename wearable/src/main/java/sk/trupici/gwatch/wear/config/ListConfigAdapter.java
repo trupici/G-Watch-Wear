@@ -138,8 +138,6 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 BoolConfigItem boolConfigItem = (BoolConfigItem) configItem;
                 switchViewHolder.init(
                         boolConfigItem.getLabelResourceId(),
-                        boolConfigItem.getIconResourceId(),
-                        boolConfigItem.getSelectedResourceId(),
                         boolConfigItem.getPreferenceName(),
                         boolConfigItem.getDefaultValueResourceId());
                 break;

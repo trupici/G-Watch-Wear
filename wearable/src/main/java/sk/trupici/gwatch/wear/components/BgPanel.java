@@ -241,8 +241,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     // range indicator - EXPERIMENTAL
     private void drawRangeIndicator(Canvas canvas) {
-
-//            Log.d(LOG_TAG, "onDraw: " + bounds);
         Paint indicatorPaint = new Paint();
         int padding = 10;
         float height = (bounds.height() - padding) / 3f - padding;
@@ -263,7 +261,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     }
 
     private void paintIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
-//        Log.d(LOG_TAG, "paintIndicatorBar: " + bounds);
         paint.reset();
         paint.setAntiAlias(true);
         paint.setColor(Color.WHITE);

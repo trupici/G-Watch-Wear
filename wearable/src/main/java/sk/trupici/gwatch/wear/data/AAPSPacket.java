@@ -22,7 +22,6 @@ import android.content.Context;
 import android.util.Log;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PacketUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
@@ -31,6 +30,8 @@ import sk.trupici.gwatch.wear.util.UiUtils;
  * glucose value, IOB, COB, TBR, etc...
  */
 public class AAPSPacket extends GlucosePacketBase {
+    private final static String LOG_TAG = AAPSPacket.class.getSimpleName();
+
     private static final String SOURCE_NAME = "AAPS";
     public static final int PACKET_DATA_SIZE = 43; // + N1 + N2 + N3
 
@@ -135,7 +136,7 @@ public class AAPSPacket extends GlucosePacketBase {
 
     public static AAPSPacket of(byte[] data) {
         if (data.length < PACKET_HEADER_SIZE) {
-            Log.d(CommonConstants.LOG_TAG, "AAPS: Invalid length: " + data.length);
+            Log.d(LOG_TAG, "AAPS: Invalid length: " + data.length);
             return null;
         }
 
@@ -144,7 +145,7 @@ public class AAPSPacket extends GlucosePacketBase {
         int dataSize = (data[idx++] & 0xFF);
 
         if (type != PacketType.AAPS.getCodeAsByte() || dataSize < 38) {
-            Log.d(CommonConstants.LOG_TAG, "AAPS: Invalid type or data: " + type + " vs " + PacketType.AAPS.getCodeAsByte() + ", dataSize: " + dataSize);
+            Log.d(LOG_TAG, "AAPS: Invalid type or data: " + type + " vs " + PacketType.AAPS.getCodeAsByte() + ", dataSize: " + dataSize);
             return null;
         }
 

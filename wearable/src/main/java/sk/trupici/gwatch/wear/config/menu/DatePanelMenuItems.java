@@ -27,8 +27,6 @@ public class DatePanelMenuItems {
     final public static ConfigItem[] items = {
             new BoolConfigItem(
                     R.string.config_item_date_show_month,
-                    R.drawable.toggle_off_24,
-                    R.drawable.toggle_on_green_24,
                     DatePanel.PREF_SHOW_MONTH,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_date_show_month),

@@ -16,18 +16,8 @@
 
 package sk.trupici.gwatch.wear.config.item;
 
-import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
-
 public class BoolConfigItem extends BasicConfigItem {
-    final private int selectedResourceId;
-
-    public BoolConfigItem(int labelResourceId, int iconResourceId, int selectedResourceId,
-                          String preferenceName, Type type, int defaultValueResourceId) {
-        super(labelResourceId, iconResourceId, preferenceName, type, defaultValueResourceId);
-        this.selectedResourceId = selectedResourceId;
-    }
-
-    public int getSelectedResourceId() {
-        return selectedResourceId;
+    public BoolConfigItem(int labelResourceId, String preferenceName, Type type, int defaultValueResourceId) {
+        super(labelResourceId, -1, preferenceName, type, defaultValueResourceId);
     }
 }

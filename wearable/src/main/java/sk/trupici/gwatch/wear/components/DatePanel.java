@@ -280,9 +280,6 @@ public class DatePanel implements ComponentPanel {
         // border
         borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_date_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_date_border_type)));
-
-//        drawBackgroundAndBorder();
-//        drawDate();
     }
 
     @Override

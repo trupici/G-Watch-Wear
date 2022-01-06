@@ -59,17 +59,17 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
 
         this.prefs = prefs;
 
-//        this.pager.registerOnPageChangeCallback(pageChangeCallback);
+        this.pager.registerOnPageChangeCallback(pageChangeCallback);
         this.pager.setCurrentItem(prefs.getInt(config.getPrefName(pageData.getType()), 0));
     }
 
     public void destroy() {
-//        this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
+        this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
     }
 
     @Override
     public int getItemCount() {
-        return 1;//pageData.getItems().length;
+        return pageData.getItems().length;
     }
 
     @NonNull
@@ -102,5 +102,4 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
             image = itemView.findViewById(R.id.image);
         }
     }
-
 }

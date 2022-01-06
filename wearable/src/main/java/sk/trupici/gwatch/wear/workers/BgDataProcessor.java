@@ -34,9 +34,8 @@ import sk.trupici.gwatch.wear.data.PacketType;
 import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 
-import static sk.trupici.gwatch.wear.util.CommonConstants.LOG_TAG;
-
 public class BgDataProcessor extends Worker {
+    private final static String LOG_TAG = BgDataProcessor.class.getSimpleName();
 
     public final static String EXTRA_DATA = "BG_DATA";
 
@@ -64,19 +63,19 @@ public class BgDataProcessor extends Worker {
         }
 
         PacketType type = PacketType.getByCode(data[0]);
-        Log.d(CommonConstants.LOG_TAG, "PACKET TYPE: " + (type == null ? "null" : type.name()));
+        Log.d(LOG_TAG, "PACKET TYPE: " + (type == null ? "null" : type.name()));
         if (type != PacketType.GLUCOSE) {
-            Log.d(CommonConstants.LOG_TAG, "Packet ignored" + (type == null ? "null" : type.name()));
+            Log.d(LOG_TAG, "Packet ignored" + (type == null ? "null" : type.name()));
             return Result.failure();
         }
 
         GlucosePacket packet = GlucosePacket.of(data);
         if (packet == null) {
-            Log.e(CommonConstants.LOG_TAG, "processGlucosePacket: failed to parse received data");
+            Log.e(LOG_TAG, "processGlucosePacket: failed to parse received data");
             return Result.failure();
         }
 
-        Log.d(CommonConstants.LOG_TAG, packet.toText(context, ""));
+        Log.d(LOG_TAG, packet.toText(context, ""));
 
         // get last stored values
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

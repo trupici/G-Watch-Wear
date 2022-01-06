@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
 public enum BorderType {
     NONE,

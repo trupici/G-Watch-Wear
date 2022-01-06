@@ -45,6 +45,8 @@ public class BgAlarmController extends BroadcastReceiver {
 
     private static final String LOG_TAG = BgAlarmController.class.getSimpleName();
 
+    public static final int CONFIG_ID = 15;
+
     public static final String PREF_NEW_VALUE_NOTIFICATION_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "notification_new_value_enabled";
 
     public static final String PREF_ENABLE_ALARMS = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable";

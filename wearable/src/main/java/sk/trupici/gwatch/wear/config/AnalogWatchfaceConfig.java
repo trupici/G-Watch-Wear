@@ -17,7 +17,6 @@
 package sk.trupici.gwatch.wear.config;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
 
 /**
  * Configuration data for Default analog watch face direct customization
@@ -25,12 +24,6 @@ import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
 public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     final public static String PREF_PREFIX = "analog_";
-
-    final public static String PREF_COMPL_BORDER_SHAPE = "border_shape";
-    final public static String PREF_COMPL_BORDER_COLOR = "border_color";
-    final public static String PREF_COMPL_DATA_COLOR = "data_color";
-    final public static String PREF_COMPL_BKG_COLOR = "bkg_color";
-    final public static String PREF_COMPL_TEXT_SIZE = "text_size";
 
     final public static String PREF_BACKGROUND_IDX = PREF_PREFIX + "background_idx";
     final public static String PREF_HANDS_SET_IDX = PREF_PREFIX + "hands_set_idx";
@@ -44,9 +37,8 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                     new ConfigPageData.ConfigItemData[] {
                             new ConfigPageData.ConfigItemData(0, "Stripes" , R.drawable.analog_background_default),
                             new ConfigPageData.ConfigItemData(1, "Circuit Board", R.drawable.analog_background_1),
-                            new ConfigPageData.ConfigItemData(1, "Classic Silver", R.drawable.analog_classic_background_1),
-                            new ConfigPageData.ConfigItemData(1, "Classic Coral", R.drawable.analog_classic_background_2),
-
+                            new ConfigPageData.ConfigItemData(2, "Classic Silver", R.drawable.analog_classic_background_1),
+                            new ConfigPageData.ConfigItemData(3, "Classic Coral", R.drawable.analog_classic_background_2),
                     },
                     R.string.config_page_title_bkg
             ),
@@ -62,9 +54,29 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                     R.string.config_page_title_hands
             ),
             new ConfigPageData(
-                    ConfigPageData.ConfigType.COMPLICATION,
+                    ConfigPageData.ConfigType.COMPLICATIONS,
                     new ConfigPageData.ConfigItemData[] {},
                     R.string.config_page_title_complications
+            ),
+            new ConfigPageData(
+                    ConfigPageData.ConfigType.ALARMS,
+                    new ConfigPageData.ConfigItemData[] {},
+                    R.string.config_page_title_alarms
+            ),
+            new ConfigPageData(
+                    ConfigPageData.ConfigType.BG_GRAPH,
+                    new ConfigPageData.ConfigItemData[] {},
+                    R.string.config_page_title_bg_graph
+            ),
+            new ConfigPageData(
+                    ConfigPageData.ConfigType.BG_PANEL,
+                    new ConfigPageData.ConfigItemData[] {},
+                    R.string.config_page_title_bg_panel
+            ),
+            new ConfigPageData(
+                    ConfigPageData.ConfigType.DATE_PANEL,
+                    new ConfigPageData.ConfigItemData[] {},
+                    R.string.config_page_title_date_panel
             ),
     };
 
@@ -80,8 +92,16 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                 return CONFIG[0];
             case HANDS:
                 return CONFIG[1];
-            case COMPLICATION:
+            case COMPLICATIONS:
                 return CONFIG[2];
+            case ALARMS:
+                return CONFIG[3];
+            case BG_GRAPH:
+                return CONFIG[4];
+            case BG_PANEL:
+                return CONFIG[5];
+            case DATE_PANEL:
+                return CONFIG[6];
             default:
                 throw new IllegalArgumentException();
         }

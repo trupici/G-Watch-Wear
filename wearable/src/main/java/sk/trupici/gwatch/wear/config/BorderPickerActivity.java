@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,47 +29,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.config.item.BorderConfigItem;
+import sk.trupici.gwatch.wear.config.menu.BorderTypeMenuItems;
 
 public class BorderPickerActivity extends Activity {
-
-    private static final BorderConfigItem[] items = new BorderConfigItem[] {
-            new BorderConfigItem(BorderType.NONE,
-                    R.string.border_type_none,
-                    R.drawable.config_no_border_24),
-            new BorderConfigItem(BorderType.RECT,
-                    R.string.border_type_rect,
-                    R.drawable.config_border_rect_24),
-            new BorderConfigItem(BorderType.ROUNDED_RECT,
-                    R.string.border_type_round_rect,
-                    R.drawable.config_border_round_rect_24),
-            new BorderConfigItem(BorderType.RING,
-                    R.string.border_type_ring,
-                    R.drawable.config_border_circle_24),
-            new BorderConfigItem(BorderType.DASHED_RECT,
-                    R.string.border_type_dashed_rect,
-                    R.drawable.config_border_rect_24),
-            new BorderConfigItem(BorderType.DASHED_ROUNDED_RECT,
-                    R.string.border_type_dashed_round_rect,
-                    R.drawable.config_border_round_rect_24),
-            new BorderConfigItem(BorderType.DASHED_RING,
-                    R.string.border_type_dashed_ring,
-                    R.drawable.config_border_circle_dash_24),
-            new BorderConfigItem(BorderType.DOTTED_RECT,
-                    R.string.border_type_dotted_rect,
-                    R.drawable.config_border_rect_24),
-            new BorderConfigItem(BorderType.DOTTED_ROUNDED_RECT,
-                    R.string.border_type_dotted_round_rect,
-                    R.drawable.config_border_round_rect_24),
-            new BorderConfigItem(BorderType.DOTTED_RING,
-                    R.string.border_type_dotted_ring,
-                    R.drawable.config_border_circle_24)
-    };
 
     public static final String EXTRA_ITEM_ID = "itemId";
     public static final String EXTRA_ITEM_TYPE = "itemType";
     public static final String EXTRA_BORDER_TYPE = "borderType";
 
-    private WearableRecyclerView recyclerView;
+    final private static BorderConfigItem[] items = BorderTypeMenuItems.items;
+
     private BorderType borderType;
     private Integer itemId;
     private Integer itemType;
@@ -91,7 +61,7 @@ public class BorderPickerActivity extends Activity {
 
         setContentView(R.layout.activity_border_selection_config);
 
-        recyclerView = findViewById(R.id.wearable_recycler_view);
+        WearableRecyclerView recyclerView = findViewById(R.id.wearable_recycler_view);
 
         // Aligns the first and last items on the list vertically centered on the screen.
         recyclerView.setEdgeItemsCenteringEnabled(true);
@@ -140,8 +110,9 @@ public class BorderPickerActivity extends Activity {
             Context context = holder.itemView.getContext();
 
             holder.setId(item.getId());
-            holder.getButton().setText(item.getLabelResourceId());
-            holder.getButton().setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(item.getIconResourceId()), null, null, null);
+            holder.getButton().setText(context.getString(item.getLabelResourceId()));
+// 1,2           holder.getButton().setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(item.getIconResourceId()), null, null, null);
+            holder.getButton().setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(item.getIconResourceId()), null);
         }
 
         @Override
@@ -156,7 +127,7 @@ public class BorderPickerActivity extends Activity {
 
         public BorderItemViewHolder(@NonNull View itemView) {
             super(itemView);
-            button = itemView.findViewById(R.id.button);
+            button = itemView.findViewById(R.id.border);
             button.setOnClickListener(this);
         }
 
@@ -177,30 +148,4 @@ public class BorderPickerActivity extends Activity {
             closeAndReturnResult(id);
         }
     }
-
-    static class BorderConfigItem {
-
-        final private BorderType id;
-        final private int labelResourceId;
-        final private int iconResourceId;
-
-        public BorderConfigItem(BorderType id, int labelResourceId, int iconResourceId) {
-            this.id = id;
-            this.labelResourceId = labelResourceId;
-            this.iconResourceId = iconResourceId;
-        }
-
-        public BorderType getId() {
-            return id;
-        }
-
-        public int getLabelResourceId() {
-            return labelResourceId;
-        }
-
-        public int getIconResourceId() {
-            return iconResourceId;
-        }
-    }
-
 }

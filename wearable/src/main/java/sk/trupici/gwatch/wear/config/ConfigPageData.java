@@ -23,7 +23,11 @@ public class ConfigPageData {
     public enum ConfigType {
         BACKGROUND,
         HANDS,
-        COMPLICATION
+        COMPLICATIONS,
+        BG_PANEL,
+        BG_GRAPH,
+        DATE_PANEL,
+        ALARMS
         ;
 
         public static ConfigType valueOf(int ordinal) {

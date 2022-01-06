@@ -18,7 +18,7 @@ package sk.trupici.gwatch.wear.util;
 
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 
-import sk.trupici.gwatch.wear.config.complications.BorderType;
+import sk.trupici.gwatch.wear.config.BorderType;
 
 public class BorderUtils {
 

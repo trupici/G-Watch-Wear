@@ -22,6 +22,12 @@ import androidx.annotation.NonNull;
 
 public class ComplicationConfig {
 
+    final public static String PREF_COMPL_BORDER_SHAPE = "border_shape";
+    final public static String PREF_COMPL_BORDER_COLOR = "border_color";
+    final public static String PREF_COMPL_DATA_COLOR = "data_color";
+    final public static String PREF_COMPL_BKG_COLOR = "bkg_color";
+    final public static String PREF_COMPL_TEXT_SIZE = "text_size";
+
     final public static String LEFT_PREFIX = "left_";
     final public static String RIGHT_PREFIX = "right_";
     final public static String CENTER_PREFIX = "center_";

@@ -25,7 +25,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationHelperActivity;
 import android.support.wearable.complications.ComplicationProviderInfo;
-import android.transition.Visibility;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +32,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 
-import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
 
 /**
  * Displays watch face preview along with complication locations. Allows user to tap on the
@@ -50,8 +50,6 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     final private ViewGroup bkgViewGroup;
     final private ComplicationViews left;
     final private ComplicationViews right;
-//    final private ComplicationViews center;
-//    final private ComplicationViews bottom;
 
     final private Drawable defaultComplicationDrawable;
 
@@ -60,21 +58,21 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
         super(view);
 
         this.complicationAdapter = complicationAdapter;
-        defaultComplicationDrawable = context.getDrawable(R.drawable.config_add_complication);
+        defaultComplicationDrawable = context.getDrawable(R.drawable.config_add_complication); // FIXME change drawable
 
         bkgViewGroup = view.findViewById(R.id.backgrounds);
 
         left = new ComplicationViews(view.findViewById(R.id.left_complication));
         right = new ComplicationViews(view.findViewById(R.id.right_complication));
-//        center = new ComplicationViews(view.findViewById(R.id.center_complication));
-//        bottom = new ComplicationViews(view.findViewById(R.id.bottom_complication));
 
         // show selector for complication marked as selected in adapter
         ComplicationId selected = complicationAdapter.getSelectedComplicationId();
         if (selected != null) {
             View selector = getComplicationViews(selected).selector;
             if (selector != null) {
-                Log.d(LOG_TAG, "ComplicationsViewHolder: selecting " + selected);
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "ComplicationsViewHolder: selecting " + selected);
+                }
                 selector.setVisibility(View.VISIBLE);
             }
         }
@@ -82,7 +80,9 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
 
     @Override
     public void onClick(View view) {
-        Log.d(LOG_TAG, "onClick: " + view);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onClick: " + view);
+        }
         ComplicationId complicationId = getComplicationId(view);
         if (complicationId != null) {
             selectComplication(complicationId);
@@ -90,7 +90,9 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void selectComplication(ComplicationId complicationId) {
-        Log.d(LOG_TAG, "selectComplication: " + complicationId);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "selectComplication: " + complicationId);
+        }
         ComplicationId prevComplicationId = complicationAdapter.getSelectedComplicationId();
         if (prevComplicationId == complicationId) {
             return;
@@ -107,7 +109,9 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void unselectComplication(ComplicationId complicationId) {
-        Log.d(LOG_TAG, "unselectComplication: " + complicationId.name());
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "unselectComplication: " + complicationId.name());
+        }
         View selector = getComplicationViews(complicationId).selector;
         if (selector != null) {
             selector.setVisibility(View.INVISIBLE);
@@ -123,8 +127,9 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             selectComplication(complicationId);
         }
 
-        Log.d(LOG_TAG, "Complication click(): " + complicationAdapter.getSelectedComplicationId());
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "Complication click(): " + complicationAdapter.getSelectedComplicationId());
+        }
         // Verifies the watch face supports the complication location, then launches the helper
         // class, so user can choose their complication data provider.
         Activity currentActivity = (Activity) view.getContext();
@@ -171,10 +176,6 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
                 return left;
             case RIGHT_COMPLICATION_ID:
                 return right;
-//            case CENTER_COMPLICATION_ID:
-//                return center;
-//            case BOTTOM_COMPLICATION_ID:
-//                return bottom;
             default:
                 return null;
         }
@@ -185,10 +186,6 @@ public class ComplicationsViewHolder extends RecyclerView.ViewHolder implements 
             return ComplicationId.LEFT_COMPLICATION_ID;
         } else if (button.equals(right.complication)) {
             return ComplicationId.RIGHT_COMPLICATION_ID;
-//        } else if (button.equals(center.complication)) {
-//            return ComplicationId.CENTER_COMPLICATION_ID;
-//        } else if (button.equals(bottom.complication)) {
-//            return ComplicationId.BOTTOM_COMPLICATION_ID;
         } else {
             return null;
         }

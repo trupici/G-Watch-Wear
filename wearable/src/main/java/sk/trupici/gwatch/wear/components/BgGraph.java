@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.components.bgchart;
+package sk.trupici.gwatch.wear.components;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,13 +35,14 @@ import java.util.stream.Collectors;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.components.ComponentPanel;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 
-public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
-    final private static String LOG_TAG = SimpleBgChart.class.getSimpleName();
+public class BgGraph extends BroadcastReceiver implements ComponentPanel {
+    final private static String LOG_TAG = BgGraph.class.getSimpleName();
+
+    public static final int CONFIG_ID = 12;
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical";
@@ -67,7 +68,6 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     private static final String PREF_DATA_LAST_UPD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "graph_last_upd";
 
     private static final String PREF_REFRESH_RATE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_refresh_rate";
-
 
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
@@ -130,7 +130,7 @@ public class SimpleBgChart extends BroadcastReceiver implements ComponentPanel {
     final private int refScreenHeight;
 
 
-    public SimpleBgChart(int screenWidth, int screenHeight) {
+    public BgGraph(int screenWidth, int screenHeight) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
     }

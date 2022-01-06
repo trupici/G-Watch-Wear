@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config.item;
 
-import sk.trupici.gwatch.wear.config.item.ConfigItem;
+import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 
-/**
- * Data for Complications Preview item in RecyclerView.
- */
-public class ComplicationConfigItem implements ConfigItem {
+public class BoolConfigItem extends BasicConfigItem {
+    final private int selectedResourceId;
 
-    final private int layoutId;
-
-    public ComplicationConfigItem(int layoutId) {
-        this.layoutId = layoutId;
+    public BoolConfigItem(int labelResourceId, int iconResourceId, int selectedResourceId,
+                          String preferenceName, Type type, int defaultValueResourceId) {
+        super(labelResourceId, iconResourceId, preferenceName, type, defaultValueResourceId);
+        this.selectedResourceId = selectedResourceId;
     }
 
-    public int getLayoutId() {
-        return layoutId;
-    }
-
-    @Override
-    public Type getConfigType() {
-        return Type.TYPE_COMPLICATION;
+    public int getSelectedResourceId() {
+        return selectedResourceId;
     }
 }

@@ -16,13 +16,10 @@
 
 package sk.trupici.gwatch.wear.watchface;
 
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -32,7 +29,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.provider.Settings;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.SystemProviders;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
@@ -53,11 +49,11 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
+import sk.trupici.gwatch.wear.components.BgGraph;
 import sk.trupici.gwatch.wear.components.BgPanel;
-import sk.trupici.gwatch.wear.components.ComponentsConfig;
+import sk.trupici.gwatch.wear.components.ComplicationAttrs;
 import sk.trupici.gwatch.wear.components.DatePanel;
 import sk.trupici.gwatch.wear.components.WatchHands;
-import sk.trupici.gwatch.wear.components.bgchart.SimpleBgChart;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
@@ -71,7 +67,7 @@ import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
 /**
  * Analog watch face with a ticking second hand.
  **/
-public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
+public class AnalogWatchfaceService extends CanvasWatchFaceService {
 
     public static final String LOG_TAG = "StdAnalogGWatchface";
 
@@ -88,7 +84,6 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
     private AnalogWatchfaceConfig watchfaceConfig;
 
-
     @Override
     public Engine onCreateEngine() {
         watchfaceConfig = new AnalogWatchfaceConfig();
@@ -96,16 +91,16 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
     }
 
     private static class EngineHandler extends Handler {
-        private final WeakReference<StandardAnalogWatchfaceService.Engine> wfReference;
+        private final WeakReference<AnalogWatchfaceService.Engine> wfReference;
 
-        public EngineHandler(StandardAnalogWatchfaceService.Engine reference) {
+        public EngineHandler(AnalogWatchfaceService.Engine reference) {
             super(Looper.myLooper());
             wfReference = new WeakReference<>(reference);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            StandardAnalogWatchfaceService.Engine engine = wfReference.get();
+            AnalogWatchfaceService.Engine engine = wfReference.get();
             if (engine != null) {
                 if (msg.what == MSG_UPDATE_TIME) {
                     engine.handleUpdateTimeMessage();
@@ -121,8 +116,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private boolean muted;
 
-        private ComponentsConfig leftComplSettings;
-        private ComponentsConfig rightComplSettings;
+        private ComplicationAttrs leftComplicationAttrs;
+        private ComplicationAttrs rightComplicationAttrs;
 
         /* Maps active complication ids to the data for that complication. Note: Data will only be
          * present if the user has chosen a provider via the settings activity for the watch face.
@@ -141,7 +136,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
         private BackgroundPanel bkgPanel;
         private WatchHands watchHands;
-        private SimpleBgChart chartPanel;
+        private BgGraph bgGraph;
         private BgPanel bgPanel;
         private DatePanel datePanel;
         private BgAlarmController bgAlarmController;
@@ -160,7 +155,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             ((Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE))
                     .vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK));
 
-            setWatchFaceStyle(new WatchFaceStyle.Builder(StandardAnalogWatchfaceService.this)
+            setWatchFaceStyle(new WatchFaceStyle.Builder(AnalogWatchfaceService.this)
                     .setAcceptsTapEvents(true)
                     .build());
 
@@ -187,8 +182,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bgPanel = new BgPanel((int) screenWidth, (int) screenHeight);
             bgPanel.onCreate(context, sharedPrefs);
 
-            chartPanel = new SimpleBgChart((int) screenWidth, (int) screenHeight);
-            chartPanel.onCreate(context, sharedPrefs);
+            bgGraph = new BgGraph((int) screenWidth, (int) screenHeight);
+            bgGraph.onCreate(context, sharedPrefs);
 
             bgAlarmController = new BgAlarmController();
             bgAlarmController.onCreate(context, sharedPrefs);
@@ -199,8 +194,8 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     getResources().getDimension(R.dimen.layout_left_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.layout_left_compl_bottom) / screenHeight
             );
-            leftComplSettings = new ComponentsConfig();
-            leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
+            leftComplicationAttrs = new ComplicationAttrs();
+            leftComplicationAttrs.load(context, sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
 
             rightComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.layout_right_compl_left) / screenWidth,
@@ -208,22 +203,14 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                     getResources().getDimension(R.dimen.layout_right_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.layout_right_compl_bottom) / screenHeight
             );
-            rightComplSettings = new ComponentsConfig();
-            rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
+            rightComplicationAttrs = new ComplicationAttrs();
+            rightComplicationAttrs.load(context, sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
 
             initializeComplications();
 
             registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
-            registerReceiver(context, chartPanel, CommonConstants.BG_RECEIVER_ACTION);
+            registerReceiver(context, bgGraph, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);
-
-            final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            try {
-                context.startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                Log.e(LOG_TAG, e.getMessage());
-            }
         }
 
         private void initializeComplications() {
@@ -242,16 +229,16 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             ComplicationDrawable complicationDrawable = new ComplicationDrawable(context);
             Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, leftComplSettings));
+                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, leftComplicationAttrs));
 
             complicationDrawable = new ComplicationDrawable(context);
             Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, rightComplSettings));
+                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, rightComplicationAttrs));
 
             setActiveComplications(Config.getComplicationIds());
         }
 
-        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComponentsConfig settings) {
+        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComplicationAttrs settings) {
             /*
             More settings to do:
                 app:highlightColor="@color/fuchsia"
@@ -267,10 +254,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             drawable.setIconColorActive(settings.getDataColor());
             drawable.setTextColorActive(settings.getDataColor());
             drawable.setTitleColorActive(settings.getDataColor());
-            if (settings.getFontSize() != -1) {
-                drawable.setTextSizeActive(settings.getFontSize());
-                drawable.setTitleSizeActive(settings.getFontSize());
-            }
+//            if (settings.getFontSize() != -1) {
+//                drawable.setTextSizeActive(settings.getFontSize());
+//                drawable.setTitleSizeActive(settings.getFontSize());
+//            }
 
             int borderStyle = settings.getBorderDrawableStyle();
             drawable.setBorderStyleActive(borderStyle);
@@ -342,7 +329,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             bkgPanel.onPropertiesChanged(context, properties);
             watchHands.onPropertiesChanged(context, properties);
             bgPanel.onPropertiesChanged(context, properties);
-            chartPanel.onPropertiesChanged(context, properties);
+            bgGraph.onPropertiesChanged(context, properties);
             datePanel.onPropertiesChanged(context, properties);
         }
 
@@ -402,7 +389,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
-            chartPanel.onSizeChanged(context, width, height);
+            bgGraph.onSizeChanged(context, width, height);
             watchHands.onSizeChanged(context, width, height);
             datePanel.onSizeChanged(context, width, height);
             bgPanel.onSizeChanged(context, width, height);
@@ -473,10 +460,10 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             boolean isAmbientMode = isInAmbientMode();
 
-            chartPanel.refresh(now, sharedPrefs);
+            bgGraph.refresh(now, sharedPrefs);
 
             bkgPanel.onDraw(canvas, isAmbientMode);
-            chartPanel.onDraw(canvas, isAmbientMode);
+            bgGraph.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
             bgPanel.onDraw(canvas, isAmbientMode);
@@ -503,28 +490,28 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
 
             if (visible) {
                 // Preferences might have changed since last time watch face was visible.
-
-                leftComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)
-                        .getComplicationDrawable(), leftComplSettings);
-
-                rightComplSettings.load(sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
-                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
-                        .getComplicationDrawable(), rightComplSettings);
-
                 Context context = getApplicationContext();
+
+                leftComplicationAttrs.load(context, sharedPrefs, PREF_PREFIX + ComplicationConfig.LEFT_PREFIX);
+                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.LEFT_COMPLICATION_ID)
+                        .getComplicationDrawable(), leftComplicationAttrs);
+
+                rightComplicationAttrs.load(context, sharedPrefs, PREF_PREFIX + ComplicationConfig.RIGHT_PREFIX);
+                updateComplicationDrawable(Config.getComplicationConfig(ComplicationId.RIGHT_COMPLICATION_ID)
+                        .getComplicationDrawable(), rightComplicationAttrs);
+
                 bkgPanel.onConfigChanged(context, sharedPrefs);
                 datePanel.onConfigChanged(context, sharedPrefs);
                 bgPanel.onConfigChanged(context, sharedPrefs);
-                chartPanel.onConfigChanged(context, sharedPrefs);
+                bgGraph.onConfigChanged(context, sharedPrefs);
                 watchHands.onConfigChanged(context, sharedPrefs);
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
                 adjustSize((int)screenWidth, (int)screenHeight);
 
-                datePanel.registerReceiver(StandardAnalogWatchfaceService.this);
+                datePanel.registerReceiver(AnalogWatchfaceService.this);
             } else {
-                datePanel.unregisterReceiver(StandardAnalogWatchfaceService.this);
+                datePanel.unregisterReceiver(AnalogWatchfaceService.this);
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */
@@ -581,7 +568,7 @@ public class StandardAnalogWatchfaceService extends CanvasWatchFaceService {
                 Log.d(LOG_TAG, "onSharedPreferenceChanged: signaled config change");
                 Context context = getApplicationContext();
                 bgPanel.onConfigChanged(context, sharedPrefs);
-                chartPanel.onConfigChanged(context, sharedPrefs);
+                bgGraph.onConfigChanged(context, sharedPrefs);
             }
         }
     }

@@ -14,33 +14,25 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.BackgroundChangeAware;
 
-public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder implements BackgroundChangeAware {
+public class ListConfigViewHolder extends WearableRecyclerView.ViewHolder {
     final private TextView title;
     final private WearableRecyclerView recyclerView;
+    final private int viewId;
 
-    public ComplicationViewHolder(@NonNull View itemView) {
+    public ListConfigViewHolder(@NonNull View itemView) {
         super(itemView);
         title = itemView.findViewById(R.id.page_title);
         recyclerView = itemView.findViewById(R.id.wearable_recycler_view);
-    }
-
-    @Override
-    public void onBackgroundChanged() {
-        RecyclerView.Adapter<?> adapter = recyclerView.getAdapter();
-        if (adapter instanceof BackgroundChangeAware) {
-            ((BackgroundChangeAware) adapter).onBackgroundChanged();
-        }
+        viewId = itemView.getId();
     }
 
     public TextView getTitle() {
@@ -49,5 +41,9 @@ public class ComplicationViewHolder extends WearableRecyclerView.ViewHolder impl
 
     public WearableRecyclerView getRecyclerView() {
         return recyclerView;
+    }
+
+    public int getViewId() {
+        return viewId;
     }
 }

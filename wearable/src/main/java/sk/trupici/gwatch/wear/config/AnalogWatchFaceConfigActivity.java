@@ -21,34 +21,60 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
-public class StandardAnalogWatchFaceConfigActivity extends Activity {
+public class AnalogWatchFaceConfigActivity extends Activity {
 
-    public static final String LOG_TAG = StandardAnalogWatchFaceConfigActivity.class.getSimpleName();
+    public static final String LOG_TAG = AnalogWatchFaceConfigActivity.class.getSimpleName();
 
     final public static int COMPLICATION_CONFIG_REQUEST_CODE = 101;
     final public static int UPDATE_COLORS_CONFIG_REQUEST_CODE = 102;
     final public static int BORDER_TYPE_CONFIG_REQUEST_CODE = 103;
-
+    final public static int NUMBER_TYPE_CONFIG_REQUEST_CODE = 104;
+    final public static int TIME_TYPE_CONFIG_REQUEST_CODE = 105;
 
     public AnalogWatchfaceConfig config;
 
-    private ViewPager2 viewPager;
-    private MainConfigViewAdapter configAdapter;
+    private AnalogWatchfaceConfigViewAdapter configAdapter;
     private PageIndicatorAdapter pageIndicatorAdapter;
 
     private SharedPreferences prefs;
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (BuildConfig.DEBUG) {
+            try {
+                super.onRestoreInstanceState(savedInstanceState);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, ">>>>>>>>>>>>> onRestoreInstanceState: failed");
+                DumpUtils.dumpBundle(savedInstanceState, ">>>");
+                savedInstanceState = null;
+            }
+        } else {
+            super.onRestoreInstanceState(savedInstanceState);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (BuildConfig.DEBUG) {
+            // log non-public API access
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+        }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         config = new AnalogWatchfaceConfig();
@@ -59,9 +85,9 @@ public class StandardAnalogWatchFaceConfigActivity extends Activity {
     private void onCreatePageView(Context context) {
         setContentView(R.layout.layout_main_config);
 
-        viewPager = findViewById(R.id.horizontal_pager);
+        ViewPager2 viewPager = findViewById(R.id.horizontal_pager);
         viewPager.setNestedScrollingEnabled(true);
-        configAdapter = new MainConfigViewAdapter(this, config, viewPager, prefs);
+        configAdapter = new AnalogWatchfaceConfigViewAdapter(this, config, viewPager, prefs);
         viewPager.setAdapter(configAdapter);
 
         pageIndicatorAdapter = new PageIndicatorAdapter(
@@ -80,12 +106,13 @@ public class StandardAnalogWatchFaceConfigActivity extends Activity {
         super.onDestroy();
 
         configAdapter.destroy();
-        pageIndicatorAdapter.destroy();
+        if (pageIndicatorAdapter != null) {
+            pageIndicatorAdapter.destroy();
+        }
     }
 
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-//        Log.d(LOG_TAG, "onGenericMotionEvent: " + event);
         return configAdapter.onGenericMotionEvent(event);
     }
 

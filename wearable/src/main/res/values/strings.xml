@@ -30,11 +30,56 @@
     <string name="config_page_title_bkg">Palette</string>
     <string name="config_page_title_hands">Hands</string>
     <string name="config_page_title_complications">Complications</string>
+    <string name="config_page_title_bg_graph">Graph</string>
+    <string name="config_page_title_bg_panel">BG Panel</string>
+    <string name="config_page_title_date_panel">Date Panel</string>
+    <string name="config_page_title_alarms">Alarms</string>
 
     <string name="config_item_border_shape_label">Border shape</string>
     <string name="config_item_border_color_label">Border color</string>
     <string name="config_item_text_color_label">Data color</string>
     <string name="config_item_bkg_color_label">Background color</string>
+
+    <string name="config_item_bg_critical_color_label">Critical color</string>
+    <string name="config_item_bg_warn_color_label">Warn color</string>
+    <string name="config_item_bg_in_range_color_label">In range color</string>
+    <string name="config_item_no_data_color_label">No data color</string>
+    <string name="config_item_is_unit_conversion">Use mmol/l</string>
+
+    <string name="config_item_graph_show_critical_lines">Show critical lines</string>
+    <string name="config_item_graph_critical_lines_color">Critical lines color</string>
+    <string name="config_item_graph_show_high_line">Show high line</string>
+    <string name="config_item_graph_high_line_color">High lines color</string>
+    <string name="config_item_graph_show_low_line">Show low line</string>
+    <string name="config_item_graph_low_line_color">Low line color</string>
+    <string name="config_item_graph_show_vert_lines">Show hour lines</string>
+    <string name="config_item_graph_vert_lines_color">Hour lines color</string>
+    <string name="config_item_graph_enable_dynamic_range">Dynamic range</string>
+    <string name="config_item_graph_draw_dots">Draw dots</string>
+    <string name="config_item_graph_draw_line">Draw line</string>
+
+    <string name="config_item_date_show_month">Show month</string>
+    <string name="config_item_date_day_of_month_color">Day of month color</string>
+    <string name="config_item_date_month_color">Month color</string>
+    <string name="config_item_date_day_of_week_color">Day of week color</string>
+
+    <string name="config_item_alarms_enable">Enable alarms</string>
+    <string name="config_item_alarms_enable_time_range">Alarms time range</string>
+    <string name="config_item_alarms_enable_sound">Enable sounds</string>
+    <string name="config_item_alarms_enable_sound_time_range">Sounds time range</string>
+    <string name="config_item_alarms_enable_hyper_alarm">Hyper alarm</string>
+    <string name="config_item_alarms_enable_hyper_sound">Hyper alarm sound</string>
+    <string name="config_item_alarms_enable_high_alarm">High alarm</string>
+    <string name="config_item_alarms_enable_high_sound">High alarm sound</string>
+    <string name="config_item_alarms_enable_low_alarm">Low alarm</string>
+    <string name="config_item_alarms_enable_low_sound">Low alarm sound</string>
+    <string name="config_item_alarms_enable_hypo_alarm">Hypo alarm</string>
+    <string name="config_item_alarms_enable_hypo_sound">Hypo alarm sound</string>
+    <string name="config_item_alarms_enable_fast_drop_alarm">Fast drop alarm</string>
+    <string name="config_item_alarms_enable_fast_drop_sound">Fast drop alarm sound</string>
+    <string name="config_item_alarms_enable_no_data_alarm">No data alarm</string>
+    <string name="config_item_alarms_enable_no_data_sound">No data alarm sound</string>
+    <string name="config_item_alarms_enable_new_data_notifications">New data notifications</string>
 
     <string name="border_type_none">No border</string>
     <string name="border_type_rect">Rect</string>

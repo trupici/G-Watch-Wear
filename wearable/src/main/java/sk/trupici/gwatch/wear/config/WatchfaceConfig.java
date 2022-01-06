@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
-
-import sk.trupici.gwatch.wear.config.ConfigPageData;
+package sk.trupici.gwatch.wear.config;
 
 public interface WatchfaceConfig {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config.item;
 
 import java.util.Arrays;
 
@@ -28,11 +28,14 @@ public interface ConfigItem {
 
     enum Type {
         TYPE_COMPLICATION,
+        TYPE_COLOR,
+        TYPE_SWITCH,
+        TYPE_PADDING,
         TYPE_BORDER_TYPE,
         TYPE_BORDER_COLOR,
         TYPE_DATA_COLOR,
         TYPE_BKG_COLOR,
-        TYPE_PADDING;
+        ;
 
         public static Type valueOf(int ordinal) {
             return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElseThrow(IllegalArgumentException::new);

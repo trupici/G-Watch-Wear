@@ -27,6 +27,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 
 public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<WatchfaceDataAdapter.ViewHolder> {
@@ -41,47 +42,54 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
     final private ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
         @Override
         public void onPageSelected(int position) {
-            Log.d(LOG_TAG, "onPageSelected: " + position);
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onPageSelected: " + position);
+            }
             prefs.edit().putInt(config.getPrefName(pageData.getType()), position).commit();
         }
     };
 
     public WatchfaceDataAdapter(ConfigPageData pageData, AnalogWatchfaceConfig config, ViewPager2 pager, SharedPreferences prefs) {
-        Log.d(LOG_TAG, "ConfigDataAdapter created");
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "WatchfaceDataAdapter created");
+        }
         this.pageData = pageData;
         this.config = config;
         this.pager = pager;
 
         this.prefs = prefs;
 
-        this.pager.registerOnPageChangeCallback(pageChangeCallback);
+//        this.pager.registerOnPageChangeCallback(pageChangeCallback);
         this.pager.setCurrentItem(prefs.getInt(config.getPrefName(pageData.getType()), 0));
     }
 
     public void destroy() {
-        this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
+//        this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
     }
 
     @Override
     public int getItemCount() {
-        return pageData.getItems().length;
+        return 1;//pageData.getItems().length;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(LOG_TAG, "onCreateViewHolder: " + parent + ", " + viewType + ", " + parent.getChildCount());
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onCreateViewHolder: " + parent + ", " + viewType + ", " + parent.getChildCount());
+        }
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_item_page, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
+        }
         ConfigPageData.ConfigItemData itemData = pageData.getItems()[position];
-        holder.label.setText(itemData.label);
-        holder.image.setImageDrawable(holder.image.getContext().getDrawable(itemData.resourceId));
+        holder.label.setText(itemData.getLabel());
+        holder.image.setImageDrawable(holder.image.getContext().getDrawable(itemData.getResourceId()));
     }
 
     static class ViewHolder extends WearableRecyclerView.ViewHolder {

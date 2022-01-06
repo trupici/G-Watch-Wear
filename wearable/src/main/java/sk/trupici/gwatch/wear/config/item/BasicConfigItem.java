@@ -14,39 +14,45 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config.item;
 
 /**
  * Data for color picker item in RecyclerView.
  */
-public class ColorConfigItem implements ConfigItem {
+public class BasicConfigItem implements ConfigItem {
 
-    final private String label;
+    final private int labelResourceId;
     final private int iconResourceId;
-    final private String sharedPrefString;
+    final private String preferenceName;
     final private Type type;
+    final private int defaultValueResourceId;
 
-    public ColorConfigItem(String label, int iconResourceId, String sharedPrefString, Type type) {
-        this.label = label;
+    public BasicConfigItem(int labelResourceId, int iconResourceId, String preferenceName, Type type, int defaultValueResourceId) {
+        this.labelResourceId = labelResourceId;
         this.iconResourceId = iconResourceId;
-        this.sharedPrefString = sharedPrefString;
+        this.preferenceName = preferenceName;
         this.type = type;
+        this.defaultValueResourceId = defaultValueResourceId;
     }
 
-    public String getLabel() {
-        return label;
+    public int getLabelResourceId() {
+        return labelResourceId;
     }
 
     public int getIconResourceId() {
         return iconResourceId;
     }
 
-    public String getSharedPrefString() {
-        return sharedPrefString;
+    public String getPreferenceName() {
+        return preferenceName;
     }
 
     @Override
     public Type getConfigType() {
         return type;
+    }
+
+    public int getDefaultValueResourceId() {
+        return defaultValueResourceId;
     }
 }

@@ -16,28 +16,27 @@
 
 package sk.trupici.gwatch.wear.components;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 
 import androidx.annotation.NonNull;
-import sk.trupici.gwatch.wear.config.complications.BorderType;
+import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.config.BorderType;
+import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BKG_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_BORDER_SHAPE;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_DATA_COLOR;
-import static sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig.PREF_COMPL_TEXT_SIZE;
+public class ComplicationAttrs {
 
-public class ComponentsConfig {
     private int dataColor;
     private int backgroundColor;
     private int borderColor;
     private BorderType borderType;
-    private int fontSize; // [sp]
+//    private int fontSize; // [sp]
 
-    public ComponentsConfig() {
+    public ComplicationAttrs() {
         init();
     }
 
@@ -46,15 +45,16 @@ public class ComponentsConfig {
         borderColor = Color.TRANSPARENT;
         dataColor = Color.WHITE;
         backgroundColor = Color.TRANSPARENT;
-        fontSize = -1;
+//        fontSize = -1;
     }
 
-    public void load(SharedPreferences prefs, String prefix) {
-        borderType = BorderType.getByNameOrDefault(prefs.getString(prefix + PREF_COMPL_BORDER_SHAPE, null));
-        borderColor = prefs.getInt(prefix + PREF_COMPL_BORDER_COLOR, Color.TRANSPARENT);
-        dataColor = prefs.getInt(prefix + PREF_COMPL_DATA_COLOR, Color.WHITE);
-        backgroundColor = prefs.getInt(prefix + PREF_COMPL_BKG_COLOR, Color.TRANSPARENT);
-        fontSize = prefs.getInt(prefix + PREF_COMPL_TEXT_SIZE, -1);
+    public void load(Context context, SharedPreferences prefs, String prefix) {
+        Resources res = context.getResources();
+        borderType = BorderType.getByNameOrDefault(prefs.getString(prefix + ComplicationConfig.PREF_COMPL_BORDER_SHAPE, context.getString(R.string.def_compl_border_type)));
+        borderColor = prefs.getInt(prefix + ComplicationConfig.PREF_COMPL_BORDER_COLOR, res.getColor(R.color.def_compl_border_color, null));
+        dataColor = prefs.getInt(prefix + ComplicationConfig.PREF_COMPL_DATA_COLOR, res.getColor(R.color.def_compl_data_color, null));
+        backgroundColor = prefs.getInt(prefix + ComplicationConfig.PREF_COMPL_BKG_COLOR, res.getColor(R.color.def_compl_background_color, null));
+//        fontSize = prefs.getInt(prefix + ComplicationConfig.PREF_COMPL_TEXT_SIZE, -1);
     }
 
     public int getBorderDrawableStyle() {
@@ -105,13 +105,13 @@ public class ComponentsConfig {
         this.borderType = borderType;
     }
 
-    public int getFontSize() {
-        return fontSize;
-    }
-
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
-    }
+//    public int getFontSize() {
+//        return fontSize;
+//    }
+//
+//    public void setFontSize(int fontSize) {
+//        this.fontSize = fontSize;
+//    }
 
     @NonNull
     @Override
@@ -119,7 +119,7 @@ public class ComponentsConfig {
         return "\nData color: " + StringUtils.formatColorStr(dataColor)
                 + "\nBackground color: " + StringUtils.formatColorStr((backgroundColor))
                 + "\nBorder type: " + (borderType == null ? "null" : borderType.name())
-                + "\nBorder color: " + StringUtils.formatColorStr(borderColor)
-                + "\nFont size: " + fontSize;
+                + "\nBorder color: " + StringUtils.formatColorStr(borderColor);
+//                + "\nFont size: " + fontSize;
     }
 }

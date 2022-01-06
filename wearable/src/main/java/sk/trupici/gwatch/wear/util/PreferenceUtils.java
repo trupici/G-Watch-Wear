@@ -38,6 +38,11 @@ public class PreferenceUtils {
         return prefs.getBoolean(prefName, defValue);
     }
 
+    public static void setIsConfigured(Context context, String prefName, boolean value) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putBoolean(prefName, value).commit();
+    }
+
     public static int getIntValue(Context context, String prefName, int defValue) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(prefName, defValue);

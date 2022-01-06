@@ -35,22 +35,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.config.ActivityResultAware;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.BackgroundChangeAware;
+import sk.trupici.gwatch.wear.config.BorderPickerActivity;
+import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.ColorPickerActivity;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
+import sk.trupici.gwatch.wear.config.PickerViewHolder;
+import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
+import sk.trupici.gwatch.wear.config.item.ConfigItem;
 
 import static android.app.Activity.RESULT_OK;
-import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.BORDER_TYPE_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.config.StandardAnalogWatchFaceConfigActivity.UPDATE_COLORS_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.BORDER_TYPE_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_GAP_LEN;
@@ -58,23 +64,22 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_RING_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
-public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements BackgroundChangeAware {
+public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements BackgroundChangeAware, ActivityResultAware {
 
     final private static String LOG_TAG = ComplicationAdapter.class.getSimpleName();
     final private Context context;
-    final private ConfigPageData pageData;
     final private ComponentName componentName;
-    final private List<ConfigItem> items;
+    final private ConfigItem[] items;
     final private AnalogWatchfaceConfig config;
 
     final private SharedPreferences prefs;
 
     // Required to retrieve complication data from watch face for preview.
-    private final ProviderInfoRetriever providerInfoRetriever;
+    final private ProviderInfoRetriever providerInfoRetriever;
 
     private ComplicationId selectedComplicationId;
 
-    private Drawable defaultComplicationDrawable;
+    final private Drawable defaultComplicationDrawable;
 
     // Maintains reference view holder to dynamically update watch face preview. Used instead of
     // notifyItemChanged(int position) to avoid flicker and re-inflating the view.
@@ -84,22 +89,25 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return componentName;
     }
 
-    public ComplicationAdapter(Context context, ConfigPageData pageData, ComponentName componentName,
-                               List<ConfigItem> items, AnalogWatchfaceConfig config,
+    public ComplicationAdapter(Context context, ComponentName componentName,
+                               ConfigItem[] items, AnalogWatchfaceConfig config,
                                SharedPreferences prefs) {
         this.context = context;
-        this.pageData = pageData;
         this.componentName = componentName;
         this.items = items;
 
         this.prefs = prefs;
         this.config = config;
 
+        defaultComplicationDrawable = context.getDrawable(R.drawable.config_add_complication);
+
         // Initialization of code to retrieve active complication data for the watch face.
         this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
         providerInfoRetriever.init();
 
-        Log.d(LOG_TAG, "ComplicationAdapter: pre-selecting LEFT_COMPLICATION_ID");
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "ComplicationAdapter: pre-selecting LEFT_COMPLICATION_ID");
+        }
         selectedComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
     }
 
@@ -115,11 +123,12 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(LOG_TAG, "onCreateViewHolder(): viewType: " + viewType);
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onCreateViewHolder(): viewType: " + viewType);
+        }
         RecyclerView.ViewHolder viewHolder;
 
-        ComplicationId defaultComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
+//        ComplicationId defaultComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
         ConfigItem.Type type = ConfigItem.Type.valueOf(viewType);
         switch (type) {
             case TYPE_COMPLICATION:
@@ -133,7 +142,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case TYPE_BKG_COLOR:
                 viewHolder = new PickerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_button_item, parent, false),
                         view -> {
-                            Log.d(LOG_TAG, "complication callback: " + selectedComplicationId + ", " + view + ", " + view.getParent());
+                            if (BuildConfig.DEBUG) {
+                                Log.d(LOG_TAG, "complication callback: " + selectedComplicationId + ", " + view + ", " + view.getParent());
+                            }
                             Intent launchIntent = new Intent(context, ColorPickerActivity.class);
                             launchIntent.putExtra(ColorPickerActivity.EXTRA_ITEM_ID, selectedComplicationId.ordinal());
                             launchIntent.putExtra(ColorPickerActivity.EXTRA_ITEM_TYPE, type.ordinal());
@@ -149,7 +160,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case TYPE_BORDER_TYPE:
                 viewHolder = new PickerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_button_item, parent, false),
                         view -> {
-                            Log.d(LOG_TAG, "complication callback: " + selectedComplicationId + ", " + view + ", " + view.getParent());
+                            if (BuildConfig.DEBUG) {
+                                Log.d(LOG_TAG, "complication callback: " + selectedComplicationId + ", " + view + ", " + view.getParent());
+                            }
                             Intent launchIntent = new Intent(context, BorderPickerActivity.class);
                             launchIntent.putExtra(BorderPickerActivity.EXTRA_ITEM_ID, selectedComplicationId.ordinal());
                             launchIntent.putExtra(BorderPickerActivity.EXTRA_ITEM_TYPE, ConfigItem.Type.TYPE_BORDER_TYPE.ordinal());
@@ -166,10 +179,11 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Log.d(LOG_TAG, "Element " + position + " set.");
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onBindViewHolder: " + position);
+        }
         // Pulls all data required for creating the UX for the specific setting option.
-        ConfigItem configItem = items.get(position);
+        ConfigItem configItem = items[position];
 
         switch (ConfigItem.Type.valueOf(holder.getItemViewType())) {
             case TYPE_COMPLICATION:
@@ -179,18 +193,13 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             case TYPE_BORDER_COLOR:
             case TYPE_DATA_COLOR:
             case TYPE_BKG_COLOR:
+            case TYPE_BORDER_TYPE:
                 PickerViewHolder pickerViewHolder = (PickerViewHolder) holder;
-                ColorConfigItem colorConfigItem = (ColorConfigItem) configItem;
-                pickerViewHolder.setIcon(colorConfigItem.getIconResourceId());
-                pickerViewHolder.setName(colorConfigItem.getLabel());
+                BasicConfigItem basicConfigItem = (BasicConfigItem) configItem;
+                pickerViewHolder.setIcon(basicConfigItem.getIconResourceId());
+                pickerViewHolder.setName(basicConfigItem.getLabelResourceId());
                 break;
             case TYPE_PADDING:
-                break;
-            case TYPE_BORDER_TYPE:
-                PickerViewHolder borderShapeViewHolder = (PickerViewHolder) holder;
-                ShapeConfigItem borderConfigItem = (ShapeConfigItem) configItem;
-                borderShapeViewHolder.setIcon(borderConfigItem.getIconResourceId());
-                borderShapeViewHolder.setName(borderConfigItem.getLabel());
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -221,7 +230,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
-        Log.d(LOG_TAG, "bounds: " + view.getClipBounds());
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "bounds: " + view.getClipBounds());
+        }
         ImageView bkgView = view.findViewById(R.id.image);
         bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(resourceId));
         ImageView more = view.findViewById(R.id.label_image);
@@ -233,18 +244,16 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemViewType(int position) {
-        ConfigItem configItem = items.get(position);
+        ConfigItem configItem = items[position];
         return configItem.getConfigType().ordinal();
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return items.length;
     }
 
-    /**
-     * @return true if the activity result was processed successfully and the view should be scrolled to the very first position
-     */
+    @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
@@ -252,8 +261,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     // Retrieves information for selected Complication provider.
                     ComplicationProviderInfo complicationProviderInfo = data.getParcelableExtra(ProviderChooserIntent.EXTRA_PROVIDER_INFO);
                     Integer id = data.getParcelableExtra(ProviderChooserIntent.EXTRA_COMPLICATION_ID);
-                    Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
-
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                    }
                     // Updates preview with new complication information for selected complication id.
                     // Note: complication id is saved and tracked in the adapter class.
                     return complicationViewHolder.updateComplicationView(context, complicationProviderInfo, id);
@@ -261,13 +271,17 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     int color = data.getIntExtra(ColorPickerActivity.EXTRA_COLOR, Color.TRANSPARENT);
                     ConfigItem.Type type = ConfigItem.Type.valueOf(data.getExtras().getInt(ColorPickerActivity.EXTRA_ITEM_TYPE));
                     id = (Integer) data.getExtras().get(ColorPickerActivity.EXTRA_ITEM_ID);
-                    Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                    }
                     return updatePreviewColors(type, id, color);
                 case BORDER_TYPE_CONFIG_REQUEST_CODE:
                     type = ConfigItem.Type.valueOf(data.getExtras().getInt(BorderPickerActivity.EXTRA_ITEM_TYPE));
                     BorderType borderType = (BorderType) data.getExtras().get(BorderPickerActivity.EXTRA_BORDER_TYPE);
                     id = (Integer) data.getExtras().get(BorderPickerActivity.EXTRA_ITEM_ID);
-                    Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                    }
                     return updateBorderType(type, id, borderType);
                 default:
                     break;
@@ -285,8 +299,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private boolean updatePreviewColors(ConfigItem.Type type, Integer id, Integer color) {
-
-        Log.d(LOG_TAG, "updatePreviewColors: " + type + ", " + color);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "updatePreviewColors: " + type + ", " + color);
+        }
         if (type == null) {
             Log.e(LOG_TAG, "updatePreviewColors: no item type specified");
             return false;
@@ -319,36 +334,50 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Log.e(LOG_TAG, "updatePreviewColors: " + "unsupported component type: " + type.name());
                 return false;
         }
-        ColorConfigItem item = (ColorConfigItem) getConfigItemByType(type);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + item.getSharedPrefString();
-        Log.d(LOG_TAG, "updatePreviewColors: " + prefName + " -> " + color);
+        BasicConfigItem item = (BasicConfigItem) getConfigItemByType(type);
+        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + item.getPreferenceName();
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "updatePreviewColors: " + prefName + " -> " + color);
+        }
         prefs.edit().putInt(prefName, color).commit();
         return true;
     }
 
     private BorderType getBorderType(ComplicationId complicationId) {
-        Log.d(LOG_TAG, "getBorderType: " + complicationId.name());
-
-        ShapeConfigItem borderTypeItem = (ShapeConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + borderTypeItem.getSharedPrefString();
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getBorderType: " + complicationId.name());
+        }
+        BasicConfigItem borderTypeItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
+        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + borderTypeItem.getPreferenceName();
         String borderTypeName = prefs.getString(prefName, null);
-        Log.d(LOG_TAG, "getBorderType: '" + prefName + "' "+ borderTypeName);
+        if (borderTypeName == null && borderTypeItem.getDefaultValueResourceId() != -1) {
+            borderTypeName = context.getResources().getString(borderTypeItem.getDefaultValueResourceId());
+        }
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getBorderType: '" + prefName + "' " + borderTypeName);
+        }
         return BorderType.getByNameOrDefault(borderTypeName);
     }
 
     private int getItemColor(ComplicationId complicationId, ConfigItem.Type type) {
-        Log.d(LOG_TAG, "getItemColor: " + complicationId.name() + ", " + type.name());
-
-        ColorConfigItem colorTypeItem = (ColorConfigItem) getConfigItemByType(type);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + colorTypeItem.getSharedPrefString();
-        int color = prefs.getInt(prefName, Color.TRANSPARENT);
-        Log.d(LOG_TAG, "getColor: '" + prefName + "' "+ color);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getItemColor: " + complicationId.name() + ", " + type.name());
+        }
+        BasicConfigItem colorTypeItem = (BasicConfigItem) getConfigItemByType(type);
+        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + colorTypeItem.getPreferenceName();
+        int defaultValue = colorTypeItem.getDefaultValueResourceId() == -1 ? Color.TRANSPARENT
+                : context.getResources().getColor(colorTypeItem.getDefaultValueResourceId(), null);
+        int color = prefs.getInt(prefName, defaultValue);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getColor: '" + prefName + "' " + color);
+        }
         return color;
     }
 
     private Drawable createBorderDrawable(BorderType borderType, int color, boolean setStroke) {
-        Log.d(LOG_TAG, "getBorderDrawable: " + borderType + ", " + color);
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getBorderDrawable: " + borderType + ", " + color);
+        }
         if (borderType == null) {
             borderType = BorderType.NONE;
         }
@@ -419,7 +448,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
 
     private boolean updateBorderType(ConfigItem.Type type, Integer id, BorderType borderType) {
-        Log.d(LOG_TAG, "updateBorderType: " + borderType);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "updateBorderType: " + borderType);
+        }
         if (borderType == null) {
             Log.e(LOG_TAG, "updateBorderType: no border type specified");
             return false;
@@ -431,19 +462,25 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         ComplicationId complicationId = ComplicationId.valueOf(id);
 
         String prefix = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId);
-        ShapeConfigItem item = (ShapeConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
-        Log.d(LOG_TAG, "updateBorderType: " + prefix + item.getSharedPrefString() + " -> " + borderType);
-        prefs.edit().putString(prefix + item.getSharedPrefString(), borderType.name()).commit();
+        BasicConfigItem item = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "updateBorderType: " + prefix + item.getPreferenceName() + " -> " + borderType);
+        }
+        prefs.edit().putString(prefix + item.getPreferenceName(), borderType.name()).commit();
 
         // draw border
-        ColorConfigItem colorItem = (ColorConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_COLOR);
-        int color = prefs.getInt(prefix + colorItem.getSharedPrefString(), Color.TRANSPARENT);
+        BasicConfigItem colorItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_COLOR);
+        int defaultValue = colorItem.getDefaultValueResourceId() == -1 ? Color.TRANSPARENT
+                : context.getResources().getColor(colorItem.getDefaultValueResourceId(), null);
+        int color = prefs.getInt(prefix + colorItem.getPreferenceName(), defaultValue);
         Drawable drawable = createBorderDrawable(borderType, color, true);
         complicationViewHolder.setBorder(complicationId, drawable);
 
         // draw background
-        colorItem = (ColorConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BKG_COLOR);
-        color = prefs.getInt(prefix + colorItem.getSharedPrefString(), Color.TRANSPARENT);
+        colorItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BKG_COLOR);
+        defaultValue = colorItem.getDefaultValueResourceId() == -1 ? Color.TRANSPARENT
+                : context.getResources().getColor(colorItem.getDefaultValueResourceId(), null);
+        color = prefs.getInt(prefix + colorItem.getPreferenceName(), defaultValue);
         drawable = createBorderDrawable(borderType, color, false);
         if (borderType == BorderType.NONE) {
             ((GradientDrawable)drawable).setColor(color);
@@ -470,13 +507,14 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ComplicationId complicationId = ComplicationId.valueOf(id);
 
             String prefix = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId);
-            Log.d(LOG_TAG, "initializeComplications: " + complicationId.name() + ", " + prefix);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "initializeComplications: " + complicationId.name() + ", " + prefix);
+            }
             BorderType borderType = getBorderType(complicationId);
 
             // draw background
-            ColorConfigItem colorItem = (ColorConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BKG_COLOR);
-            int color = prefs.getInt(prefix + colorItem.getSharedPrefString(), Color.TRANSPARENT);
+            BasicConfigItem colorItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BKG_COLOR);
+            int color = prefs.getInt(prefix + colorItem.getPreferenceName(), Color.TRANSPARENT);
             Drawable drawable = createBorderDrawable(borderType, color, false);
             if (borderType == BorderType.NONE) {
                 ((GradientDrawable) drawable).setColor(color);
@@ -484,8 +522,8 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             complicationViewHolder.setBackground(complicationId, drawable);
 
             // set data color
-            colorItem = (ColorConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_DATA_COLOR);
-            color = prefs.getInt(prefix + colorItem.getSharedPrefString(), Color.TRANSPARENT);
+            colorItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_DATA_COLOR);
+            color = prefs.getInt(prefix + colorItem.getPreferenceName(), Color.TRANSPARENT);
             PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             complicationViewHolder.setColorFilter(complicationId, colorFilter);
 
@@ -495,8 +533,8 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             // draw border
             if (borderType != BorderType.NONE) {
                 // draw border
-                colorItem = (ColorConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_COLOR);
-                color = prefs.getInt(prefix + colorItem.getSharedPrefString(), Color.TRANSPARENT);
+                colorItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_COLOR);
+                color = prefs.getInt(prefix + colorItem.getPreferenceName(), Color.TRANSPARENT);
                 drawable = createBorderDrawable(borderType, color, true);
                 complicationViewHolder.setBorder(complicationId, drawable);
             }
@@ -505,7 +543,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     new ProviderInfoRetriever.OnProviderInfoReceivedCallback() {
                         @Override
                         public void onProviderInfoReceived(int watchFaceComplicationId, @Nullable ComplicationProviderInfo complicationProviderInfo) {
-                            Log.d(LOG_TAG, "onProviderInfoReceived: " + watchFaceComplicationId + ", " + complicationProviderInfo);
+                            if (BuildConfig.DEBUG) {
+                                Log.d(LOG_TAG, "onProviderInfoReceived: " + watchFaceComplicationId + ", " + complicationProviderInfo);
+                            }
                             if (complicationProviderInfo != null) {
                                 ComplicationId complicationId = ComplicationId.valueOf(watchFaceComplicationId);
                                 complicationViewHolder.setIcon(complicationId, complicationProviderInfo.providerIcon);

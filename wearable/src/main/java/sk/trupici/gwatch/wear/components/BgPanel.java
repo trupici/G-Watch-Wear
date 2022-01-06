@@ -32,7 +32,7 @@ import android.util.Log;
 
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
-import sk.trupici.gwatch.wear.config.complications.BorderType;
+import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.Trend;
@@ -53,6 +53,8 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     public static final String LOG_TAG = BgPanel.class.getSimpleName();
+
+    public static final int CONFIG_ID = 13;
 
     public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
     public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";

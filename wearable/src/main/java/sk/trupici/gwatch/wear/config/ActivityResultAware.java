@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
-import sk.trupici.gwatch.wear.config.item.ConfigItem;
+import android.content.Intent;
 
-/**
- * Data for Complications Preview item in RecyclerView.
- */
-public class ComplicationConfigItem implements ConfigItem {
-
-    final private int layoutId;
-
-    public ComplicationConfigItem(int layoutId) {
-        this.layoutId = layoutId;
-    }
-
-    public int getLayoutId() {
-        return layoutId;
-    }
-
-    @Override
-    public Type getConfigType() {
-        return Type.TYPE_COMPLICATION;
-    }
+public interface ActivityResultAware {
+    /**
+     * @return true if the activity result was processed successfully and the view should be scrolled to the very first position
+     */
+    boolean onActivityResult(int requestCode, int resultCode, Intent data);
 }

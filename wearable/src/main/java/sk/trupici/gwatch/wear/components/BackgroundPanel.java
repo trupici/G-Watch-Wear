@@ -29,12 +29,13 @@ import android.support.wearable.watchface.WatchFaceService;
 
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
-import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
+import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 
 public class BackgroundPanel implements ComponentPanel {
 
     public static final String LOG_TAG = BackgroundPanel.class.getSimpleName();
 
+    public static final int CONFIG_ID = 1;
 
     private Paint backgroundPaint;
     private Bitmap backgroundBitmap;

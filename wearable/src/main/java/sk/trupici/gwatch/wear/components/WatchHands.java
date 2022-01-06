@@ -27,12 +27,15 @@ import android.os.Bundle;
 
 import java.util.Calendar;
 
+import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
-import sk.trupici.gwatch.wear.config.complications.WatchfaceConfig;
+import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 
 public class WatchHands implements ComponentPanel {
     public static final String LOG_TAG = WatchHands.class.getSimpleName();
+
+    public static final int CONFIG_ID = 2;
 
     // offsets for watch hands shadows - currently we use the same value for X and Y
     private static final float HOUR_HAND_SHADOW_OFFSET = 3;
@@ -66,9 +69,15 @@ public class WatchHands implements ComponentPanel {
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-        ConfigPageData.HandsConfigData configData = (ConfigPageData.HandsConfigData)
-                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
-                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
+//        ConfigPageData.HandsConfigData configData = (ConfigPageData.HandsConfigData)
+//                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
+//                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
+        ConfigPageData.HandsConfigData configData =
+                new ConfigPageData.HandsConfigData(0, "", R.drawable.analog_hands_preview_default,
+                                    R.drawable.hours_default, R.drawable.hours_shadow_default,
+                                    R.drawable.minutes_default, R.drawable.minutes_shadow_default,
+                                    R.drawable.seconds_default, R.drawable.seconds_shadow_default
+            );
 
         hourBitmap = BitmapFactory.decodeResource(context.getResources(), configData.getHourHandId());
         hourShadowBitmap = configData.getHourHandShadowId() == 0 ? null

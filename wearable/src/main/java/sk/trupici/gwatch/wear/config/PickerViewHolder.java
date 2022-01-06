@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,19 +47,19 @@ public class PickerViewHolder extends RecyclerView.ViewHolder implements View.On
         view.setOnClickListener(this);
     }
 
-    public void setName(String name) {
-        button.setText(name);
+    public void setName(int resourceId) {
+        Context context = button.getContext();
+        button.setText(context.getString(resourceId));
     }
 
     public void setIcon(int resourceId) {
         Context context = button.getContext();
-        button.setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(resourceId), null, null, null);
+// 1,2       button.setCompoundDrawablesWithIntrinsicBounds(context.getDrawable(resourceId), null, null, null);
+        button.setCompoundDrawablesWithIntrinsicBounds(null, null, context.getDrawable(resourceId), null);
     }
 
     @Override
     public void onClick(View view) {
-        int position = getAdapterPosition();
-        Log.d(LOG_TAG, "Complication onClick() position: " + position);
         if (onClickCallback != null) {
             onClickCallback.accept(view);
         }

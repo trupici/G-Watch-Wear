@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -37,16 +36,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.components.BackgroundPanel;
+import sk.trupici.gwatch.wear.components.BgAlarmController;
+import sk.trupici.gwatch.wear.components.BgPanel;
+import sk.trupici.gwatch.wear.components.DatePanel;
+import sk.trupici.gwatch.wear.components.WatchHands;
+import sk.trupici.gwatch.wear.components.BgGraph;
 import sk.trupici.gwatch.wear.config.complications.ComplicationAdapter;
-import sk.trupici.gwatch.wear.config.complications.ComplicationConfigItem;
 import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
-import sk.trupici.gwatch.wear.config.complications.PaddingConfigItem;
-import sk.trupici.gwatch.wear.watchface.StandardAnalogWatchfaceService;
+import sk.trupici.gwatch.wear.config.menu.AlarmsMenuItems;
+import sk.trupici.gwatch.wear.config.menu.BgGraphMenuItems;
+import sk.trupici.gwatch.wear.config.menu.BgPanelMenuItems;
+import sk.trupici.gwatch.wear.config.menu.ComplicationsMenuItems;
+import sk.trupici.gwatch.wear.config.menu.DatePanelMenuItems;
+import sk.trupici.gwatch.wear.watchface.AnalogWatchfaceService;
 
-public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
+public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
 
-    private final static String LOG_TAG = MainConfigViewAdapter.class.getSimpleName();
+    private final static String LOG_TAG = AnalogWatchfaceConfigViewAdapter.class.getSimpleName();
     private static final String TAG_VERTICAL_SCROLLABLE = "Pager";
 
     int position = 0;
@@ -64,8 +73,10 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
     final private ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
         @Override
         public void onPageSelected(int position) {
-            Log.d(LOG_TAG, "onPageSelected: " + position);
-            MainConfigViewAdapter.this.position = position;
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onPageSelected: " + position);
+            }
+            AnalogWatchfaceConfigViewAdapter.this.position = position;
 
             // notify all view holders about page change
             View child = pager.getChildAt(0); // get pager's RecycleView
@@ -84,14 +95,15 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         }
     };
 
-    public MainConfigViewAdapter(Context context, AnalogWatchfaceConfig config, ViewPager2 pager, SharedPreferences prefs) {
-        Log.d(LOG_TAG, "MainConfigViewAdapter: ");
-
+    public AnalogWatchfaceConfigViewAdapter(Context context, AnalogWatchfaceConfig config, ViewPager2 pager, SharedPreferences prefs) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "MainConfigViewAdapter: ");
+        }
         this.context = context;
         this.config = config;
         this.pager = pager;
 
-        this.componentName = new ComponentName(context, StandardAnalogWatchfaceService.class);
+        this.componentName = new ComponentName(context, AnalogWatchfaceService.class);
 
         this.prefs = prefs;
 
@@ -103,8 +115,6 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
     }
 
     public boolean onGenericMotionEvent(MotionEvent event) {
-//        Log.d(LOG_TAG, "MainAdapter.onGenericMotionEvent: " + event);
-
         View child = pager.findViewWithTag(TAG_VERTICAL_SCROLLABLE + position);
         if (child != null) {
             if (child instanceof RecyclerView) {
@@ -134,37 +144,77 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
 
     @Override
     public int getItemViewType(int position) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "getItemViewType: " + position);
+        }
         return config.getPageData(position).getType().ordinal();
     }
 
     @NonNull
     @Override
     public WearableRecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(LOG_TAG, "onCreateViewHolder: " + parent.getClass().getSimpleName() + ", " + viewType + ", " + position);
-//        Utils.dumpView(parent, viewType + " ");
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onCreateViewHolder: " + parent.getClass().getSimpleName() + ", " + viewType + ", " + position);
+        }
 
         View view;
         ConfigPageData.ConfigType type = ConfigPageData.ConfigType.valueOf(viewType);
         switch (type) {
             case BACKGROUND:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page, parent, false);
+                view.setId(BackgroundPanel.CONFIG_ID);
+                return new WatchFaceViewHolder(this, view, type);
             case HANDS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page, parent, false);
+                view.setId(WatchHands.CONFIG_ID);
                 return new WatchFaceViewHolder(this, view, type);
-            case COMPLICATION:
+            case COMPLICATIONS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
                 return new ComplicationViewHolder(view);
+            case BG_PANEL:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
+                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
+                view.setId(BgPanel.CONFIG_ID);
+                return new ListConfigViewHolder(view);
+            case BG_GRAPH:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
+                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
+                view.setId(BgGraph.CONFIG_ID);
+                return new ListConfigViewHolder(view);
+            case DATE_PANEL:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
+                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
+                view.setId(DatePanel.CONFIG_ID);
+                return new ListConfigViewHolder(view);
+            case ALARMS:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
+                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
+                view.setId(BgAlarmController.CONFIG_ID);
+                return new ListConfigViewHolder(view);
         }
         throw new IllegalArgumentException();
     }
 
     @Override
     public void onBindViewHolder(@NonNull WearableRecyclerView.ViewHolder holder, int position) {
-        Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
-
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
+        }
         if (holder instanceof WatchFaceViewHolder) {
             onBindWatchFaceViewHolder((WatchFaceViewHolder)holder, position);
         } else if (holder instanceof ComplicationViewHolder) {
             onBindComplicationViewHolder((ComplicationViewHolder) holder, position);
+        } else if (holder instanceof ListConfigViewHolder) {
+            ListConfigViewHolder listHolder = (ListConfigViewHolder) holder;
+            if (BgPanel.CONFIG_ID == listHolder.getViewId()) {
+                onBindBgPanelConfigViewHolder(listHolder, position);
+            } else if (BgGraph.CONFIG_ID == listHolder.getViewId()) {
+                onBindBgGraphConfigViewHolder(listHolder, position);
+            } else if (DatePanel.CONFIG_ID == listHolder.getViewId()) {
+                onBindDatePanelConfigViewHolder(listHolder, position);
+            } else if (BgAlarmController.CONFIG_ID == listHolder.getViewId()) {
+                onBindAlarmsConfigViewHolder(listHolder, position);
+            }
         }
     }
 
@@ -175,8 +225,7 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
 
     private void onBindWatchFaceViewHolder(WatchFaceViewHolder holder, int position) {
         ConfigPageData pageData = config.getPageData(position);
-
-        holder.getTitle().setText(pageData.getTitleId());
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
 
         holder.getVerticalPager().setAdapter(new WatchfaceDataAdapter(pageData, config, holder.getVerticalPager(), prefs));
         if (pageData.getType() != ConfigPageData.ConfigType.BACKGROUND) {
@@ -189,21 +238,15 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
     }
 
     private void onBindComplicationViewHolder(ComplicationViewHolder holder, int position) {
+        ComplicationAdapter adapter = new ComplicationAdapter(
+                context,
+                componentName,
+                ComplicationsMenuItems.items,
+                config,
+                prefs);
+
         ConfigPageData pageData = config.getPageData(position);
-
-        holder.getTitle().setText(pageData.getTitleId());
-
-        ComplicationAdapter adapter;
-        adapter = new ComplicationAdapter(context, pageData, componentName,
-                Arrays.asList(
-                        new ComplicationConfigItem(R.layout.config_list_complications_preview_item),
-                        holder.createBorderTypeItem(context, null),
-                        holder.createBorderColorItem(context, null),
-                        holder.createDataColorItem(context, null),
-                        holder.createBkgColorItem(context, null),
-                        new PaddingConfigItem()
-                ),
-                config, prefs);
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
 
         holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
         holder.getRecyclerView().setHasFixedSize(true);
@@ -212,14 +255,83 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         holder.onBackgroundChanged();
     }
 
+    private void onBindBgPanelConfigViewHolder(ListConfigViewHolder holder, int position) {
+        ListConfigAdapter adapter = new ListConfigAdapter(
+                context,
+                holder.getRecyclerView(),
+                BgPanel.CONFIG_ID,
+                BgPanelMenuItems.items,
+                prefs);
+
+        ConfigPageData pageData = config.getPageData(position);
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
+
+        holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
+        holder.getRecyclerView().setHasFixedSize(true);
+        holder.getRecyclerView().setAdapter(adapter);
+        holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
+    }
+
+
+    private void onBindBgGraphConfigViewHolder(ListConfigViewHolder holder, int position) {
+        ListConfigAdapter adapter = new ListConfigAdapter(
+                context,
+                holder.getRecyclerView(),
+                BgGraph.CONFIG_ID,
+                BgGraphMenuItems.items,
+                prefs);
+
+        ConfigPageData pageData = config.getPageData(position);
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
+
+        holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
+        holder.getRecyclerView().setHasFixedSize(true);
+        holder.getRecyclerView().setAdapter(adapter);
+        holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
+    }
+
+    private void onBindDatePanelConfigViewHolder(ListConfigViewHolder holder, int position) {
+        ListConfigAdapter adapter = new ListConfigAdapter(
+                context,
+                holder.getRecyclerView(),
+                DatePanel.CONFIG_ID,
+                DatePanelMenuItems.items,
+                prefs);
+
+        ConfigPageData pageData = config.getPageData(position);
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
+
+        holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
+        holder.getRecyclerView().setHasFixedSize(true);
+        holder.getRecyclerView().setAdapter(adapter);
+        holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
+    }
+
+    private void onBindAlarmsConfigViewHolder(ListConfigViewHolder holder, int position) {
+        ListConfigAdapter adapter = new ListConfigAdapter(
+                context,
+                holder.getRecyclerView(),
+                BgAlarmController.CONFIG_ID,
+                AlarmsMenuItems.items,
+                prefs);
+
+        ConfigPageData pageData = config.getPageData(position);
+        holder.getTitle().setText(context.getString(pageData.getTitleId()));
+
+        holder.getRecyclerView().setLayoutManager(new LinearLayoutManager(context));
+        holder.getRecyclerView().setHasFixedSize(true);
+        holder.getRecyclerView().setAdapter(adapter);
+        holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
+    }
+
     @Override
     public void onViewDetachedFromWindow(@NonNull WearableRecyclerView.ViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
         if (holder instanceof ComplicationViewHolder) {
             ((ComplicationAdapter)((ComplicationViewHolder) holder).getRecyclerView().getAdapter()).destroy();
         } else if (holder instanceof WatchFaceViewHolder) {
             ((WatchfaceDataAdapter)((WatchFaceViewHolder) holder).getVerticalPager().getAdapter()).destroy();
         }
+        super.onViewDetachedFromWindow(holder);
     }
 
     public void dispatchActivityResult(int requestCode, int resultCode, Intent data) {
@@ -228,8 +340,8 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
             View child = view.findViewWithTag(TAG_VERTICAL_SCROLLABLE + position);
             if (child instanceof RecyclerView) {
                 RecyclerView.Adapter<?> adapter = ((RecyclerView) child).getAdapter();
-                if (adapter instanceof ComplicationAdapter) {
-                    if (((ComplicationAdapter) adapter).onActivityResult(requestCode, resultCode, data)) {
+                if (adapter instanceof ActivityResultAware) {
+                    if (((ActivityResultAware) adapter).onActivityResult(requestCode, resultCode, data)) {
                         ((WearableRecyclerView)child).smoothScrollToPosition(0);
                     }
                 }
@@ -246,5 +358,4 @@ public class MainConfigViewAdapter extends WearableRecyclerView.Adapter<Wearable
         }
         return ids;
     }
-
 }

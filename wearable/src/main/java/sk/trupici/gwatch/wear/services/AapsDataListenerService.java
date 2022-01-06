@@ -96,7 +96,7 @@ public class AapsDataListenerService extends WearableListenerService {
                     .build();
             OneTimeWorkRequest workRequest =
                     new OneTimeWorkRequest.Builder(BgDataProcessor.class)
-                            .setInputData(new Data.Builder().putByteArray(BgDataProcessor.EXTRA_DATA, data).build())
+                            .setInputData(new Data.Builder().putByteArray(BgDataProcessor.EXTRA_DATA, glucosePacket.getData()).build())
                             .setConstraints(constraints)
                             .build();
 

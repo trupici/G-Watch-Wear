@@ -30,13 +30,13 @@ import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
 
 public class WatchFaceViewHolder extends WearableRecyclerView.ViewHolder implements BackgroundChangeAware {
-    private final MainConfigViewAdapter parentViewAdapter;
+    private final AnalogWatchfaceConfigViewAdapter parentViewAdapter;
     private final TextView title;
     private final ViewPager2 verticalPager;
     private final ViewGroup bkgViewGroup;
     private final ConfigPageData.ConfigType dataType;
 
-    public WatchFaceViewHolder(MainConfigViewAdapter parentViewAdapter, @NonNull View itemView, ConfigPageData.ConfigType dataType) {
+    public WatchFaceViewHolder(AnalogWatchfaceConfigViewAdapter parentViewAdapter, @NonNull View itemView, ConfigPageData.ConfigType dataType) {
         super(itemView);
         this.parentViewAdapter = parentViewAdapter;
         title = itemView.findViewById(R.id.page_title);
@@ -77,7 +77,5 @@ public class WatchFaceViewHolder extends WearableRecyclerView.ViewHolder impleme
         ImageView bkgView = view.findViewById(R.id.image);
         bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(resourceId));
         bkgViewGroup.addView(view);
-//            bkgViewGroup.invalidate();
-
     }
 }

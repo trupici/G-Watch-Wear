@@ -44,7 +44,7 @@ import java.util.TimeZone;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
-import sk.trupici.gwatch.wear.config.complications.BorderType;
+import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
@@ -56,6 +56,8 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
 public class DatePanel implements ComponentPanel {
     public static final String LOG_TAG = DatePanel.class.getSimpleName();
+
+    public static final int CONFIG_ID = 14;
 
     public static final String PREF_SHOW_MONTH = AnalogWatchfaceConfig.PREF_PREFIX + "date_show_month";
 

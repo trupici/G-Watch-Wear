@@ -212,9 +212,9 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         float x = bounds.left + bounds.width() / 2f; // text will be centered around
         float top = bounds.top + topOffset;
         float height = bounds.height() - topOffset;
-        long bgTimeDiff = System.currentTimeMillis() / 60000 - lastBgData.getTimestamp();
+        long bgTimeDiff = System.currentTimeMillis() - lastBgData.getTimestamp();
         if (isAmbientMode) {
-            paint.setColor(Color.LTGRAY);
+            paint.setColor(getAmbientRangedColor(lastBgData.getValue(), bgTimeDiff));
 //            paint.setAntiAlias(false);
         } else {
             paint.setColor(getRangedColor(lastBgData.getValue(), bgTimeDiff));
@@ -282,11 +282,11 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     private int getRangedColor(int bgValue, long bgTimeDiff) {
         if (bgValue == 0) {
-            return Color.WHITE;
-        }
-        if (bgValue > 0 && bgTimeDiff > noDataThreshold) {
+            return Color.LTGRAY;
+        } else if (bgTimeDiff > noDataThreshold * CommonConstants.SECOND_IN_MILLIS) {
             return noDataColor;
         }
+
         if (bgValue <= lowThreshold) {
             return bgValue <= hypoThreshold ? criticalColor : warnColor;
         } else if (bgValue >= highThreshold) {
@@ -294,6 +294,10 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         } else {
             return inRangeColor;
         }
+    }
+
+    private int getAmbientRangedColor(int bgValue, long bgTimeDiff) {
+        return (bgTimeDiff > noDataThreshold * CommonConstants.SECOND_IN_MILLIS) ? Color.DKGRAY : Color.LTGRAY;
     }
 
     private void onDataUpdate(Context context, BgData bgData) {

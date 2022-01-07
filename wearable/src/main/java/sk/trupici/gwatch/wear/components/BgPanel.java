@@ -30,6 +30,7 @@ import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.BorderType;
@@ -38,6 +39,7 @@ import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
@@ -64,10 +66,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     public static final String PREF_BORDER_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_color";
     public static final String PREF_BORDER_TYPE = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_type";
-
-    // TODO more sets are available in standard unicode font
-    private static final char[] TREND_SET_1 = {' ', '⇈', '↑', '↗', '→', '↘', '↓', '⇊'}; // standard arrows
-    private static final char[] TREND_SET_2 = {' ', '⮅', '⭡', '⭧', '⭢', '⭨', '⭣', '⮇'}; // triangle arrows (unknown chars on watch)
 
     private RectF sizeFactors;
     private float topOffset;
@@ -298,27 +296,32 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         }
     }
 
-    public void onDataUpdate(Context context, BgData bgData) {
+    private void onDataUpdate(Context context, BgData bgData) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "onDataUpdate: " + bgData.toString());
+        }
 
-        boolean noData = bgData.getValue() == 0;
+        boolean invalidData = bgData.getValue() == 0;
+
+        if (bgData.getTimestampDiff() < 0) {
+            return; // historical data
+        }
 
         long bgTimestampDiff = bgData.getTimestampDiff() / CommonConstants.MINUTE_IN_MILLIS; // to minutes
         if (bgTimestampDiff > CommonConstants.DAY_IN_MINUTES) {
-            noData = true;
+            invalidData = true;
         }
 
-        if (noData) {
+        if (invalidData) {
             bgLine1 = "--";
             bgLine2 = "--";
         } else {
-            char trendArrow = TREND_SET_1[bgData.getTrend().ordinal()];
-
             if (isUnitConversion) {
-                bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
-                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
+                bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + UiUtils.getTrendChar(bgData.getTrend());
+                bgLine2 = bgTimestampDiff < 0 ? StringUtils.EMPTY_STRING : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
             } else {
-                bgLine1 = "" + bgData.getValue() + trendArrow;
-                bgLine2 = bgTimestampDiff < 0 ? "" : "Δ " + bgData.getValueDiff();
+                bgLine1 = Integer.toString(bgData.getValue()) + UiUtils.getTrendChar(bgData.getTrend());
+                bgLine2 = bgTimestampDiff < 0 ? StringUtils.EMPTY_STRING : "Δ " + bgData.getValueDiff();
             }
         }
 

@@ -29,16 +29,14 @@ import java.util.Date;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 
 public class ProviderDataUpdater extends BroadcastReceiver {
     private static final String LOG_TAG = ProviderDataUpdater.class.getSimpleName();
-
-    private static final char[] TREND_SET = {' ', '⇈', '↑', '↗', '→', '↘', '↓', '⇊'}; // standard arrows
 
     /** Receives intents on tap and causes complication states to be toggled and updated. */
     @Override
@@ -50,19 +48,25 @@ public class ProviderDataUpdater extends BroadcastReceiver {
         Bundle extras = intent.getExtras();
         BgData bgData = BgData.fromBundle(extras);
 
+        boolean invalidTimestampDiff = false;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         long lastBgTimestamp = prefs.getLong(BgDataProviderService.PREF_LAST_UPDATE, 0L);
         if (lastBgTimestamp > bgData.getTimestamp()) {
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: last ts > bg ts. Back-filling?");
             }
-            return; // back filling ?
+            if (lastBgTimestamp - bgData.getTimestamp() > CommonConstants.DAY_IN_MILLIS) {
+                invalidTimestampDiff = true;
+            } else { // back filling ?
+                return;
+            }
         }
 
         SharedPreferences.Editor edit = prefs.edit();
         edit.putLong(BgDataProviderService.PREF_LAST_UPDATE, bgData.getTimestamp());
 
-        if (System.currentTimeMillis() - bgData.getTimestamp() > CommonConstants.HOUR_IN_MILLIS) {
+        long timeDiff = System.currentTimeMillis() - bgData.getTimestamp();
+        if (invalidTimestampDiff || timeDiff > CommonConstants.HOUR_IN_MILLIS) {
             // signal no data
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: data is too old: " + new Date(bgData.getTimestamp()));
@@ -72,17 +76,20 @@ public class ProviderDataUpdater extends BroadcastReceiver {
             edit.remove(BgDataProviderService.PREF_TITLE);
             edit.remove(BgDataProviderService.PREF_VALUE);
         } else {
-            char trendArrow = TREND_SET[bgData.getTrend().ordinal()];
+            long noDataThreshold = prefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data)) * CommonConstants.SECOND_IN_MILLIS;
+            boolean invalidTimestamp = (timeDiff > noDataThreshold) || bgData.getTimestampDiff() < 0;
+
+            char trendArrow = UiUtils.getTrendChar(bgData.getTrend());
 
             String text;
             String title;
             boolean isUnitConversion = prefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
             if (isUnitConversion) {
                 text = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
-                title = bgData.getTimestampDiff() < 0 ? "" : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
+                title = invalidTimestamp ? StringUtils.EMPTY_STRING : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
             } else {
-                text = "" + bgData.getValue() + trendArrow;
-                title = bgData.getTimestampDiff() < 0 ? "" : "Δ " + bgData.getValueDiff();
+                text = Integer.toString(bgData.getValue()) + trendArrow;
+                title = invalidTimestamp ? StringUtils.EMPTY_STRING : "Δ " + bgData.getValueDiff();
             }
 
             if (BuildConfig.DEBUG) {

@@ -25,6 +25,8 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import sk.trupici.gwatch.wear.data.Trend;
+
 public class UiUtils {
 
     public static final Double GLUCOSE_CONV_FACTOR = 18.018018;
@@ -32,6 +34,14 @@ public class UiUtils {
     public static final String GLUCOSE_UNITS_MMOLL = "mmol/l";
 
     public static final String NO_DATA_STR = "-";
+
+    private static final char[] TREND_SET = {' ', '⇈', '↑', '↗', '→', '↘', '↓', '⇊'}; // standard arrows
+    private static final char[] TREND_SET_2 = {' ', '⮅', '⭡', '⭧', '⭢', '⭨', '⭣', '⮇'}; // triangle arrows (not all chars on watch)
+
+    public static char getTrendChar(Trend trend) {
+        int idx = trend == null ? 0 : trend.ordinal();
+        return TREND_SET[idx];
+    }
 
     public static String formatDateTime(Date date) {
         return java.text.DateFormat.getDateTimeInstance().format(date);

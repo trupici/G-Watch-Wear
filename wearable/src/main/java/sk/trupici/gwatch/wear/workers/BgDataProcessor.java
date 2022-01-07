@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.android.gms.common.internal.service.Common;
+
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
@@ -104,8 +106,8 @@ public class BgDataProcessor extends Worker {
             trend = calcTrend(valueDiff, samplePeriod);
         }
 
-        // store received values
-        if (timestampDiff >= 0) {
+        // store received values - new values only
+        if (timestampDiff >= 0 || Math.abs(timestampDiff) > CommonConstants.DAY_IN_MILLIS) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt(PREF_LAST_BG_VALUE, bgValue);
             editor.putLong(PREF_LAST_BG_TIMESTAMP, bgTimestamp);

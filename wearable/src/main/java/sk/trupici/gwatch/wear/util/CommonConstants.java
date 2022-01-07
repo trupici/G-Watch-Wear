@@ -25,8 +25,9 @@ public interface CommonConstants {
     int MINUTE_IN_SECONDS = 60;
     long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
     int HOUR_IN_MINUTES = 60;
-    long HOUR_IN_MILLIS = 3600000l; // 60 * 60 * 1000
+    long HOUR_IN_MILLIS = 3600000L; // 60 * 60 * 1000
     int DAY_IN_MINUTES = 1440; // 24 * 60
+    long DAY_IN_MILLIS = 86400000L; // 24 * 60 * 60 * 1000
 
     String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
 

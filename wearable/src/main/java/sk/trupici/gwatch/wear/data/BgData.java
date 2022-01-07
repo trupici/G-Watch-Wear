@@ -17,7 +17,13 @@
 package sk.trupici.gwatch.wear.data;
 
 import android.os.Bundle;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import androidx.annotation.NonNull;
+import sk.trupici.gwatch.wear.util.CommonConstants;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class BgData {
     private final static String KEY_VALUE = "value";
@@ -60,6 +66,15 @@ public class BgData {
             bundle.putString(KEY_TREND, trend.name());
         }
         return bundle;
+    }
+
+    public String toString() {
+        return "{ value: " + value + " (" + UiUtils.convertGlucoseToMmolL2Str(value) + ")"
+                + ", ts: " + UiUtils.formatTime(new Date(timestamp))
+                + ", diff: " + valueDiff + " (" + UiUtils.convertGlucoseToMmolL2Str(valueDiff) + ")"
+                + ", ts diff: " + timestampDiff / CommonConstants.SECOND_IN_MILLIS
+                + ", trend: " + trend
+                + " }";
     }
 
     public int getValue() {

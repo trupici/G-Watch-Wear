@@ -27,7 +27,6 @@ import android.os.Bundle;
 
 import java.util.Calendar;
 
-import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
@@ -69,15 +68,9 @@ public class WatchHands implements ComponentPanel {
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-//        ConfigPageData.HandsConfigData configData = (ConfigPageData.HandsConfigData)
-//                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
-//                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
-        ConfigPageData.HandsConfigData configData =
-                new ConfigPageData.HandsConfigData(0, "", R.drawable.analog_hands_preview_default,
-                                    R.drawable.hours_default, R.drawable.hours_shadow_default,
-                                    R.drawable.minutes_default, R.drawable.minutes_shadow_default,
-                                    R.drawable.seconds_default, R.drawable.seconds_shadow_default
-            );
+        ConfigPageData.HandsConfigData configData = (ConfigPageData.HandsConfigData)
+                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
+                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
 
         hourBitmap = BitmapFactory.decodeResource(context.getResources(), configData.getHourHandId());
         hourShadowBitmap = configData.getHourHandShadowId() == 0 ? null
@@ -124,7 +117,6 @@ public class WatchHands implements ComponentPanel {
          * 360 / 60 = 6 and 360 / 12 = 30.
          */
         final float seconds = (calendar.get(Calendar.SECOND) + calendar.get(Calendar.MILLISECOND) / 1000f);
-        final float secondsRotation = seconds * 6f;
 
         final int minutes = calendar.get(Calendar.MINUTE);
         final float minutesHandOffset = seconds / 10f;
@@ -154,6 +146,7 @@ public class WatchHands implements ComponentPanel {
 
         if (!isAmbientMode) {
             matrix.reset();
+            final float secondsRotation = seconds * 6f;
             matrix.postRotate(secondsRotation, centerX, centerY);
             matrix.postTranslate(SECOND_HAND_SHADOW_OFFSET, SECOND_HAND_SHADOW_OFFSET);
             canvas.drawBitmap(secondShadowBitmap, matrix, paint);

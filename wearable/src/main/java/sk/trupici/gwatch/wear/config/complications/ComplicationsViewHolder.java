@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.COMPLICATION_CONFIG_REQUEST_CODE;
 
 /**
  * Displays watch face preview along with complication locations. Allows user to tap on the

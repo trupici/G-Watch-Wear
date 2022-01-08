@@ -69,7 +69,7 @@ import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
  **/
 public class AnalogWatchfaceService extends CanvasWatchFaceService {
 
-    public static final String LOG_TAG = "StdAnalogGWatchface";
+    private static final String LOG_TAG = AnalogWatchfaceService.class.getSimpleName();
 
     /*
      * Updates rate in milliseconds for interactive mode. We update once a second to advance the
@@ -134,8 +134,8 @@ public class AnalogWatchfaceService extends CanvasWatchFaceService {
         private RectF leftComplCoefs;
         private RectF rightComplCoefs;
 
-        private BackgroundPanel bkgPanel;
         private WatchHands watchHands;
+        private BackgroundPanel bkgPanel;
         private BgGraph bgGraph;
         private BgPanel bgPanel;
         private DatePanel datePanel;
@@ -144,6 +144,11 @@ public class AnalogWatchfaceService extends CanvasWatchFaceService {
         private final List<BroadcastReceiver> receivers = new ArrayList<>(8);
 
         private long lastMinute = 0L;
+
+        Engine() {
+            //  Ask for a hardware accelerated canvas.
+            super(true);
+        }
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -323,10 +328,11 @@ public class AnalogWatchfaceService extends CanvasWatchFaceService {
 
             Context context = getApplicationContext();
             bkgPanel.onPropertiesChanged(context, properties);
-            watchHands.onPropertiesChanged(context, properties);
             bgPanel.onPropertiesChanged(context, properties);
             bgGraph.onPropertiesChanged(context, properties);
             datePanel.onPropertiesChanged(context, properties);
+
+            watchHands.onPropertiesChanged(context, properties);
         }
 
         @Override
@@ -386,9 +392,10 @@ public class AnalogWatchfaceService extends CanvasWatchFaceService {
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
             bgGraph.onSizeChanged(context, width, height);
-            watchHands.onSizeChanged(context, width, height);
             datePanel.onSizeChanged(context, width, height);
             bgPanel.onSizeChanged(context, width, height);
+
+            watchHands.onSizeChanged(context, width, height);
 
             /*
              * Calculates location bounds for right and left circular complications. Please note,

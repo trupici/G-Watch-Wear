@@ -34,8 +34,8 @@ import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
 
 import static android.app.Activity.RESULT_OK;
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.BORDER_TYPE_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.UPDATE_COLORS_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 
 public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ActivityResultAware {
 

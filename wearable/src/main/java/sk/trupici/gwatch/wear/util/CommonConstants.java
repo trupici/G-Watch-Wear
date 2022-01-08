@@ -39,4 +39,9 @@ public interface CommonConstants {
 
     String PREF_CONFIG_CHANGED = AnalogWatchfaceConfig.PREF_PREFIX + "config_changed";
 
+    int COMPLICATION_CONFIG_REQUEST_CODE = 101;
+    int UPDATE_COLORS_CONFIG_REQUEST_CODE = 102;
+    int BORDER_TYPE_CONFIG_REQUEST_CODE = 103;
+    int NUMBER_TYPE_CONFIG_REQUEST_CODE = 104;
+    int TIME_TYPE_CONFIG_REQUEST_CODE = 105;
 }

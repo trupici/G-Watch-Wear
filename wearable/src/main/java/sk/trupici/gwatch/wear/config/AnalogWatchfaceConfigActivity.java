@@ -36,12 +36,6 @@ public class AnalogWatchFaceConfigActivity extends Activity {
 
     public static final String LOG_TAG = AnalogWatchFaceConfigActivity.class.getSimpleName();
 
-    final public static int COMPLICATION_CONFIG_REQUEST_CODE = 101;
-    final public static int UPDATE_COLORS_CONFIG_REQUEST_CODE = 102;
-    final public static int BORDER_TYPE_CONFIG_REQUEST_CODE = 103;
-    final public static int NUMBER_TYPE_CONFIG_REQUEST_CODE = 104;
-    final public static int TIME_TYPE_CONFIG_REQUEST_CODE = 105;
-
     public AnalogWatchfaceConfig config;
 
     private AnalogWatchfaceConfigViewAdapter configAdapter;

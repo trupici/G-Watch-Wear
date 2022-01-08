@@ -54,15 +54,15 @@ import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
 
 import static android.app.Activity.RESULT_OK;
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.BORDER_TYPE_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.COMPLICATION_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.config.AnalogWatchFaceConfigActivity.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_GAP_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_RING_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
+import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.COMPLICATION_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 
 public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements BackgroundChangeAware, ActivityResultAware {
 

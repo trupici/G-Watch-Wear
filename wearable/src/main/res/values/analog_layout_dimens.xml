@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!--
+        FIXME:
+        consider to move to dpi specific folders
+        or recalculate to dpi values.
+        GW4 46mm 450x450 dp-to-pixel ratio = 2.125
+    -->
+
+    <dimen name="analog_layout_left_compl_left">55px</dimen>
+    <dimen name="analog_layout_left_compl_top">213px</dimen>
+    <dimen name="analog_layout_left_compl_right">167px</dimen>
+    <dimen name="analog_layout_left_compl_bottom">325px</dimen>
+
+    <dimen name="analog_layout_right_compl_left">283px</dimen>
+    <dimen name="analog_layout_right_compl_top">213px</dimen>
+    <dimen name="analog_layout_right_compl_right">395px</dimen>
+    <dimen name="analog_layout_right_compl_bottom">325px</dimen>
+
+
+    <dimen name="analog_layout_date_panel_left">198px</dimen>
+    <dimen name="analog_layout_date_panel_top">240px</dimen>
+    <dimen name="analog_layout_date_panel_right">252px</dimen>
+    <dimen name="analog_layout_date_panel_bottom">298px</dimen>
+
+    <dimen name="analog_layout_bg_pnel_left">166px</dimen>
+    <dimen name="analog_layout_bg_panel_top">315px</dimen>
+    <dimen name="analog_layout_bg_panel_right">284px</dimen>
+    <dimen name="analog_layout_bg_panel_bottom">409px</dimen>
+    <dimen name="analog_layout_bg_panel_top_offset">25px</dimen>
+
+    <dimen name="analog_layout_bg_graph_panel_left">91px</dimen>
+    <dimen name="analog_layout_bg_graph_panel_top">85px</dimen>
+    <dimen name="analog_layout_bg_graph_panel_right">360px</dimen>
+    <dimen name="analog_layout_bg_graph_panel_bottom">195px</dimen>
+
+    <dimen name="analog_layout_bg_graph_left_padding">1px</dimen>
+    <dimen name="analog_layout_bg_graph_right_padding">1px</dimen>
+    <dimen name="analog_layout_bg_graph_top_padding">1px</dimen>
+    <dimen name="analog_layout_bg_graph_bottom_padding">1px</dimen>
+
+</resources>

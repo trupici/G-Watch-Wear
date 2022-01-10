@@ -32,6 +32,7 @@ public interface ConfigItem {
         TYPE_SWITCH,
         TYPE_PADDING,
         TYPE_BORDER_TYPE,
+        // complications specific
         TYPE_BORDER_COLOR,
         TYPE_DATA_COLOR,
         TYPE_BKG_COLOR,

@@ -29,7 +29,7 @@ import java.util.Calendar;
 
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
-import sk.trupici.gwatch.wear.config.WatchfaceConfig;
+import sk.trupici.gwatch.wear.config.HandsConfigData;
 
 public class WatchHands implements ComponentPanel {
     public static final String LOG_TAG = WatchHands.class.getSimpleName();
@@ -52,9 +52,9 @@ public class WatchHands implements ComponentPanel {
     private Bitmap secondBitmap;
     private Bitmap secondShadowBitmap;
 
-    final private WatchfaceConfig watchfaceConfig;
+    final private AnalogWatchfaceConfig watchfaceConfig;
 
-    public WatchHands(WatchfaceConfig watchfaceConfig) {
+    public WatchHands(AnalogWatchfaceConfig watchfaceConfig) {
         this.watchfaceConfig = watchfaceConfig;
     }
 
@@ -68,9 +68,7 @@ public class WatchHands implements ComponentPanel {
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-        ConfigPageData.HandsConfigData configData = (ConfigPageData.HandsConfigData)
-                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.HANDS,
-                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_HANDS_SET_IDX, AnalogWatchfaceConfig.DEF_HANDS_SET_IDX));
+        HandsConfigData configData = (HandsConfigData) watchfaceConfig.getSelectedItem(context, ConfigPageData.ConfigType.HANDS);
 
         hourBitmap = BitmapFactory.decodeResource(context.getResources(), configData.getHourHandId());
         hourShadowBitmap = configData.getHourHandShadowId() == 0 ? null

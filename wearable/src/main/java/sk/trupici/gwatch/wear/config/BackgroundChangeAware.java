@@ -16,6 +16,9 @@
 
 package sk.trupici.gwatch.wear.config;
 
+/**
+ * Interface for {@code ViewHolder}s supporting background layer
+ */
 public interface BackgroundChangeAware {
     void onBackgroundChanged();
 }

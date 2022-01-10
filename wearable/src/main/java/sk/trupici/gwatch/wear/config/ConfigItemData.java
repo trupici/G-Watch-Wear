@@ -14,15 +14,28 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.config.complications;
+package sk.trupici.gwatch.wear.config;
 
-/**
- * Used by associated watch face to let this adapter know which complication locations
- * are supported, their ids, and supported complication data types.
- */
-public enum ComplicationLocation {
-    LEFT,
-    RIGHT,
-    CENTER,
-    BOTTOM,
+public class ConfigItemData {
+    int id;
+    String label;
+    int resourceId;
+
+    public ConfigItemData(int id, String label, int resourceId) {
+        this.id = id;
+        this.label = label;
+        this.resourceId = resourceId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public int getResourceId() {
+        return resourceId;
+    }
 }

@@ -31,9 +31,7 @@ import android.support.wearable.complications.ProviderChooserIntent;
 import android.support.wearable.complications.ProviderInfoRetriever;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.concurrent.Executors;
 
@@ -43,13 +41,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.ActivityResultAware;
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.BackgroundChangeAware;
 import sk.trupici.gwatch.wear.config.BorderPickerActivity;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.ColorPickerActivity;
-import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.PickerViewHolder;
+import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
 
@@ -64,13 +61,13 @@ import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQ
 import static sk.trupici.gwatch.wear.util.CommonConstants.COMPLICATION_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 
-public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements BackgroundChangeAware, ActivityResultAware {
+public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ActivityResultAware {
 
-    final private static String LOG_TAG = ComplicationAdapter.class.getSimpleName();
+    final private static String LOG_TAG = ComplicationsConfigAdapter.class.getSimpleName();
     final private Context context;
     final private ComponentName componentName;
     final private ConfigItem[] items;
-    final private AnalogWatchfaceConfig config;
+    final private WatchfaceConfig watchfaceConfig;
 
     final private SharedPreferences prefs;
 
@@ -83,21 +80,21 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     // Maintains reference view holder to dynamically update watch face preview. Used instead of
     // notifyItemChanged(int position) to avoid flicker and re-inflating the view.
-    private ComplicationsViewHolder complicationViewHolder;
+    private ComplicationViewHolder complicationViewHolder;
 
     public ComponentName getComponentName() {
         return componentName;
     }
 
-    public ComplicationAdapter(Context context, ComponentName componentName,
-                               ConfigItem[] items, AnalogWatchfaceConfig config,
-                               SharedPreferences prefs) {
+    public ComplicationsConfigAdapter(Context context, ComponentName componentName,
+                                      ConfigItem[] items, WatchfaceConfig watchfaceConfig,
+                                      SharedPreferences prefs) {
         this.context = context;
         this.componentName = componentName;
         this.items = items;
 
         this.prefs = prefs;
-        this.config = config;
+        this.watchfaceConfig = watchfaceConfig;
 
         defaultComplicationDrawable = context.getDrawable(R.drawable.config_add_complication);
 
@@ -105,10 +102,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
         providerInfoRetriever.init();
 
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "ComplicationAdapter: pre-selecting LEFT_COMPLICATION_ID");
-        }
-        selectedComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
+        selectedComplicationId = watchfaceConfig.getDefaultComplicationId();
     }
 
 
@@ -128,14 +122,11 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         RecyclerView.ViewHolder viewHolder;
 
-//        ComplicationId defaultComplicationId = ComplicationId.LEFT_COMPLICATION_ID;
         ConfigItem.Type type = ConfigItem.Type.valueOf(viewType);
         switch (type) {
             case TYPE_COMPLICATION:
-                ComplicationConfigItem complItem = (ComplicationConfigItem) getConfigItemByType(type);
-                View layout = LayoutInflater.from(parent.getContext()).inflate(complItem.getLayoutId(), parent, false);
-                viewHolder = new ComplicationsViewHolder(context, this, layout);
-                complicationViewHolder = (ComplicationsViewHolder) viewHolder;
+                viewHolder = watchfaceConfig.createComplicationsViewHolder(this, parent);
+                complicationViewHolder = (ComplicationViewHolder) viewHolder;
                 break;
             case TYPE_BORDER_COLOR:
             case TYPE_DATA_COLOR:
@@ -187,7 +178,9 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         switch (ConfigItem.Type.valueOf(holder.getItemViewType())) {
             case TYPE_COMPLICATION:
-                onBackgroundChanged();
+                if (holder instanceof BackgroundChangeAware) {
+                    ((BackgroundChangeAware) holder).onBackgroundChanged();
+                }
                 initializeComplications();
                 break;
             case TYPE_BORDER_COLOR:
@@ -204,42 +197,6 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    @Override
-    public void onBackgroundChanged() {
-        if (complicationViewHolder == null) {
-            return;
-        }
-
-        ViewGroup bkgViewGroup = complicationViewHolder.getBackgroundViewGroup();
-        bkgViewGroup.removeAllViews();
-        addBackgroundView(bkgViewGroup,
-                config.getConfigItemData(ConfigPageData.ConfigType.BACKGROUND,
-                        prefs.getInt(config.PREF_BACKGROUND_IDX, config.DEF_BACKGROUND_IDX)
-                ).getResourceId());
-        addBackgroundView(bkgViewGroup,
-                config.getConfigItemData(ConfigPageData.ConfigType.HANDS,
-                        prefs.getInt(config.PREF_HANDS_SET_IDX, config.DEF_HANDS_SET_IDX)
-                ).getResourceId());
-    }
-
-    void addBackgroundView(ViewGroup bkgViewGroup, int resourceId) {
-        if (resourceId == 0) {
-            return;
-        }
-
-        ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "bounds: " + view.getClipBounds());
-        }
-        ImageView bkgView = view.findViewById(R.id.image);
-        bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(resourceId));
-        ImageView more = view.findViewById(R.id.label_image);
-        more.setImageDrawable(bkgViewGroup.getContext().getDrawable(R.drawable.config_more_items));
-        bkgViewGroup.addView(view);
-//            bkgViewGroup.invalidate();
-
     }
 
     @Override
@@ -335,7 +292,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return false;
         }
         BasicConfigItem item = (BasicConfigItem) getConfigItemByType(type);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + item.getPreferenceName();
+        String prefName = watchfaceConfig.getPrefsPrefix() + ComplicationConfig.getComplicationPrefix(complicationId) + item.getPreferenceName();
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "updatePreviewColors: " + prefName + " -> " + color);
         }
@@ -348,7 +305,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Log.d(LOG_TAG, "getBorderType: " + complicationId.name());
         }
         BasicConfigItem borderTypeItem = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + borderTypeItem.getPreferenceName();
+        String prefName = watchfaceConfig.getPrefsPrefix() + ComplicationConfig.getComplicationPrefix(complicationId) + borderTypeItem.getPreferenceName();
         String borderTypeName = prefs.getString(prefName, null);
         if (borderTypeName == null && borderTypeItem.getDefaultValueResourceId() != -1) {
             borderTypeName = context.getResources().getString(borderTypeItem.getDefaultValueResourceId());
@@ -364,7 +321,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Log.d(LOG_TAG, "getItemColor: " + complicationId.name() + ", " + type.name());
         }
         BasicConfigItem colorTypeItem = (BasicConfigItem) getConfigItemByType(type);
-        String prefName = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId) + colorTypeItem.getPreferenceName();
+        String prefName = watchfaceConfig.getPrefsPrefix() + ComplicationConfig.getComplicationPrefix(complicationId) + colorTypeItem.getPreferenceName();
         int defaultValue = colorTypeItem.getDefaultValueResourceId() == -1 ? Color.TRANSPARENT
                 : context.getResources().getColor(colorTypeItem.getDefaultValueResourceId(), null);
         int color = prefs.getInt(prefName, defaultValue);
@@ -461,7 +418,7 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         ComplicationId complicationId = ComplicationId.valueOf(id);
 
-        String prefix = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId);
+        String prefix = watchfaceConfig.getPrefsPrefix() + ComplicationConfig.getComplicationPrefix(complicationId);
         BasicConfigItem item = (BasicConfigItem) getConfigItemByType(ConfigItem.Type.TYPE_BORDER_TYPE);
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "updateBorderType: " + prefix + item.getPreferenceName() + " -> " + borderType);
@@ -501,12 +458,12 @@ public class ComplicationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void initializeComplications() {
 
-        final int[] complicationIds = Config.getComplicationIds();
+        final int[] complicationIds = watchfaceConfig.getComplicationIds();
 
         for (int id : complicationIds) {
             ComplicationId complicationId = ComplicationId.valueOf(id);
 
-            String prefix = config.PREF_PREFIX + ComplicationConfig.getComplicationPrefix(complicationId);
+            String prefix = watchfaceConfig.getPrefsPrefix() + ComplicationConfig.getComplicationPrefix(complicationId);
             if (BuildConfig.DEBUG) {
                 Log.d(LOG_TAG, "initializeComplications: " + complicationId.name() + ", " + prefix);
             }

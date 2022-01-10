@@ -22,17 +22,6 @@ import sk.trupici.gwatch.wear.config.item.ConfigItem;
  * Data for Complications Preview item in RecyclerView.
  */
 public class ComplicationConfigItem implements ConfigItem {
-
-    final private int layoutId;
-
-    public ComplicationConfigItem(int layoutId) {
-        this.layoutId = layoutId;
-    }
-
-    public int getLayoutId() {
-        return layoutId;
-    }
-
     @Override
     public Type getConfigType() {
         return Type.TYPE_COMPLICATION;

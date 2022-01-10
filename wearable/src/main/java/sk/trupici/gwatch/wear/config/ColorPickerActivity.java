@@ -36,6 +36,9 @@ import androidx.core.view.InputDeviceCompat;
 import androidx.core.view.MotionEventCompat;
 import sk.trupici.gwatch.wear.R;
 
+/**
+ * Picker {@code Activity} to select a color
+ */
 public class ColorPickerActivity extends Activity implements ColorPicker.OnColorChangedListener {
 
     public static final String EXTRA_ITEM_ID = "itemId";

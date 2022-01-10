@@ -18,6 +18,10 @@ package sk.trupici.gwatch.wear.config.item;
 
 public class BoolConfigItem extends BasicConfigItem {
     public BoolConfigItem(int labelResourceId, String preferenceName, Type type, int defaultValueResourceId) {
-        super(labelResourceId, -1, preferenceName, type, defaultValueResourceId);
+        this(labelResourceId, preferenceName, type, defaultValueResourceId, false);
+    }
+
+    public BoolConfigItem(int labelResourceId, String preferenceName, Type type, int defaultValueResourceId, boolean isGlobal) {
+        super(labelResourceId, -1, preferenceName, type, defaultValueResourceId, isGlobal);
     }
 }

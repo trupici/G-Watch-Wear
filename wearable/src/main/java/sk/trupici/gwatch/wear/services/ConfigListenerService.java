@@ -96,6 +96,7 @@ public class ConfigListenerService extends WearableListenerService {
             }
 
             // notify watchface that config has changed
+            // FIXME - change to LocalBroadcast and single receivers
             edit.putLong(PREF_CONFIG_CHANGED, System.currentTimeMillis());
             edit.apply();
         } finally {

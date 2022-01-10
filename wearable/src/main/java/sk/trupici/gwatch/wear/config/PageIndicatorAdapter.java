@@ -26,6 +26,9 @@ import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.R;
 
+/**
+ * Adapter class for active page index indicator
+ */
 public class PageIndicatorAdapter extends ViewPager2.OnPageChangeCallback {
 
     final private ViewGroup indicatorView;

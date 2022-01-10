@@ -15,14 +15,13 @@
  limitations under the License.
 -->
 <resources>
-    <color name="def_date_background_color">#00000000</color>
-    <color name="def_date_month_color">#FFFC0709</color>
-    <color name="def_date_day_of_week_color">#FFFC0709</color>
-    <color name="def_date_day_of_month_color">#FFFCFCFC</color>
 
-    <color name="def_date_border_color">#00000000</color>
-    <string name="def_date_border_type" translatable="false">NONE</string>
+    <bool name="def_time_show_seconds">true</bool>
 
-    <bool name="def_date_show_month">false</bool>
+    <color name="def_time_background_color">#00000000</color>
+    <color name="def_time_text_color">#FFFCFCFC</color>
+
+    <color name="def_time_border_color">#00000000</color>
+    <string name="def_time_border_type" translatable="false">NONE</string>
 
 </resources>

@@ -51,39 +51,71 @@
 
         <service
             android:name=".watchface.AnalogWatchfaceService"
-            android:label="@string/standard_analog_name"
+            android:label="@string/analog_watchface_name"
             android:permission="android.permission.BIND_WALLPAPER"
             android:exported="true"
             >
 
             <meta-data
                 android:name="android.service.wallpaper"
-                android:resource="@xml/standard_analog_watch_face" />
+                android:resource="@xml/analog_watchface" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
                 android:resource="@drawable/preview_analog" />
 
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
-                android:value="sk.trupici.gwatch.wear.CONFIG_STD_ANALOG" />
+                android:value="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
+        </service>
+
+        <activity
+            android:name=".config.AnalogWatchfaceConfigActivity"
+            android:label="@string/analog_config_name"
+            android:exported="true"
+            >
             <intent-filter>
-                <action android:name="test.alarm.result" />
+                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />
+                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".watchface.DigitalWatchfaceService"
+            android:label="@string/digital_watchface_name"
+            android:permission="android.permission.BIND_WALLPAPER"
+            android:exported="true"
+            >
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/digital_watchface" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview"
+                android:resource="@drawable/preview_analog" />
+
+            <meta-data
+                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value="sk.trupici.gwatch.wear.CONFIG_WATCH_DIGITAL" />
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
 
         <activity
-            android:name=".config.AnalogWatchFaceConfigActivity"
-            android:label="@string/standard_analog_config_name"
+            android:name=".config.DigitalWatchfaceConfigActivity"
+            android:label="@string/digital_config_name"
             android:exported="true"
             >
             <intent-filter>
-                <action android:name="sk.trupici.gwatch.wear.CONFIG_STD_ANALOG" />
+                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_DIGITAL" />
                 <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -91,13 +123,13 @@
 
         <activity
             android:name=".config.ColorPickerActivity"
-            android:label="@string/standard_analog_config_name"
+            android:label="@string/digital_config_name"
             android:exported="true"
             >
         </activity>
         <activity
             android:name=".config.BorderPickerActivity"
-            android:label="@string/standard_analog_config_name"
+            android:label="@string/digital_config_name"
             android:exported="true"
             >
         </activity>

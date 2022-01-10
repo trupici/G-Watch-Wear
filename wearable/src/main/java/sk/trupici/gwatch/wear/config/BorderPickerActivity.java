@@ -32,6 +32,9 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.item.BorderConfigItem;
 import sk.trupici.gwatch.wear.config.menu.BorderTypeMenuItems;
 
+/**
+ * Picker {@code Activity} to select a {@link BorderType}
+ */
 public class BorderPickerActivity extends Activity {
 
     public static final String EXTRA_ITEM_ID = "itemId";
@@ -59,7 +62,7 @@ public class BorderPickerActivity extends Activity {
             borderType = BorderType.NONE;
         }
 
-        setContentView(R.layout.activity_border_selection_config);
+        setContentView(R.layout.layout_border_picker);
 
         WearableRecyclerView recyclerView = findViewById(R.id.wearable_recycler_view);
 

@@ -32,7 +32,6 @@ import java.util.Date;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
@@ -47,85 +46,84 @@ public class BgAlarmController extends BroadcastReceiver {
 
     public static final int CONFIG_ID = 15;
 
-    public static final String PREF_NEW_VALUE_NOTIFICATION_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "notification_new_value_enabled";
+    public static final String PREF_NEW_VALUE_NOTIFICATION_ENABLED = "notification_new_value_enabled";
 
-    public static final String PREF_ENABLE_ALARMS = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable";
-    public static final String PREF_ENABLE_TIME_RANGE = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_time_range";
-    public static final String PREF_ENABLE_FROM = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_from";
-    public static final String PREF_ENABLE_TO = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_to";
+    public static final String PREF_ENABLE_ALARMS = "alarm_enable";
+    public static final String PREF_ENABLE_TIME_RANGE = "alarm_enable_time_range";
+    public static final String PREF_ENABLE_FROM = "alarm_enable_from";
+    public static final String PREF_ENABLE_TO = "alarm_enable_to";
 
-    public static final String PREF_ENABLE_SOUND = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_sound";
-    public static final String PREF_ENABLE_SOUND_TIME_RANGE = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_sound_time_range";
-    public static final String PREF_ENABLE_SOUND_FROM = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_sound_from";
-    public static final String PREF_ENABLE_SOUND_TO = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_enable_sound_to";
+    public static final String PREF_ENABLE_SOUND = "alarm_enable_sound";
+    public static final String PREF_ENABLE_SOUND_TIME_RANGE = "alarm_enable_sound_time_range";
+    public static final String PREF_ENABLE_SOUND_FROM = "alarm_enable_sound_from";
+    public static final String PREF_ENABLE_SOUND_TO = "alarm_enable_sound_to";
 
-    public static final String PREF_CRITICAL_ALARMS_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_enabled";
-    public static final String PREF_CRITICAL_ALARMS_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_duration";
-    public static final String PREF_CRITICAL_ALARMS_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_snooze_time";
-    public static final String PREF_CRITICAL_ALARMS_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_intensity";
-    public static final String PREF_CRITICAL_ALARMS_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_period";
-    public static final String PREF_CRITICAL_ALARMS_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_sound_enabled";
-    public static final String PREF_CRITICAL_ALARMS_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_critical_sound_volume";
+    public static final String PREF_CRITICAL_ALARMS_ENABLED = "alarm_critical_enabled";
+    public static final String PREF_CRITICAL_ALARMS_DURATION = "alarm_critical_duration";
+    public static final String PREF_CRITICAL_ALARMS_SNOOZE_TIME = "alarm_critical_snooze_time";
+    public static final String PREF_CRITICAL_ALARMS_INTENSITY = "alarm_critical_intensity";
+    public static final String PREF_CRITICAL_ALARMS_PERIOD = "alarm_critical_period";
+    public static final String PREF_CRITICAL_ALARMS_SOUND_ENABLED = "alarm_critical_sound_enabled";
+    public static final String PREF_CRITICAL_ALARMS_SOUND_VOLUME = "alarm_critical_sound_volume";
 
-    public static final String PREF_HYPER_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_enabled";
-    public static final String PREF_HYPER_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_duration";
-    public static final String PREF_HYPER_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_snooze_time";
-    public static final String PREF_HYPER_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_intensity";
-    public static final String PREF_HYPER_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_period";
-    public static final String PREF_HYPER_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_sound_enabled";
-    public static final String PREF_HYPER_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hyper_sound_volume";
+    public static final String PREF_HYPER_ALARM_ENABLED = "alarm_hyper_enabled";
+    public static final String PREF_HYPER_ALARM_DURATION = "alarm_hyper_duration";
+    public static final String PREF_HYPER_ALARM_SNOOZE_TIME = "alarm_hyper_snooze_time";
+    public static final String PREF_HYPER_ALARM_INTENSITY = "alarm_hyper_intensity";
+    public static final String PREF_HYPER_ALARM_PERIOD = "alarm_hyper_period";
+    public static final String PREF_HYPER_ALARM_SOUND_ENABLED = "alarm_hyper_sound_enabled";
+    public static final String PREF_HYPER_ALARM_SOUND_VOLUME = "alarm_hyper_sound_volume";
 
-    public static final String PREF_HIGH_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_enabled";
-    public static final String PREF_HIGH_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_duration";
-    public static final String PREF_HIGH_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_snooze_time";
-    public static final String PREF_HIGH_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_intensity";
-    public static final String PREF_HIGH_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_period";
-    public static final String PREF_HIGH_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_sound_enabled";
-    public static final String PREF_HIGH_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_high_sound_volume";
+    public static final String PREF_HIGH_ALARM_ENABLED = "alarm_high_enabled";
+    public static final String PREF_HIGH_ALARM_DURATION = "alarm_high_duration";
+    public static final String PREF_HIGH_ALARM_SNOOZE_TIME = "alarm_high_snooze_time";
+    public static final String PREF_HIGH_ALARM_INTENSITY = "alarm_high_intensity";
+    public static final String PREF_HIGH_ALARM_PERIOD = "alarm_high_period";
+    public static final String PREF_HIGH_ALARM_SOUND_ENABLED = "alarm_high_sound_enabled";
+    public static final String PREF_HIGH_ALARM_SOUND_VOLUME = "alarm_high_sound_volume";
 
-    public static final String PREF_LOW_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_enabled";
-    public static final String PREF_LOW_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_duration";
-    public static final String PREF_LOW_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_snooze_time";
-    public static final String PREF_LOW_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_intensity";
-    public static final String PREF_LOW_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_period";
-    public static final String PREF_LOW_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_sound_enabled";
-    public static final String PREF_LOW_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_low_sound_volume";
+    public static final String PREF_LOW_ALARM_ENABLED = "alarm_low_enabled";
+    public static final String PREF_LOW_ALARM_DURATION = "alarm_low_duration";
+    public static final String PREF_LOW_ALARM_SNOOZE_TIME = "alarm_low_snooze_time";
+    public static final String PREF_LOW_ALARM_INTENSITY = "alarm_low_intensity";
+    public static final String PREF_LOW_ALARM_PERIOD = "alarm_low_period";
+    public static final String PREF_LOW_ALARM_SOUND_ENABLED = "alarm_low_sound_enabled";
+    public static final String PREF_LOW_ALARM_SOUND_VOLUME = "alarm_low_sound_volume";
 
-    public static final String PREF_HYPO_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_enabled";
-    public static final String PREF_HYPO_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_duration";
-    public static final String PREF_HYPO_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_snooze_time";
-    public static final String PREF_HYPO_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_intensity";
-    public static final String PREF_HYPO_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_period";
-    public static final String PREF_HYPO_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_sound_enabled";
-    public static final String PREF_HYPO_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_hypo_sound_volume";
+    public static final String PREF_HYPO_ALARM_ENABLED = "alarm_hypo_enabled";
+    public static final String PREF_HYPO_ALARM_DURATION = "alarm_hypo_duration";
+    public static final String PREF_HYPO_ALARM_SNOOZE_TIME = "alarm_hypo_snooze_time";
+    public static final String PREF_HYPO_ALARM_INTENSITY = "alarm_hypo_intensity";
+    public static final String PREF_HYPO_ALARM_PERIOD = "alarm_hypo_period";
+    public static final String PREF_HYPO_ALARM_SOUND_ENABLED = "alarm_hypo_sound_enabled";
+    public static final String PREF_HYPO_ALARM_SOUND_VOLUME = "alarm_hypo_sound_volume";
 
-    public static final String PREF_NO_DATA_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_enabled";
-    public static final String PREF_NO_DATA_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_duration";
-    public static final String PREF_NO_DATA_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_snooze_time";
-    public static final String PREF_NO_DATA_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_intensity";
-    public static final String PREF_NO_DATA_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_period";
-    public static final String PREF_NO_DATA_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_sound_enabled";
-    public static final String PREF_NO_DATA_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_sound_volume";
-    public static final String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_threshold";
+    public static final String PREF_NO_DATA_ALARM_ENABLED = "alarm_no_data_enabled";
+    public static final String PREF_NO_DATA_ALARM_DURATION = "alarm_no_data_duration";
+    public static final String PREF_NO_DATA_ALARM_SNOOZE_TIME = "alarm_no_data_snooze_time";
+    public static final String PREF_NO_DATA_ALARM_INTENSITY = "alarm_no_data_intensity";
+    public static final String PREF_NO_DATA_ALARM_PERIOD = "alarm_no_data_period";
+    public static final String PREF_NO_DATA_ALARM_SOUND_ENABLED = "alarm_no_data_sound_enabled";
+    public static final String PREF_NO_DATA_ALARM_SOUND_VOLUME = "alarm_no_data_sound_volume";
 
-    public static final String PREF_FAST_DROP_ALARM_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_enabled";
-    public static final String PREF_FAST_DROP_ALARM_DURATION = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_duration";
-    public static final String PREF_FAST_DROP_ALARM_SNOOZE_TIME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_snooze_time";
-    public static final String PREF_FAST_DROP_ALARM_INTENSITY = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_intensity";
-    public static final String PREF_FAST_DROP_ALARM_PERIOD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_period";
-    public static final String PREF_FAST_DROP_ALARM_SOUND_ENABLED = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_sound_enabled";
-    public static final String PREF_FAST_DROP_ALARM_SOUND_VOLUME = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_sound_volume";
-    public static final String PREF_FAST_DROP_ALARM_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_threshold";
+    public static final String PREF_FAST_DROP_ALARM_ENABLED = "alarm_fast_drop_enabled";
+    public static final String PREF_FAST_DROP_ALARM_DURATION = "alarm_fast_drop_duration";
+    public static final String PREF_FAST_DROP_ALARM_SNOOZE_TIME = "alarm_fast_drop_snooze_time";
+    public static final String PREF_FAST_DROP_ALARM_INTENSITY = "alarm_fast_drop_intensity";
+    public static final String PREF_FAST_DROP_ALARM_PERIOD = "alarm_fast_drop_period";
+    public static final String PREF_FAST_DROP_ALARM_SOUND_ENABLED = "alarm_fast_drop_sound_enabled";
+    public static final String PREF_FAST_DROP_ALARM_SOUND_VOLUME = "alarm_fast_drop_sound_volume";
+    public static final String PREF_FAST_DROP_ALARM_THRESHOLD = "alarm_fast_drop_threshold";
 
-    public static final String PREF_LAST_SNOOZED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_last_snoozed_at";
-    public static final String PREF_LAST_TRIGGERED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_last_triggered_at";
-    public static final String PREF_LAST_ALARM_TYPE = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_last_alarm_type";
+    public static final String PREF_LAST_SNOOZED_AT = "alarm_last_snoozed_at";
+    public static final String PREF_LAST_TRIGGERED_AT = "alarm_last_triggered_at";
+    public static final String PREF_LAST_ALARM_TYPE = "alarm_last_alarm_type";
 
-    public static final String PREF_NO_DATA_LAST_SNOOZED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_last_snoozed_at";
-    public static final String PREF_NO_DATA_LAST_TRIGGERED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_no_data_last_triggered_at";
+    public static final String PREF_NO_DATA_LAST_SNOOZED_AT = "alarm_no_data_last_snoozed_at";
+    public static final String PREF_NO_DATA_LAST_TRIGGERED_AT = "alarm_no_data_last_triggered_at";
 
-    public static final String PREF_FAST_DROP_LAST_SNOOZED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_last_snoozed_at";
-    public static final String PREF_FAST_DROP_LAST_TRIGGERED_AT = AnalogWatchfaceConfig.PREF_PREFIX + "alarm_fast_drop_last_triggered_at";
+    public static final String PREF_FAST_DROP_LAST_SNOOZED_AT = "alarm_fast_drop_last_snoozed_at";
+    public static final String PREF_FAST_DROP_LAST_TRIGGERED_AT = "alarm_fast_drop_last_triggered_at";
 
     private static final String WAKE_LOCK_TAG = "gwatch.wear:" + BgAlarmController.class.getSimpleName() + ".wake_lock";
     private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 60s
@@ -307,7 +305,7 @@ public class BgAlarmController extends BroadcastReceiver {
         noDataConfig.intensity = sharedPrefs.getInt(PREF_NO_DATA_ALARM_INTENSITY, defaultIntensity);
         noDataConfig.soundEnabled = sharedPrefs.getBoolean(PREF_NO_DATA_ALARM_SOUND_ENABLED, defaultSoundEnabled);
         noDataConfig.volume = sharedPrefs.getInt(PREF_NO_DATA_ALARM_SOUND_VOLUME, defaultVolume) / 100f;
-        noDataConfig.threshold = sharedPrefs.getInt(PREF_NO_DATA_THRESHOLD, res.getInteger(R.integer.def_bg_threshold_no_data));
+        noDataConfig.threshold = sharedPrefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, res.getInteger(R.integer.def_bg_threshold_no_data));
 
         fastDropConfig.enabled = sharedPrefs.getBoolean(PREF_FAST_DROP_ALARM_ENABLED, res.getBoolean(R.bool.def_alarms_hyper_enabled));
         fastDropConfig.duration = sharedPrefs.getInt(PREF_FAST_DROP_ALARM_DURATION, res.getInteger(R.integer.def_alarms_fast_drop_duration));

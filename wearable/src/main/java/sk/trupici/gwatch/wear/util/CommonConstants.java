@@ -16,8 +16,6 @@
 
 package sk.trupici.gwatch.wear.util;
 
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
-
 public interface CommonConstants {
     String BG_RECEIVER_ACTION = "sk.trupici.gwatch.wear.BG_RECEIVER_ACTION";
 
@@ -29,15 +27,15 @@ public interface CommonConstants {
     int DAY_IN_MINUTES = 1440; // 24 * 60
     long DAY_IN_MILLIS = 86400000L; // 24 * 60 * 60 * 1000
 
-    String PREF_IS_UNIT_CONVERSION = AnalogWatchfaceConfig.PREF_PREFIX + "bg_is_unit_conversion";
+    String PREF_IS_UNIT_CONVERSION = "bg_is_unit_conversion";
 
-    String PREF_HYPER_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hyper";
-    String PREF_HIGH_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_high";
-    String PREF_LOW_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_low";
-    String PREF_HYPO_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_hypo";
-    String PREF_NO_DATA_THRESHOLD = AnalogWatchfaceConfig.PREF_PREFIX + "bg_threshold_no_data";
+    String PREF_HYPER_THRESHOLD = "bg_threshold_hyper";
+    String PREF_HIGH_THRESHOLD = "bg_threshold_high";
+    String PREF_LOW_THRESHOLD = "bg_threshold_low";
+    String PREF_HYPO_THRESHOLD = "bg_threshold_hypo";
+    String PREF_NO_DATA_THRESHOLD = "bg_threshold_no_data";
 
-    String PREF_CONFIG_CHANGED = AnalogWatchfaceConfig.PREF_PREFIX + "config_changed";
+    String PREF_CONFIG_CHANGED = "config_changed";
 
     int COMPLICATION_CONFIG_REQUEST_CODE = 101;
     int UPDATE_COLORS_CONFIG_REQUEST_CODE = 102;

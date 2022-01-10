@@ -16,7 +16,19 @@
 
 package sk.trupici.gwatch.wear.config;
 
+import android.content.Context;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.view.ViewGroup;
+
+import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
+import sk.trupici.gwatch.wear.config.complications.ComplicationId;
+import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
+import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigAdapter;
+
 public interface WatchfaceConfig {
+
+    String PREF_BACKGROUND_IDX = "background_idx";
 
     /**
      * Get number of configuration pages available in config
@@ -40,17 +52,86 @@ public interface WatchfaceConfig {
     ConfigPageData getPageData(ConfigPageData.ConfigType type);
 
     /**
-     * Get configuration data of specified type at given position
-     * @param type {@link ConfigPageData.ConfigType configuration data type}
-     * @param index item index (view position)
-     * @return
+     * Get prefix of all preferences belonging to this configuration
+     * @return prefix of all preferences belonging to this configuration
      */
-    ConfigPageData.ConfigItemData getConfigItemData(ConfigPageData.ConfigType type, int index);
+    String getPrefsPrefix();
 
     /**
-     * Get configuration data shared preference name
-     * @param type {@link ConfigPageData.ConfigType configuration data type}
-     * @return shared preference name assigned to this config data type
+     * Creates {@code ComplicationViewHolder} for the watch face complication layout
+     * @param adapter {@code Adapter} handling the new view holder
+     * @param parent parent view group
      */
-    String getPrefName(ConfigPageData.ConfigType type);
+    ComplicationViewHolder createComplicationsViewHolder(ComplicationsConfigAdapter adapter, ViewGroup parent);
+
+    /**
+     * Get all items of specified type configured for this watch face
+     * @param type item type
+     * @return array of configured items or an empty arrays
+     */
+    ConfigItemData[] getItems(ConfigPageData.ConfigType type);
+
+    /**
+     * Get selected item of specified type
+     * @param context context
+     * @param type item type
+     * @return selected item or an item with default index if nothing is selected
+     * or null if there is no item of such type configured
+     */
+    ConfigItemData getSelectedItem(Context context, ConfigPageData.ConfigType type);
+
+    /**
+     * Get the selected index to array of items of specified type
+     * @param context context
+     * @param type item type
+     * @return index of selected item or default index if nothing is selected
+     */
+    int getSelectedIdx(Context context, ConfigPageData.ConfigType type);
+
+    /**
+     * set the selected index to array of items of specified type
+     * @param context context
+     * @param type item type
+     * @param idx selected item index to set
+     */
+    void setSelectedIdx(Context context, ConfigPageData.ConfigType type, int idx);
+
+    /**
+     * @return array of configured complication ids or empty array if no complication is configured
+     */
+    int[] getComplicationIds();
+
+    /**
+     * @return {@code ComplicationConfig} for the complication with specified id
+     */
+    ComplicationConfig getComplicationConfig(ComplicationId id);
+
+    /**
+     * @return array of all {@code ComplicationConfig}s configured for this watch face
+     */
+    ComplicationConfig[] getComplicationConfigs();
+
+    /**
+     * @return id of complication to preselect on configuration page
+     */
+    ComplicationId getDefaultComplicationId();
+
+    /**
+     * Get specific boolean preference default value, e.g. dependant on context
+     * @param prefName preference name
+     * @return specific boolean preference default value
+     */
+    boolean getBoolPrefDefaultValue(Context context, String prefName);
+
+    /**
+     * Get watch face specific BG Panel layout attributes
+     */
+    RectF getBgPanelBounds(Context context);
+    float getBgPanelTopOffset(Context context);
+
+    /**
+     * Get watch face specific BG Graph layout attributes
+     */
+    RectF getBgGraphBounds(Context context);
+    Rect getBgGraphPadding(Context context);
 }

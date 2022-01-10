@@ -18,6 +18,9 @@ package sk.trupici.gwatch.wear.config;
 
 import android.content.Intent;
 
+/**
+ * Interface for {@code Adapter}s handling the result of activities invoked to enter/change {@code ConfigItem} value
+ */
 public interface ActivityResultAware {
     /**
      * @return true if the activity result was processed successfully and the view should be scrolled to the very first position

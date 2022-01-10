@@ -48,6 +48,11 @@ public class PreferenceUtils {
         return prefs.getInt(prefName, defValue);
     }
 
+    public static void setIntValue(Context context, String prefName, int value) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putInt(prefName, value).commit();
+    }
+
     public static int getStringValueAsInt(Context context, String prefName, int defValue) {
         return getStringValueAsInt(PreferenceManager.getDefaultSharedPreferences(context), prefName, defValue);
     }

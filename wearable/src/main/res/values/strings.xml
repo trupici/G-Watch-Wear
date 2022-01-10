@@ -18,26 +18,28 @@
     <string name="app_name" translatable="false">G-Watch Wear App</string>
     <string name="provider_name" translatable="false">G-Watch BG Provider</string>
 
-    <string name="standard_analog_name">G-Watch</string>
-    <string name="standard_analog_config_name">G-Watch Config</string>
-    <string name="color_config_name">G-Watch Color Config</string>
+    <string name="analog_watchface_name">G-Watch Analog</string>
+    <string name="analog_config_name">G-Watch Digital Config</string>
+    <string name="digital_watchface_name">G-Watch Digital</string>
+    <string name="digital_config_name">G-Watch Digital Config</string>
 
-    <string name="standard_analog_complication_preferences_key">sk.trupici.gwatch.wear.STANDARD_ANALOG_COMPLICATION_PREFERENCES_KEY</string>
+    <string name="color_config_name">G-Watch Color Config</string>
 
     <string name="add_complication">Add Complication</string>
     <string name="edit_complication">Edit Complication</string>
 
-    <string name="config_page_title_bkg">Palette</string>
+    <string name="config_page_title_bkg">Background</string>
     <string name="config_page_title_hands">Hands</string>
     <string name="config_page_title_complications">Complications</string>
     <string name="config_page_title_bg_graph">Graph</string>
     <string name="config_page_title_bg_panel">BG Panel</string>
     <string name="config_page_title_date_panel">Date Panel</string>
     <string name="config_page_title_alarms">Alarms</string>
+    <string name="config_page_title_time_panel">Time Panel</string>
 
     <string name="config_item_border_shape_label">Border shape</string>
     <string name="config_item_border_color_label">Border color</string>
-    <string name="config_item_text_color_label">Data color</string>
+    <string name="config_item_text_color_label">Text color</string>
     <string name="config_item_bkg_color_label">Background color</string>
 
     <string name="config_item_bg_critical_color_label">Critical color</string>
@@ -80,6 +82,9 @@
     <string name="config_item_alarms_enable_no_data_alarm">No data alarm</string>
     <string name="config_item_alarms_enable_no_data_sound">No data alarm sound</string>
     <string name="config_item_alarms_enable_new_data_notifications">New data notifications</string>
+
+    <string name="config_item_time_show_seconds">Show seconds</string>
+    <string name="config_item_time_24hr_time">24 hours format</string>
 
     <string name="border_type_none">No border</string>
     <string name="border_type_rect">Rect</string>

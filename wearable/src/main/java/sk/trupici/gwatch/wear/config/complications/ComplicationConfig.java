@@ -30,35 +30,47 @@ public class ComplicationConfig {
 
     final public static String LEFT_PREFIX = "left_";
     final public static String RIGHT_PREFIX = "right_";
+    final public static String TOP_LEFT_PREFIX = "top_left_";
+    final public static String TOP_RIGHT_PREFIX = "top_right_";
+    final public static String BOTTOM_LEFT_PREFIX = "bottom_left_";
+    final public static String BOTTOM_RIGHT_PREFIX = "bottom_right_";
+    final public static String TOP_PREFIX = "top_";
     final public static String CENTER_PREFIX = "center_";
     final public static String BOTTOM_PREFIX = "bottom_";
 
     final public static String NO_DATA_TEXT = "--";
 
     private final ComplicationId id;
-    private final ComplicationLocation location;
     private final int[] supportedTypes;
     private ComplicationDrawable complicationDrawable;
 
-
     public static String getComplicationPrefix(ComplicationId complicationId) {
         switch (complicationId) {
-            case LEFT_COMPLICATION_ID:
+            case LEFT:
                 return LEFT_PREFIX;
-            case RIGHT_COMPLICATION_ID:
+            case RIGHT:
                 return RIGHT_PREFIX;
-            case CENTER_COMPLICATION_ID:
+            case TOP_LEFT:
+                return TOP_LEFT_PREFIX;
+            case TOP_RIGHT:
+                return TOP_RIGHT_PREFIX;
+            case BOTTOM_LEFT:
+                return BOTTOM_LEFT_PREFIX;
+            case BOTTOM_RIGHT:
+                return BOTTOM_RIGHT_PREFIX;
+            case TOP:
+                return TOP_PREFIX;
+            case CENTER:
                 return CENTER_PREFIX;
-            case BOTTOM_COMPLICATION_ID:
+            case BOTTOM:
                 return BOTTOM_PREFIX;
             default:
                 return "";
         }
     }
 
-    public ComplicationConfig(ComplicationId id, ComplicationLocation location, @NonNull int[] supportedTypes) {
+    public ComplicationConfig(ComplicationId id, @NonNull int[] supportedTypes) {
         this.id = id;
-        this.location = location;
         this.supportedTypes = supportedTypes;
     }
 
@@ -68,10 +80,6 @@ public class ComplicationConfig {
 
     public ComplicationId getComplicationId() {
         return id;
-    }
-
-    public ComplicationLocation getLocation() {
-        return location;
     }
 
     public int[] getSupportedTypes() {

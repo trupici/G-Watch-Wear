@@ -25,7 +25,7 @@ import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 
 public class ComplicationsMenuItems {
     final public static ConfigItem[] items = {
-            new ComplicationConfigItem(R.layout.config_list_complications_preview_item),
+            new ComplicationConfigItem(),
             new BasicConfigItem(
                     R.string.config_item_border_shape_label,
                     R.drawable.config_border_rect_24,

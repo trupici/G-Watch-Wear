@@ -23,12 +23,15 @@ import androidx.annotation.NonNull;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
 
-public class ListConfigViewHolder extends WearableRecyclerView.ViewHolder {
+/**
+ * {@code ViewHolder} holding a config page with {@code ConfigItem} list
+ */
+public class ConfigItemListPageViewHolder extends WearableRecyclerView.ViewHolder {
     final private TextView title;
     final private WearableRecyclerView recyclerView;
     final private int viewId;
 
-    public ListConfigViewHolder(@NonNull View itemView) {
+    public ConfigItemListPageViewHolder(@NonNull View itemView) {
         super(itemView);
         title = itemView.findViewById(R.id.page_title);
         recyclerView = itemView.findViewById(R.id.wearable_recycler_view);

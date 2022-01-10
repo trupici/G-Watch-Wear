@@ -32,8 +32,8 @@ import android.util.Log;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.BorderType;
+import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.Trend;
@@ -58,14 +58,19 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     public static final int CONFIG_ID = 13;
 
-    public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_background";
-    public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_critical";
-    public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_warn";
-    public static final String PREF_IN_RANGE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_in_range";
-    public static final String PREF_NO_DATA_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_color_no_data";
+    public static final String PREF_BKG_COLOR = "bg_color_background";
+    public static final String PREF_CRITICAL_COLOR = "bg_color_critical";
+    public static final String PREF_WARN_COLOR = "bg_color_warn";
+    public static final String PREF_IN_RANGE_COLOR = "bg_color_in_range";
+    public static final String PREF_NO_DATA_COLOR = "bg_color_no_data";
 
-    public static final String PREF_BORDER_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_color";
-    public static final String PREF_BORDER_TYPE = AnalogWatchfaceConfig.PREF_PREFIX + "bg_border_type";
+    public static final String PREF_BORDER_COLOR = "bg_border_color";
+    public static final String PREF_BORDER_TYPE = "bg_border_type";
+
+    final private int refScreenWidth;
+    final private int refScreenHeight;
+
+    final private WatchfaceConfig watchfaceConfig;
 
     private RectF sizeFactors;
     private float topOffset;
@@ -78,9 +83,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private BgData lastBgData;
 
     boolean isUnitConversion;
-
-    final private int refScreenWidth;
-    final private int refScreenHeight;
 
     private int backgroundColor;
     private int criticalColor;
@@ -97,9 +99,10 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private int borderColor;
     private BorderType borderType;
 
-    public BgPanel(int screenWidth, int screenHeight) {
+    public BgPanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
+        this.watchfaceConfig = watchfaceConfig;
         lastBgData = new BgData(0, 0, 0 , 0, Trend.UNKNOWN);
     }
 
@@ -111,14 +114,15 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
+        RectF bounds = watchfaceConfig.getBgPanelBounds(context);
         sizeFactors = new RectF(
-                context.getResources().getDimension(R.dimen.layout_bg_pnel_left) / (float)refScreenWidth,
-                context.getResources().getDimension(R.dimen.layout_bg_panel_top) / (float)refScreenHeight,
-                context.getResources().getDimension(R.dimen.layout_bg_panel_right) / (float)refScreenWidth,
-                context.getResources().getDimension(R.dimen.layout_bg_panel_bottom) / (float)refScreenHeight
+                bounds.left / (float)refScreenWidth,
+                bounds.top / (float)refScreenHeight,
+                bounds.right / (float)refScreenWidth,
+                bounds.bottom / (float)refScreenHeight
         );
-        topOffset = context.getResources().getDimension(R.dimen.layout_bg_panel_top_offset);
-        Log.w(LOG_TAG, "Rect: " + sizeFactors);
+        topOffset = watchfaceConfig.getBgPanelTopOffset(context);
+        Log.w(LOG_TAG, "Rect: " + sizeFactors + ", offset: " + topOffset);
 
         paint = new TextPaint();
         paint.setAntiAlias(true);
@@ -138,7 +142,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
         Log.d(LOG_TAG, "onConfigChanged: ");
 
-        isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
+        isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION,
+                context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
 
         // thresholds
         hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
@@ -148,15 +153,15 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         noDataThreshold = sharedPrefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
 
         // colors
-        backgroundColor = sharedPrefs.getInt(PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));
-        criticalColor = sharedPrefs.getInt(PREF_CRITICAL_COLOR, context.getColor(R.color.def_bg_critical));
-        warnColor = sharedPrefs.getInt(PREF_WARN_COLOR, context.getColor(R.color.def_bg_warn));
-        inRangeColor = sharedPrefs.getInt(PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range));
-        noDataColor = sharedPrefs.getInt(PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
+        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));
+        criticalColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_COLOR, context.getColor(R.color.def_bg_critical));
+        warnColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_WARN_COLOR, context.getColor(R.color.def_bg_warn));
+        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range));
+        noDataColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
 
         // border
-        borderColor = sharedPrefs.getInt(PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
-        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
+        borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
+        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
 
         onDataUpdate(context, lastBgData);
     }

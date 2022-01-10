@@ -26,7 +26,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
- * Simple 2-state switch config item view holder
+ * Simple 2-state switch view holder for bound {@code ConfigItem}
  */
 public class SwitchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -40,13 +40,12 @@ public class SwitchViewHolder extends RecyclerView.ViewHolder implements View.On
         view.setOnClickListener(this);
     }
 
-    public void init(int labelId, String prefName, int defaultValueId) {
+    public void init(int labelId, String prefName, boolean defaultValue) {
         this.prefName = prefName;
 
         Context context = button.getContext();
         button.setText(context.getString(labelId));
 
-        boolean defaultValue = defaultValueId != -1 && context.getResources().getBoolean(defaultValueId);
         boolean isOn = PreferenceUtils.isConfigured(button.getContext(), prefName, defaultValue);
         button.setChecked(isOn);
     }

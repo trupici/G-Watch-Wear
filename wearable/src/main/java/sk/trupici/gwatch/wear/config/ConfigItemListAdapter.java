@@ -37,21 +37,26 @@ import static android.app.Activity.RESULT_OK;
 import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQUEST_CODE;
 import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 
-public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ActivityResultAware {
+/**
+ * {@code Adapter} for {@code ConfigItem} list
+ */
+public class ConfigItemListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ActivityResultAware {
 
-    final private static String LOG_TAG = ListConfigAdapter.class.getSimpleName();
+    final private static String LOG_TAG = ConfigItemListAdapter.class.getSimpleName();
 
     final private Context context;
     final private ConfigItem[] items;
 
     final private SharedPreferences prefs;
 
-    final private RecyclerView recyclerView;
+//    final private RecyclerView recyclerView;
 
     final private int configId;
 
-    public ListConfigAdapter(Context context, RecyclerView recyclerView, int configId,
-                             ConfigItem[] items, SharedPreferences prefs) {
+    final private WatchfaceConfig watchfaceConfig;
+
+    public ConfigItemListAdapter(Context context, RecyclerView parent, int configId,
+                                 ConfigItem[] items, SharedPreferences prefs, WatchfaceConfig watchfaceConfig) {
 
         this.configId = configId;
 
@@ -59,7 +64,9 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.items = items;
 
         this.prefs = prefs;
-        this.recyclerView = recyclerView;
+//        this.recyclerView = parent;
+
+        this.watchfaceConfig = watchfaceConfig;
     }
 
     @NonNull
@@ -136,10 +143,13 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             case TYPE_SWITCH:
                 SwitchViewHolder switchViewHolder = (SwitchViewHolder) holder;
                 BoolConfigItem boolConfigItem = (BoolConfigItem) configItem;
+                boolean defaultValue = boolConfigItem.getDefaultValueResourceId() == -1
+                        ? watchfaceConfig.getBoolPrefDefaultValue(context, boolConfigItem.getPreferenceName())
+                        : context.getResources().getBoolean(boolConfigItem.getDefaultValueResourceId());
                 switchViewHolder.init(
                         boolConfigItem.getLabelResourceId(),
-                        boolConfigItem.getPreferenceName(),
-                        boolConfigItem.getDefaultValueResourceId());
+                        (boolConfigItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + boolConfigItem.getPreferenceName(),
+                        defaultValue);
                 break;
             case TYPE_PADDING:
                 break;
@@ -165,7 +175,7 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             Log.d(LOG_TAG, "getItemColor: " + position);
         }
         BasicConfigItem colorTypeItem = (BasicConfigItem) items[position];
-        String prefName = colorTypeItem.getPreferenceName();
+        String prefName = (colorTypeItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + colorTypeItem.getPreferenceName();
         int defaultValue = colorTypeItem.getDefaultValueResourceId() == -1 ? Color.TRANSPARENT
                 : context.getResources().getColor(colorTypeItem.getDefaultValueResourceId(), null);
         int color = prefs.getInt(prefName, defaultValue);
@@ -181,7 +191,7 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         BasicConfigItem borderTypeItem = (BasicConfigItem) items[position];
-        String prefName = borderTypeItem.getPreferenceName();
+        String prefName = (borderTypeItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + borderTypeItem.getPreferenceName();
         String borderTypeName = prefs.getString(prefName, null);
         if (borderTypeName == null && borderTypeItem.getDefaultValueResourceId() != -1) {
             borderTypeName = context.getResources().getString(borderTypeItem.getDefaultValueResourceId());
@@ -203,7 +213,7 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         Log.d(LOG_TAG, "onActivityResult: itemId=" + id);
                     }
                     BasicConfigItem colorConfigItem = (BasicConfigItem) items[id];
-                    String prefName = colorConfigItem.getPreferenceName();
+                    String prefName = (colorConfigItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + colorConfigItem.getPreferenceName();
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "update color: " + prefName + " -> " + color);
                     }
@@ -216,7 +226,7 @@ public class ListConfigAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         Log.d(LOG_TAG, "onActivityResult: item Id=" + id);
                     }
                     BasicConfigItem shapeConfigItem = (BasicConfigItem) items[id];
-                    prefName = shapeConfigItem.getPreferenceName();
+                    prefName = (shapeConfigItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + shapeConfigItem.getPreferenceName();
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "update border: " + prefName + " -> " + borderType);
                     }

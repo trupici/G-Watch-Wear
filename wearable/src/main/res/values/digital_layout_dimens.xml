@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2021 Juraj Antal
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <!--
+        FIXME:
+        consider to move to dpi specific folders
+        or recalculate to dpi values.
+        GW4 46mm 450x450 dp-to-pixel ratio = 2.125
+    -->
+
+    <dimen name="digital_layout_top_left_compl_left">31px</dimen>
+    <dimen name="digital_layout_top_left_compl_top">201px</dimen>
+    <dimen name="digital_layout_top_left_compl_right">79px</dimen>
+    <dimen name="digital_layout_top_left_compl_bottom">249px</dimen>
+
+    <dimen name="digital_layout_top_right_compl_left">371px</dimen>
+    <dimen name="digital_layout_top_right_compl_top">201px</dimen>
+    <dimen name="digital_layout_top_right_compl_right">419px</dimen>
+    <dimen name="digital_layout_top_right_compl_bottom">249px</dimen>
+
+    <dimen name="digital_layout_bottom_left_compl_left">87px</dimen>
+    <dimen name="digital_layout_bottom_left_compl_top">291px</dimen>
+    <dimen name="digital_layout_bottom_left_compl_right">155px</dimen>
+    <dimen name="digital_layout_bottom_left_compl_bottom">359px</dimen>
+
+    <dimen name="digital_layout_bottom_right_compl_left">293px</dimen>
+    <dimen name="digital_layout_bottom_right_compl_top">291px</dimen>
+    <dimen name="digital_layout_bottom_right_compl_right">361px</dimen>
+    <dimen name="digital_layout_bottom_right_compl_bottom">359px</dimen>
+
+    <dimen name="digital_layout_bg_pnel_left">164px</dimen>
+    <dimen name="digital_layout_bg_panel_top">294px</dimen>
+    <dimen name="digital_layout_bg_panel_right">288px</dimen>
+    <dimen name="digital_layout_bg_panel_bottom">361px</dimen>
+    <dimen name="digital_layout_bg_panel_top_offset">0px</dimen>
+
+    <dimen name="digital_layout_bg_graph_panel_left">89px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_top">172px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_right">362px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_bottom">285px</dimen>
+
+    <dimen name="digital_layout_bg_graph_left_padding">2px</dimen>
+    <dimen name="digital_layout_bg_graph_right_padding">2px</dimen>
+    <dimen name="digital_layout_bg_graph_top_padding">2px</dimen>
+    <dimen name="digital_layout_bg_graph_bottom_padding">2px</dimen>
+
+    <dimen name="digital_layout_time_panel_left">89px</dimen>
+    <dimen name="digital_layout_time_panel_top">82px</dimen>
+    <dimen name="digital_layout_time_panel_right">362px</dimen>
+    <dimen name="digital_layout_time_panel_bottom">161px</dimen>
+
+</resources>

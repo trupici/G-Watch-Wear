@@ -34,16 +34,4 @@
     <color name="def_bg_border_color">#00000000</color>
     <string name="def_bg_border_type" translatable="false">NONE</string>
 
-    <!--
-         FIXME:
-         consider to move to dpi specific folders
-         or recalculate to dpi values.
-         GW4 46mm 450x450 dp-to-pixel ratio = 2.125
-     -->
-    <dimen name="layout_bg_pnel_left">166px</dimen>
-    <dimen name="layout_bg_panel_top">315px</dimen>
-    <dimen name="layout_bg_panel_right">284px</dimen>
-    <dimen name="layout_bg_panel_bottom">409px</dimen>
-    <dimen name="layout_bg_panel_top_offset">25px</dimen>
-
 </resources>

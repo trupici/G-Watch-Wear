@@ -20,15 +20,17 @@ import java.util.Arrays;
 
 /**
  * Enumeration of unique IDs for each complication.
- * The settings activity that supports allowing users to select their complication data provider
- * requires numbers to be >= 0.
  */
-
 public enum ComplicationId {
-    LEFT_COMPLICATION_ID,
-    RIGHT_COMPLICATION_ID,
-    CENTER_COMPLICATION_ID,
-    BOTTOM_COMPLICATION_ID,
+    LEFT,
+    RIGHT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
+    TOP,
+    CENTER,
+    BOTTOM,
     ;
 
     public static ComplicationId valueOf(int ordinal) {

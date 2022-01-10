@@ -26,13 +26,19 @@ public class BasicConfigItem implements ConfigItem {
     final private String preferenceName;
     final private Type type;
     final private int defaultValueResourceId;
+    final private boolean isGlobal;
 
     public BasicConfigItem(int labelResourceId, int iconResourceId, String preferenceName, Type type, int defaultValueResourceId) {
+        this(labelResourceId, iconResourceId, preferenceName, type, defaultValueResourceId, false);
+    }
+
+    public BasicConfigItem(int labelResourceId, int iconResourceId, String preferenceName, Type type, int defaultValueResourceId, boolean isGlobal) {
         this.labelResourceId = labelResourceId;
         this.iconResourceId = iconResourceId;
         this.preferenceName = preferenceName;
         this.type = type;
         this.defaultValueResourceId = defaultValueResourceId;
+        this.isGlobal = isGlobal;
     }
 
     public int getLabelResourceId() {
@@ -54,5 +60,9 @@ public class BasicConfigItem implements ConfigItem {
 
     public int getDefaultValueResourceId() {
         return defaultValueResourceId;
+    }
+
+    public boolean isGlobal() {
+        return isGlobal;
     }
 }

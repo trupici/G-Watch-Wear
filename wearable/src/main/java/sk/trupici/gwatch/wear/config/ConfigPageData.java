@@ -27,7 +27,8 @@ public class ConfigPageData {
         BG_PANEL,
         BG_GRAPH,
         DATE_PANEL,
-        ALARMS
+        ALARMS,
+        TIME_PANEL
         ;
 
         public static ConfigType valueOf(int ordinal) {
@@ -36,96 +37,20 @@ public class ConfigPageData {
     }
 
     final private ConfigType type;
-    final private ConfigItemData[] items;
     final private int titleId;
 
-    public ConfigPageData(ConfigType type, ConfigItemData[] items, int titleId) {
+    public ConfigPageData(ConfigType type, int titleId) {
         this.type = type;
-        this.items = items;
         this.titleId = titleId;
-    }
-
-    public static class ConfigItemData {
-        int id;
-        String label;
-        int resourceId;
-
-        public ConfigItemData(int id, String label, int resourceId) {
-            this.id = id;
-            this.label = label;
-            this.resourceId = resourceId;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public int getResourceId() {
-            return resourceId;
-        }
     }
 
     public ConfigType getType() {
         return type;
     }
 
-    public ConfigItemData[] getItems() {
-        return items;
-    }
-
     public int getTitleId() {
         return titleId;
     }
 
-
-    public static class HandsConfigData extends ConfigItemData {
-        final private int hourHandId;
-        final private int hourHandShadowId;
-        final private int minuteHandId;
-        final private int minuteHandShadowId;
-        final private int secondHandId;
-        final private int secondHandShadowId;
-
-        public HandsConfigData(int id, String label, int resourceId,
-                               int hourHandId, int hourHandShadowId,
-                               int minuteHandId, int minuteHandShadowId,
-                               int secondHandId, int secondHandShadowId) {
-            super(id, label, resourceId);
-            this.hourHandId = hourHandId;
-            this.hourHandShadowId = hourHandShadowId;
-            this.minuteHandId = minuteHandId;
-            this.minuteHandShadowId = minuteHandShadowId;
-            this.secondHandId = secondHandId;
-            this.secondHandShadowId = secondHandShadowId;
-        }
-
-        public int getHourHandId() {
-            return hourHandId;
-        }
-
-        public int getHourHandShadowId() {
-            return hourHandShadowId;
-        }
-
-        public int getMinuteHandId() {
-            return minuteHandId;
-        }
-
-        public int getMinuteHandShadowId() {
-            return minuteHandShadowId;
-        }
-
-        public int getSecondHandId() {
-            return secondHandId;
-        }
-
-        public int getSecondHandShadowId() {
-            return secondHandShadowId;
-        }
-    }
 
 }

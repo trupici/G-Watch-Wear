@@ -22,23 +22,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.R;
 
-public class WatchFaceViewHolder extends WearableRecyclerView.ViewHolder implements BackgroundChangeAware {
-    private final AnalogWatchfaceConfigViewAdapter parentViewAdapter;
+/**
+ * ViewHolder holding a page with image list. It also supports layouts with background layer.
+ */
+public class ImageSetPageViewHolder extends WearableRecyclerView.ViewHolder implements BackgroundChangeAware {
+    private final WatchfaceConfig watchfaceConfig;
     private final TextView title;
     private final ViewPager2 verticalPager;
     private final ViewGroup bkgViewGroup;
     private final ConfigPageData.ConfigType dataType;
 
-    public WatchFaceViewHolder(AnalogWatchfaceConfigViewAdapter parentViewAdapter, @NonNull View itemView, ConfigPageData.ConfigType dataType) {
+    public ImageSetPageViewHolder(WatchfaceConfig watchfaceConfig, @NonNull View itemView, ConfigPageData.ConfigType dataType) {
         super(itemView);
-        this.parentViewAdapter = parentViewAdapter;
+        this.watchfaceConfig = watchfaceConfig;
         title = itemView.findViewById(R.id.page_title);
         verticalPager = itemView.findViewById(R.id.vertical_pager);
         bkgViewGroup = itemView.findViewById(R.id.backgrounds);
@@ -53,29 +54,21 @@ public class WatchFaceViewHolder extends WearableRecyclerView.ViewHolder impleme
         return verticalPager;
     }
 
-    public ViewGroup getBkgViewGroup() {
-        return bkgViewGroup;
+    public ConfigPageData.ConfigType getDataType() {
+        return dataType;
     }
 
     @Override
     public void onBackgroundChanged() {
-        List<Integer> resourceIds = parentViewAdapter.getBackgroundResourceIds(dataType);
-        if (resourceIds.size() > 0) {
+        if (dataType != ConfigPageData.ConfigType.BACKGROUND) {
             bkgViewGroup.removeAllViews();
-            for (int resourceId : resourceIds) {
-                addBackgroundView(bkgViewGroup, resourceId);
+            ConfigItemData itemData = watchfaceConfig.getSelectedItem(bkgViewGroup.getContext(), ConfigPageData.ConfigType.BACKGROUND);
+            if (itemData != null && itemData.getResourceId() != 0) {
+                ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
+                ImageView bkgView = view.findViewById(R.id.image);
+                bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(itemData.getResourceId()));
+                bkgViewGroup.addView(view);
             }
         }
-    }
-
-    private void addBackgroundView(ViewGroup bkgViewGroup, int resourceId) {
-        if (resourceId == 0) {
-            return;
-        }
-
-        ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
-        ImageView bkgView = view.findViewById(R.id.image);
-        bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(resourceId));
-        bkgViewGroup.addView(view);
     }
 }

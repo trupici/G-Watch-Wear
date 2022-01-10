@@ -27,7 +27,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.wearable.watchface.WatchFaceService;
 
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
+import sk.trupici.gwatch.wear.config.ConfigItemData;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 
@@ -37,6 +37,11 @@ public class BackgroundPanel implements ComponentPanel {
 
     public static final int CONFIG_ID = 1;
 
+//    final private int refScreenWidth;
+//    final private int refScreenHeight;
+
+    final private WatchfaceConfig watchfaceConfig;
+
     private Paint backgroundPaint;
     private Bitmap backgroundBitmap;
     private Bitmap ambientBackgroundBitmap;
@@ -44,9 +49,9 @@ public class BackgroundPanel implements ComponentPanel {
     private boolean lowBitAmbient;
     private boolean burnInProtection;
 
-    final private WatchfaceConfig watchfaceConfig;
-
-    public BackgroundPanel(WatchfaceConfig watchfaceConfig) {
+    public BackgroundPanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
+//        this.refScreenWidth = screenWidth;
+//        this.refScreenHeight = screenHeight;
         this.watchfaceConfig = watchfaceConfig;
     }
 
@@ -79,9 +84,8 @@ public class BackgroundPanel implements ComponentPanel {
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
         backgroundBitmap = BitmapFactory.decodeResource(context.getResources(),
-                watchfaceConfig.getConfigItemData(ConfigPageData.ConfigType.BACKGROUND,
-                        sharedPrefs.getInt(AnalogWatchfaceConfig.PREF_BACKGROUND_IDX, AnalogWatchfaceConfig.DEF_BACKGROUND_IDX)
-                ).getResourceId());
+                watchfaceConfig.getSelectedItem(context, ConfigPageData.ConfigType.BACKGROUND).getResourceId()
+        );
     }
 
     @Override

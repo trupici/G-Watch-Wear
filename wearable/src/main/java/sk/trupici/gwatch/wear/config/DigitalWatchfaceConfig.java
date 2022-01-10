@@ -25,47 +25,31 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.complications.AnalogComplicationViewHolder;
+import sk.trupici.gwatch.wear.components.DigitalTimePanel;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
 import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigAdapter;
+import sk.trupici.gwatch.wear.config.complications.DigitalComplicationViewHolder;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
- * Configuration data for Analog watch face configuration
+ * Configuration data for Digital watch face configuration
  */
-public class AnalogWatchfaceConfig implements WatchfaceConfig {
+public class DigitalWatchfaceConfig implements WatchfaceConfig {
 
-    final private static String PREF_PREFIX = "analog_";
-
-    final public static String PREF_HANDS_SET_IDX = PREF_PREFIX + "hands_set_idx";
+    final private static String PREF_PREFIX = "digital_";
 
     final public static int DEF_BACKGROUND_IDX = 0;
-    final public static int DEF_HANDS_SET_IDX = 0;
 
-    private final static ConfigItemData[] backgroundConfig = new ConfigItemData[]{
-            new ConfigItemData(0, "Stripes", R.drawable.analog_background_default),
-            new ConfigItemData(1, "Circuit Board", R.drawable.analog_background_1),
-            new ConfigItemData(2, "Classic Silver", R.drawable.analog_classic_background_1),
-            new ConfigItemData(3, "Classic Coral", R.drawable.analog_classic_background_2),
-    };
-
-    private final static ConfigItemData[] handsConfig = new ConfigItemData[]{
-            new HandsConfigData(0, "", R.drawable.analog_hands_preview_default,
-                    R.drawable.hours_default, R.drawable.hours_shadow_default,
-                    R.drawable.minutes_default, R.drawable.minutes_shadow_default,
-                    R.drawable.seconds_default, R.drawable.seconds_shadow_default),
+    private final static ConfigItemData[] backgroundConfig = new ConfigItemData[] {
+            new ConfigItemData(0, "Stripes" , R.drawable.digital_background_default),
     };
 
     private final static ConfigPageData[] CONFIG = {
             new ConfigPageData(
                     ConfigPageData.ConfigType.BACKGROUND,
                     R.string.config_page_title_bkg
-            ),
-            new ConfigPageData(
-                    ConfigPageData.ConfigType.HANDS,
-                    R.string.config_page_title_hands
             ),
             new ConfigPageData(
                     ConfigPageData.ConfigType.COMPLICATIONS,
@@ -84,23 +68,33 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                     R.string.config_page_title_bg_panel
             ),
             new ConfigPageData(
-                    ConfigPageData.ConfigType.DATE_PANEL,
-                    R.string.config_page_title_date_panel
+                    ConfigPageData.ConfigType.TIME_PANEL,
+                    R.string.config_page_title_time_panel
             ),
     };
 
-
     private final static ComplicationConfig[] complicationConfig = {
             new ComplicationConfig(
-                    ComplicationId.LEFT,
-                    new int[]{
+                    ComplicationId.TOP_LEFT,
+                    new int[] {
+                            ComplicationData.TYPE_RANGED_VALUE,
+                            ComplicationData.TYPE_SHORT_TEXT,
+                    }),
+            new ComplicationConfig(
+                    ComplicationId.TOP_RIGHT,
+                    new int[] {
+                            ComplicationData.TYPE_RANGED_VALUE,
+                            ComplicationData.TYPE_SHORT_TEXT,
+                    }),
+            new ComplicationConfig(
+                    ComplicationId.BOTTOM_LEFT,
+                    new int[] {
                             ComplicationData.TYPE_RANGED_VALUE,
                             ComplicationData.TYPE_SHORT_TEXT,
                             ComplicationData.TYPE_LONG_TEXT,
                     }),
-            new ComplicationConfig(
-                    ComplicationId.RIGHT,
-                    new int[]{
+            new ComplicationConfig(ComplicationId.BOTTOM_RIGHT,
+                    new int[] {
                             ComplicationData.TYPE_RANGED_VALUE,
                             ComplicationData.TYPE_SHORT_TEXT,
                             ComplicationData.TYPE_LONG_TEXT,
@@ -111,11 +105,10 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     static {
         complicationIds = new int[complicationConfig.length];
-        for (int i = 0; i < complicationIds.length; i++) {
+        for (int i=0; i<complicationIds.length; i++) {
             complicationIds[i] = complicationConfig[i].getId();
         }
     }
-
 
     @Override
     public String getPrefsPrefix() {
@@ -126,7 +119,6 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     public int getItemCount() {
         return CONFIG.length;
     }
-
 
     @Override
     public ConfigPageData getPageData(ConfigPageData.ConfigType type) {
@@ -149,16 +141,14 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     @Override
     public ComplicationViewHolder createComplicationsViewHolder(ComplicationsConfigAdapter adapter, ViewGroup parent) {
-        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_analog_complications_item, parent, false);
-        return new AnalogComplicationViewHolder(this, adapter, layout);
+        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_digital_complications_item, parent, false);
+        return new DigitalComplicationViewHolder(this, adapter, layout);
     }
 
     @Override
     public ConfigItemData[] getItems(ConfigPageData.ConfigType type) {
         if (type == ConfigPageData.ConfigType.BACKGROUND) {
             return backgroundConfig;
-        } else if (type == ConfigPageData.ConfigType.HANDS) {
-            return handsConfig;
         } else {
             return new ConfigItemData[]{};
         }
@@ -168,8 +158,6 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     public ConfigItemData getSelectedItem(Context context, ConfigPageData.ConfigType type) {
         if (type == ConfigPageData.ConfigType.BACKGROUND) {
             return backgroundConfig[getSelectedIdx(context, type)];
-        } else if (type == ConfigPageData.ConfigType.HANDS) {
-            return handsConfig[getSelectedIdx(context, type)];
         } else {
             return null;
         }
@@ -178,13 +166,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     @Override
     public int getSelectedIdx(Context context, ConfigPageData.ConfigType type) {
         if (type == ConfigPageData.ConfigType.BACKGROUND) {
-            return getValidIdx(backgroundConfig,
-                    PreferenceUtils.getIntValue(context, PREF_PREFIX + WatchfaceConfig.PREF_BACKGROUND_IDX, DEF_BACKGROUND_IDX),
-                    DEF_BACKGROUND_IDX);
-        } else if (type == ConfigPageData.ConfigType.HANDS) {
-            return getValidIdx(handsConfig,
-                    PreferenceUtils.getIntValue(context, PREF_HANDS_SET_IDX, DEF_HANDS_SET_IDX),
-                    DEF_HANDS_SET_IDX);
+            return PreferenceUtils.getIntValue(context, PREF_PREFIX + WatchfaceConfig.PREF_BACKGROUND_IDX, DEF_BACKGROUND_IDX);
         } else {
             return 0;
         }
@@ -195,15 +177,13 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
         if (type == ConfigPageData.ConfigType.BACKGROUND) {
             PreferenceUtils.setIntValue(context, PREF_PREFIX + WatchfaceConfig.PREF_BACKGROUND_IDX,
                     getValidIdx(backgroundConfig, idx, DEF_BACKGROUND_IDX));
-        } else if (type == ConfigPageData.ConfigType.HANDS) {
-            PreferenceUtils.setIntValue(context, PREF_HANDS_SET_IDX,
-                    getValidIdx(handsConfig, idx, DEF_HANDS_SET_IDX));
         }
     }
 
     private int getValidIdx(ConfigItemData[] items, int index, int defIndex) {
         return (index < 0 || items.length <= index) ? defIndex : index;
     }
+
 
     @Override
     public int[] getComplicationIds() {
@@ -212,7 +192,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     @Override
     public ComplicationConfig[] getComplicationConfigs() {
-        return new ComplicationConfig[0];
+        return complicationConfig;
     }
 
     @Override
@@ -227,46 +207,48 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     @Override
     public ComplicationId getDefaultComplicationId() {
-        return ComplicationId.LEFT;
+        return ComplicationId.TOP_LEFT;
     }
 
     @Override
     public boolean getBoolPrefDefaultValue(Context context, String prefName) {
-        return false;
+        return DigitalTimePanel.PREF_IS_24_HR_TIME.equals(prefName)
+                ? DigitalTimePanel.getIs24HourFormatDefaultValue(context)
+                : false;
     }
 
     @Override
     public RectF getBgPanelBounds(Context context) {
         return new RectF(
-                context.getResources().getDimension(R.dimen.analog_layout_bg_pnel_left),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_panel_top),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_panel_right),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_panel_bottom)
+                context.getResources().getDimension(R.dimen.digital_layout_bg_pnel_left),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_panel_top),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_panel_right),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_panel_bottom)
         );
     }
 
     @Override
     public float getBgPanelTopOffset(Context context) {
-        return context.getResources().getDimension(R.dimen.analog_layout_bg_panel_top_offset);
+        return context.getResources().getDimension(R.dimen.digital_layout_bg_panel_top_offset);
     }
 
     @Override
     public RectF getBgGraphBounds(Context context) {
         return new RectF(
-                context.getResources().getDimension(R.dimen.analog_layout_bg_graph_panel_left),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_graph_panel_top),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_graph_panel_right),
-                context.getResources().getDimension(R.dimen.analog_layout_bg_graph_panel_bottom)
+                context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_left),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_top),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_right),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_bottom)
         );
     }
 
     @Override
     public Rect getBgGraphPadding(Context context) {
         return new Rect(
-                context.getResources().getDimensionPixelOffset(R.dimen.analog_layout_bg_graph_left_padding),
-                context.getResources().getDimensionPixelOffset(R.dimen.analog_layout_bg_graph_top_padding),
-                context.getResources().getDimensionPixelOffset(R.dimen.analog_layout_bg_graph_right_padding),
-                context.getResources().getDimensionPixelOffset(R.dimen.analog_layout_bg_graph_bottom_padding)
+                context.getResources().getDimensionPixelOffset(R.dimen.digital_layout_bg_graph_left_padding),
+                context.getResources().getDimensionPixelOffset(R.dimen.digital_layout_bg_graph_top_padding),
+                context.getResources().getDimensionPixelOffset(R.dimen.digital_layout_bg_graph_right_padding),
+                context.getResources().getDimensionPixelOffset(R.dimen.digital_layout_bg_graph_bottom_padding)
         );
     }
 }

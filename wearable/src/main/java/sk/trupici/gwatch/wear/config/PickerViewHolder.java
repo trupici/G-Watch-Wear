@@ -17,22 +17,18 @@
 package sk.trupici.gwatch.wear.config;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import androidx.recyclerview.widget.RecyclerView;
 import sk.trupici.gwatch.wear.R;
 
 /**
- * Displays options for the item on the watch face. These could include border, color, etc.
+ * View holding a button to invoke a picker activity for bound {@code ConfigItem}.
  */
 public class PickerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-    private final static String LOG_TAG = PickerViewHolder.class.getSimpleName();
 
     private Button button;
 

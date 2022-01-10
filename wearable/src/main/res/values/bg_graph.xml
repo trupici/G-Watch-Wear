@@ -38,21 +38,4 @@
 
     <integer name="def_graph_refresh_rate">5</integer>
 
-    <!--
-    FIXME:
-    consider to move to dpi specific folders
-    or recalculate to dpi values.
-    GW4 46mm 450x450 dp-to-pixel ratio = 2.125
--->
-
-    <dimen name="layout_graph_panel_left">91px</dimen>
-    <dimen name="layout_graph_panel_top">85px</dimen>
-    <dimen name="layout_graph_panel_right">360px</dimen>
-    <dimen name="layout_graph_panel_bottom">195px</dimen>
-
-    <dimen name="graph_left_padding">1px</dimen>
-    <dimen name="graph_right_padding">1px</dimen>
-    <dimen name="graph_top_padding">1px</dimen>
-    <dimen name="graph_bottom_padding">1px</dimen>
-
 </resources>

@@ -25,6 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
+import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 
@@ -44,30 +45,30 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
     public static final int CONFIG_ID = 12;
 
-    public static final String PREF_BKG_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_background";
-    public static final String PREF_CRITICAL_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical";
-    public static final String PREF_WARN_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_warn";
-    public static final String PREF_IN_RANGE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_in_range";
+    public static final String PREF_BKG_COLOR = "graph_color_background";
+    public static final String PREF_CRITICAL_COLOR = "graph_color_critical";
+    public static final String PREF_WARN_COLOR = "graph_color_warn";
+    public static final String PREF_IN_RANGE_COLOR = "graph_color_in_range";
 
-    public static final String PREF_VERT_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_vert_line";
-    public static final String PREF_LOW_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_low_line";
-    public static final String PREF_HIGH_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_high_line";
-    public static final String PREF_CRITICAL_LINE_COLOR = AnalogWatchfaceConfig.PREF_PREFIX + "graph_color_critical_line";
+    public static final String PREF_VERT_LINE_COLOR = "graph_color_vert_line";
+    public static final String PREF_LOW_LINE_COLOR = "graph_color_low_line";
+    public static final String PREF_HIGH_LINE_COLOR = "graph_color_high_line";
+    public static final String PREF_CRITICAL_LINE_COLOR = "graph_color_critical_line";
 
-    public static final String PREF_ENABLE_VERT_LINES = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_vert_lines";
-    public static final String PREF_ENABLE_CRITICAL_LINES = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_critical_lines";
-    public static final String PREF_ENABLE_HIGH_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_high_line";
-    public static final String PREF_ENABLE_LOW_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_low_line";
+    public static final String PREF_ENABLE_VERT_LINES = "graph_enable_vert_lines";
+    public static final String PREF_ENABLE_CRITICAL_LINES = "graph_enable_critical_lines";
+    public static final String PREF_ENABLE_HIGH_LINE = "graph_enable_high_line";
+    public static final String PREF_ENABLE_LOW_LINE = "graph_enable_low_line";
 
-    public static final String PREF_ENABLE_DYNAMIC_RANGE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_enable_dynamic_range";
+    public static final String PREF_ENABLE_DYNAMIC_RANGE = "graph_enable_dynamic_range";
 
-    public static final String PREF_TYPE_LINE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_type_draw_line";
-    public static final String PREF_TYPE_DOTS = AnalogWatchfaceConfig.PREF_PREFIX + "graph_type_draw_dots";
+    public static final String PREF_TYPE_LINE = "graph_type_draw_line";
+    public static final String PREF_TYPE_DOTS = "graph_type_draw_dots";
 
-    private static final String PREF_DATA = AnalogWatchfaceConfig.PREF_PREFIX + "graph_data";
-    private static final String PREF_DATA_LAST_UPD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "graph_last_upd";
+    private static final String PREF_DATA = "graph_data";
+    private static final String PREF_DATA_LAST_UPD_MIN = "graph_last_upd";
 
-    private static final String PREF_REFRESH_RATE = AnalogWatchfaceConfig.PREF_PREFIX + "graph_refresh_rate";
+    private static final String PREF_REFRESH_RATE = "graph_refresh_rate";
 
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
@@ -82,6 +83,11 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
     private static final int GRAPH_DATA_LEN = 48;
 
+
+    final private int refScreenWidth;
+    final private int refScreenHeight;
+
+    final private WatchfaceConfig watchfaceConfig;
 
     private int[] graphData = new int[GRAPH_DATA_LEN];
     private long lastGraphUpdateMin = 0;
@@ -126,34 +132,27 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     private RectF sizeFactors;
     private RectF bounds;
 
-    final private int refScreenWidth;
-    final private int refScreenHeight;
-
-
-    public BgGraph(int screenWidth, int screenHeight) {
+    public BgGraph(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
+        this.watchfaceConfig = watchfaceConfig;
     }
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-
-        float left = context.getResources().getDimension(R.dimen.layout_graph_panel_left);
-        float top = context.getResources().getDimension(R.dimen.layout_graph_panel_top);
-        float right = context.getResources().getDimension(R.dimen.layout_graph_panel_right);
-        float bottom = context.getResources().getDimension(R.dimen.layout_graph_panel_bottom);
-
+        RectF bounds = watchfaceConfig.getBgGraphBounds(context);
         sizeFactors = new RectF(
-                left / refScreenWidth,
-                top / refScreenHeight,
-                right / refScreenWidth,
-                bottom / refScreenHeight
+                bounds.left / refScreenWidth,
+                bounds.top / refScreenHeight,
+                bounds.right / refScreenWidth,
+                bounds.bottom / refScreenHeight
         );
 
-        leftPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_left_padding);
-        topPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_top_padding);
-        rightPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_right_padding);
-        bottomPadding = context.getResources().getDimensionPixelOffset(R.dimen.graph_bottom_padding);
+        Rect padding = watchfaceConfig.getBgGraphPadding(context);
+        leftPadding = padding.left;
+        topPadding = padding.top;
+        rightPadding = padding.right;
+        bottomPadding = padding.bottom;
 
         paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
@@ -186,28 +185,28 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
         // colors
-        backgroundColor = sharedPrefs.getInt(PREF_BKG_COLOR, context.getColor(R.color.def_graph_color_background));
-        criticalColor = sharedPrefs.getInt(PREF_CRITICAL_COLOR, context.getColor(R.color.def_graph_color_critical));
-        warnColor = sharedPrefs.getInt(PREF_WARN_COLOR, context.getColor(R.color.def_graph_color_warn));
-        inRangeColor = sharedPrefs.getInt(PREF_IN_RANGE_COLOR, context.getColor(R.color.def_graph_color_in_range));
+        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_graph_color_background));
+        criticalColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_COLOR, context.getColor(R.color.def_graph_color_critical));
+        warnColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_WARN_COLOR, context.getColor(R.color.def_graph_color_warn));
+        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_graph_color_in_range));
 
         // lines
-        vertLineColor = sharedPrefs.getInt(PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));
-        lowLineColor = sharedPrefs.getInt(PREF_LOW_LINE_COLOR, context.getColor(R.color.def_graph_color_low_line));
-        highLineColor = sharedPrefs.getInt(PREF_HIGH_LINE_COLOR, context.getColor(R.color.def_graph_color_high_line));
-        criticalLineColor = sharedPrefs.getInt(PREF_CRITICAL_LINE_COLOR, context.getColor(R.color.def_graph_color_critical_line));
+        vertLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));
+        lowLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_LINE_COLOR, context.getColor(R.color.def_graph_color_low_line));
+        highLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_LINE_COLOR, context.getColor(R.color.def_graph_color_high_line));
+        criticalLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_LINE_COLOR, context.getColor(R.color.def_graph_color_critical_line));
 
-        enableVertLines = sharedPrefs.getBoolean(PREF_ENABLE_VERT_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_vert_lines));
-        enableCriticalLines = sharedPrefs.getBoolean(PREF_ENABLE_CRITICAL_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_critical_lines));
-        enableHighLine = sharedPrefs.getBoolean(PREF_ENABLE_HIGH_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_high_line));
-        enableLowLine = sharedPrefs.getBoolean(PREF_ENABLE_LOW_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_low_line));
+        enableVertLines = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_VERT_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_vert_lines));
+        enableCriticalLines = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_CRITICAL_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_critical_lines));
+        enableHighLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_HIGH_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_high_line));
+        enableLowLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_LOW_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_low_line));
 
-        enableDynamicRange = sharedPrefs.getBoolean(PREF_ENABLE_DYNAMIC_RANGE, context.getResources().getBoolean(R.bool.def_graph_enable_dynamic_range));
+        enableDynamicRange = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_DYNAMIC_RANGE, context.getResources().getBoolean(R.bool.def_graph_enable_dynamic_range));
 
-        drawChartLine = sharedPrefs.getBoolean(PREF_TYPE_LINE, context.getResources().getBoolean(R.bool.def_graph_type_draw_line));
-        drawChartDots = sharedPrefs.getBoolean(PREF_TYPE_DOTS, context.getResources().getBoolean(R.bool.def_graph_type_draw_dots));
+        drawChartLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_LINE, context.getResources().getBoolean(R.bool.def_graph_type_draw_line));
+        drawChartDots = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_DOTS, context.getResources().getBoolean(R.bool.def_graph_type_draw_dots));
 
-        refreshRateMin = sharedPrefs.getInt(PREF_REFRESH_RATE, context.getResources().getInteger(R.integer.def_graph_refresh_rate));
+        refreshRateMin = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_REFRESH_RATE, context.getResources().getInteger(R.integer.def_graph_refresh_rate));
 
         // levels - external BG panel settings dependency !
         hypoThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));

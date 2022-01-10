@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package sk.trupici.gwatch.wear.components;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,10 +25,10 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
@@ -38,7 +40,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import sk.trupici.gwatch.wear.BuildConfig;
@@ -54,62 +55,59 @@ import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_RING_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_ROUND_RECT_RADIUS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_WIDTH;
 
-public class DatePanel implements ComponentPanel {
-    public static final String LOG_TAG = DatePanel.class.getSimpleName();
+public class DigitalTimePanel implements ComponentPanel {
+    public static final String LOG_TAG = DigitalTimePanel.class.getSimpleName();
 
-    public static final int CONFIG_ID = 14;
+    public static final int CONFIG_ID = 16;
 
-    public static final String PREF_SHOW_MONTH = "date_show_month";
+    public static final String PREF_IS_24_HR_TIME = "time_is_24_hr";
+    public static final String PREF_SHOW_SECS = "time_show_seconds";
 
-    public static final String PREF_BKG_COLOR = "date_background_color";
-    public static final String PREF_MONTH_COLOR = "date_month_color";
-    public static final String PREF_DAY_OF_MONTH_COLOR = "date_day_of_month_color";
-    public static final String PREF_DAY_OF_WEEK_COLOR = "date_day_of_week_color";
+    public static final String PREF_BKG_COLOR = "time_background_color";
+    public static final String PREF_TEXT_COLOR = "time_text_color";
 
-    public static final String PREF_BORDER_COLOR = "date_border_color";
-    public static final String PREF_BORDER_TYPE = "date_border_type";
+    public static final String PREF_BORDER_COLOR = "time_border_color";
+    public static final String PREF_BORDER_TYPE = "time_border_type";
 
     final private int refScreenWidth;
     final private int refScreenHeight;
 
     final private WatchfaceConfig watchfaceConfig;
 
-    private boolean showMonth;
-
     private int backgroundColor;
-    private int monthColor;
-    private int dayOfMonthColor;
-    private int dayOfWeekColor;
+    private int textColor;
+    private int ambientTextColor;
+    private boolean is24hrTime;
+    private boolean showSeconds;
 
     private int borderColor;
     private BorderType borderType;
 
     private Calendar calendar;
-    private DateFormat dayOfWeekFormat;
-    private DateFormat monthFormat;
-    private DateFormat dayOfMonthFormat;
+    private DateFormat timeFormat;
+    private DateFormat ambientTimeFormat;
 
     private RectF sizeFactors;
     private RectF bounds;
+    private PointF position;
 
-    private Bitmap bitmap;
     private Bitmap bkgBitmap;
 
-    private int lastDayOfYear;
-
     private TextPaint paint;
-    private TextPaint ambientPaint;
 
     private boolean timeZoneRegistered = false;
     private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             calendar.setTimeZone(TimeZone.getDefault());
-            drawDate();
         }
     };
 
-    public DatePanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
+    public static boolean getIs24HourFormatDefaultValue(Context context) {
+        return android.text.format.DateFormat.is24HourFormat(context);
+    }
+
+    public DigitalTimePanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
         this.watchfaceConfig = watchfaceConfig;
@@ -117,30 +115,21 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        lastDayOfYear = -1; // force redraw
 
         calendar = Calendar.getInstance();
 
         paint = new TextPaint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextScaleX(0.9f);
-
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        ambientPaint = new TextPaint();
-        ambientPaint.setAntiAlias(false);
-        ambientPaint.setColorFilter(filter);
-        ambientPaint.setTextAlign(Paint.Align.CENTER);
-        ambientPaint.setTextScaleX(0.9f);
 
         sizeFactors = new RectF(
-                context.getResources().getDimension(R.dimen.analog_layout_date_panel_left) / refScreenWidth,
-                context.getResources().getDimension(R.dimen.analog_layout_date_panel_top) / refScreenHeight,
-                context.getResources().getDimension(R.dimen.analog_layout_date_panel_right) / refScreenWidth,
-                context.getResources().getDimension(R.dimen.analog_layout_date_panel_bottom) / refScreenHeight
+                context.getResources().getDimension(R.dimen.digital_layout_time_panel_left) / refScreenWidth,
+                context.getResources().getDimension(R.dimen.digital_layout_time_panel_top) / refScreenHeight,
+                context.getResources().getDimension(R.dimen.digital_layout_time_panel_right) / refScreenWidth,
+                context.getResources().getDimension(R.dimen.digital_layout_time_panel_bottom) / refScreenHeight
         );
+
+        ambientTextColor = Color.LTGRAY;
     }
 
     @Override
@@ -151,71 +140,90 @@ public class DatePanel implements ComponentPanel {
                 width * sizeFactors.right,
                 height * sizeFactors.bottom);
 
-        bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
         bkgBitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
 
-        paint.setTextSize(bounds.height() / 2.2f);
-        ambientPaint.setTextSize(paint.getTextSize());
+        paint.setTextSize(bounds.height() * 0.8f);
 
-        drawDate();
+        Rect textBounds = new Rect();
+        paint.getTextBounds("12:00", 0, 5, textBounds);
+
+        position = new PointF(
+                bounds.width() / 2, // center
+                (bounds.height() - textBounds.height()) / 2
+        );
+
         drawBackgroundAndBorder();
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    @Override
+    public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
+        /* Update time zone in case it changed while we weren"t visible. */
+        calendar.setTimeZone(TimeZone.getDefault());
+
+        is24hrTime = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_IS_24_HR_TIME, getIs24HourFormatDefaultValue(context));
+        showSeconds = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_SHOW_SECS, context.getResources().getBoolean(R.bool.def_time_show_seconds));
+
+        if (is24hrTime) {
+            if (showSeconds) {
+                timeFormat = new SimpleDateFormat("HH:mm:ss");
+                ambientTimeFormat = new SimpleDateFormat("HH:mm");
+            } else {
+                timeFormat = new SimpleDateFormat("HH:mm");
+                ambientTimeFormat = timeFormat;
+            }
+        } else {
+            if (showSeconds) {
+                timeFormat = new SimpleDateFormat("h:mm:ss");
+                ambientTimeFormat = new SimpleDateFormat("h:mm");
+            } else {
+                timeFormat = new SimpleDateFormat("h:mm");
+                ambientTimeFormat = timeFormat;
+            }
+        }
+
+        // colors
+        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_time_background_color));
+        textColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_TEXT_COLOR, context.getColor(R.color.def_time_text_color));
+
+        // border
+        borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_time_border_color));
+        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_time_border_type)));
+    }
+
+    @Override
+    public void onPropertiesChanged(Context context, Bundle properties) {
+        calendar.setTimeZone(TimeZone.getDefault());
     }
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
-        calendar.setTimeInMillis(System.currentTimeMillis());
 
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        if (dayOfYear != lastDayOfYear) {
-            lastDayOfYear = dayOfYear;
-            drawDate();
-        }
-
-        if (isAmbientMode) {
-            canvas.drawBitmap(bitmap, bounds.left, bounds.top, ambientPaint);
-        } else {
-            canvas.drawBitmap(bkgBitmap, bounds.left, bounds.top, paint);
-            canvas.drawBitmap(bitmap, bounds.left, bounds.top, paint);
-        }
-    }
-
-    private void drawDate() {
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "drawDate: ");
-        }
-        if (bitmap == null || dayOfMonthFormat == null) {
+        if (timeFormat == null) {
             return; // not ready yet
         }
 
         calendar.setTimeInMillis(System.currentTimeMillis());
         final Date date = calendar.getTime();
 
-        Canvas canvas = new Canvas(bitmap);
-
-        String line1;
-        if (showMonth) { // Month
-            paint.setColor(monthColor);
-            line1 = monthFormat.format(date);
-        } else { // Day of week
-            paint.setColor(dayOfWeekColor);
-            line1 = dayOfWeekFormat.format(date);
+        String text;
+        if (isAmbientMode) {
+            text = ambientTimeFormat.format(date);
+            paint.setColor(ambientTextColor);
+        } else {
+            canvas.drawBitmap(bkgBitmap, bounds.left, bounds.top, paint);
+            text = timeFormat.format(date);
+            paint.setColor(textColor);
         }
 
-        final float centerX = bounds.width() / 2f;
-
-        // upper text
-        canvas.drawText(line1, centerX, bounds.height() / 2f - 5, paint);
-
-        // Day of Month
-        paint.setColor(dayOfMonthColor);
-        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 5, paint);
+        canvas.drawText(text, bounds.left + position.x, bounds.bottom - position.y, paint);
     }
 
     private void drawBackgroundAndBorder() {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "drawBackgroundAndBorder: ");
         }
-        if (bkgBitmap == null || dayOfMonthFormat == null) {
+        if (bkgBitmap == null || timeFormat == null) {
             return; // not ready yet
         }
         bkgBitmap.eraseColor(Color.TRANSPARENT);
@@ -261,35 +269,6 @@ public class DatePanel implements ComponentPanel {
                 canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, paint);
             }
         }
-    }
-
-    @Override
-    public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-        /* Update time zone in case it changed while we weren"t visible. */
-        calendar.setTimeZone(TimeZone.getDefault());
-        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
-
-        showMonth = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_SHOW_MONTH, context.getResources().getBoolean(R.bool.def_date_show_month));
-
-        // colors
-        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_date_background_color));
-        monthColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_MONTH_COLOR, context.getColor(R.color.def_date_month_color));
-        dayOfMonthColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_DAY_OF_MONTH_COLOR, context.getColor(R.color.def_date_day_of_month_color));
-        dayOfWeekColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_DAY_OF_WEEK_COLOR, context.getColor(R.color.def_date_day_of_week_color));
-
-        // border
-        borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_date_border_color));
-        borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_date_border_type)));
-    }
-
-    @Override
-    public void onPropertiesChanged(Context context, Bundle properties) {
-        calendar.setTimeZone(TimeZone.getDefault());
-        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
     }
 
     public void registerReceiver(WatchFaceService watchFaceService) {

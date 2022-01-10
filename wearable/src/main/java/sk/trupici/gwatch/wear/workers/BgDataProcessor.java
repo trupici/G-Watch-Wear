@@ -20,15 +20,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.android.gms.common.internal.service.Common;
-
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.PacketBase;
@@ -41,9 +38,9 @@ public class BgDataProcessor extends Worker {
 
     public final static String EXTRA_DATA = "BG_DATA";
 
-    public final static String PREF_LAST_BG_TIMESTAMP = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_ts";
-    private final static String PREF_LAST_BG_VALUE = AnalogWatchfaceConfig.PREF_PREFIX + "last_bg_value";
-    private final static String PREF_SAMPLE_PERIOD_MIN = AnalogWatchfaceConfig.PREF_PREFIX + "bg_sample_period";
+    public final static String PREF_LAST_BG_TIMESTAMP = "last_bg_ts";
+    private final static String PREF_LAST_BG_VALUE = "last_bg_value";
+    private final static String PREF_SAMPLE_PERIOD_MIN = "bg_sample_period";
 
     private final static int MAX_VALUE_DIFF = 100;
 

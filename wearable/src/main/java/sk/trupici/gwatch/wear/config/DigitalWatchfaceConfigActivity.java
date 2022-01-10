@@ -33,15 +33,15 @@ import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
- * Main {@code Activity} for Analog watch face configuration
+ * Main {@code Activity} for Digital watch face configuration
  */
-public class AnalogWatchfaceConfigActivity extends Activity {
+public class DigitalWatchfaceConfigActivity extends Activity {
 
-    public static final String LOG_TAG = AnalogWatchfaceConfigActivity.class.getSimpleName();
+    public static final String LOG_TAG = DigitalWatchfaceConfigActivity.class.getSimpleName();
 
-    public AnalogWatchfaceConfig config;
+    public DigitalWatchfaceConfig config;
 
-    private AnalogWatchfaceConfigViewAdapter configAdapter;
+    private DigitalWatchfaceConfigViewAdapter configAdapter;
     private PageIndicatorAdapter pageIndicatorAdapter;
 
     private SharedPreferences prefs;
@@ -74,7 +74,7 @@ public class AnalogWatchfaceConfigActivity extends Activity {
         }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        config = new AnalogWatchfaceConfig();
+        config = new DigitalWatchfaceConfig();
 
         onCreatePageView(this);
     }
@@ -84,7 +84,7 @@ public class AnalogWatchfaceConfigActivity extends Activity {
 
         ViewPager2 viewPager = findViewById(R.id.horizontal_pager);
         viewPager.setNestedScrollingEnabled(true);
-        configAdapter = new AnalogWatchfaceConfigViewAdapter(this, config, viewPager, prefs);
+        configAdapter = new DigitalWatchfaceConfigViewAdapter(this, config, viewPager, prefs);
         viewPager.setAdapter(configAdapter);
 
         pageIndicatorAdapter = new PageIndicatorAdapter(

@@ -30,14 +30,16 @@ import androidx.wear.widget.WearableRecyclerView;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 
-public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<WatchfaceDataAdapter.ViewHolder> {
-    private static final String LOG_TAG = WatchfaceDataAdapter.class.getSimpleName();
+/**
+ * {@code Adapter} for the main vertically scrolled view pager handling watch face config pages
+ */
+public class ConfigPageAdapter extends WearableRecyclerView.Adapter<ConfigPageAdapter.ViewHolder> {
+    private static final String LOG_TAG = ConfigPageAdapter.class.getSimpleName();
 
-    final private AnalogWatchfaceConfig config;
+    final private WatchfaceConfig watchfaceConfig;
     final private ConfigPageData pageData;
+    final private ConfigItemData[] items;
     final private ViewPager2 pager;
-
-    final private SharedPreferences prefs;
 
     final private ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
         @Override
@@ -45,22 +47,22 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
             if (BuildConfig.DEBUG) {
                 Log.d(LOG_TAG, "onPageSelected: " + position);
             }
-            prefs.edit().putInt(config.getPrefName(pageData.getType()), position).commit();
+            watchfaceConfig.setSelectedIdx(pager.getContext(), pageData.getType(), position);
         }
     };
 
-    public WatchfaceDataAdapter(ConfigPageData pageData, AnalogWatchfaceConfig config, ViewPager2 pager, SharedPreferences prefs) {
+    public ConfigPageAdapter(ConfigPageData pageData, ConfigItemData[] items, WatchfaceConfig watchfaceConfig, ViewPager2 pager, SharedPreferences prefs) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "WatchfaceDataAdapter created");
         }
+
+        this.items = items;
         this.pageData = pageData;
-        this.config = config;
+        this.watchfaceConfig = watchfaceConfig;
         this.pager = pager;
 
-        this.prefs = prefs;
-
         this.pager.registerOnPageChangeCallback(pageChangeCallback);
-        this.pager.setCurrentItem(prefs.getInt(config.getPrefName(pageData.getType()), 0));
+        this.pager.setCurrentItem(watchfaceConfig.getSelectedIdx(pager.getContext(), pageData.getType()));
     }
 
     public void destroy() {
@@ -69,7 +71,7 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
 
     @Override
     public int getItemCount() {
-        return pageData.getItems().length;
+        return items.length;
     }
 
     @NonNull
@@ -87,7 +89,7 @@ public class WatchfaceDataAdapter extends WearableRecyclerView.Adapter<Watchface
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
         }
-        ConfigPageData.ConfigItemData itemData = pageData.getItems()[position];
+        ConfigItemData itemData = items[position];
         holder.label.setText(itemData.getLabel());
         holder.image.setImageDrawable(holder.image.getContext().getDrawable(itemData.getResourceId()));
     }

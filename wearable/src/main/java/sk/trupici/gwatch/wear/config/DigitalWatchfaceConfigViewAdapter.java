@@ -39,30 +39,29 @@ import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
 import sk.trupici.gwatch.wear.components.BgGraph;
 import sk.trupici.gwatch.wear.components.BgPanel;
-import sk.trupici.gwatch.wear.components.DatePanel;
-import sk.trupici.gwatch.wear.components.WatchHands;
+import sk.trupici.gwatch.wear.components.DigitalTimePanel;
 import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigAdapter;
 import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigViewHolder;
 import sk.trupici.gwatch.wear.config.menu.AlarmsMenuItems;
 import sk.trupici.gwatch.wear.config.menu.BgGraphMenuItems;
 import sk.trupici.gwatch.wear.config.menu.BgPanelMenuItems;
 import sk.trupici.gwatch.wear.config.menu.ComplicationsMenuItems;
-import sk.trupici.gwatch.wear.config.menu.DatePanelMenuItems;
-import sk.trupici.gwatch.wear.watchface.AnalogWatchfaceService;
+import sk.trupici.gwatch.wear.config.menu.DigitalTimePanelMenuItems;
+import sk.trupici.gwatch.wear.watchface.DigitalWatchfaceService;
 
 /**
- * Main {@code Adapter} for Analog watch face configuration
+ * Main {@code Adapter} for Digital watch face configuration
  */
-public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
+public class DigitalWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
 
-    private final static String LOG_TAG = AnalogWatchfaceConfigViewAdapter.class.getSimpleName();
+    private final static String LOG_TAG = DigitalWatchfaceConfigViewAdapter.class.getSimpleName();
     private static final String TAG_VERTICAL_SCROLLABLE = "Pager";
 
     int position = 0;
 
     final private Context context;
     final private ViewPager2 pager;
-    final private AnalogWatchfaceConfig watchfaceConfig;
+    final private DigitalWatchfaceConfig watchfaceConfig;
 
     final private SharedPreferences prefs;
 
@@ -76,7 +75,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
             if (BuildConfig.DEBUG) {
                 Log.d(LOG_TAG, "onPageSelected: " + position);
             }
-            AnalogWatchfaceConfigViewAdapter.this.position = position;
+            DigitalWatchfaceConfigViewAdapter.this.position = position;
 
             // notify all view holders about page change
             View child = pager.getChildAt(0); // get pager's RecycleView
@@ -95,7 +94,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         }
     };
 
-    public AnalogWatchfaceConfigViewAdapter(Context context, AnalogWatchfaceConfig watchfaceConfig, ViewPager2 pager, SharedPreferences prefs) {
+    public DigitalWatchfaceConfigViewAdapter(Context context, DigitalWatchfaceConfig watchfaceConfig, ViewPager2 pager, SharedPreferences prefs) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "MainConfigViewAdapter: ");
         }
@@ -103,7 +102,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         this.watchfaceConfig = watchfaceConfig;
         this.pager = pager;
 
-        this.componentName = new ComponentName(context, AnalogWatchfaceService.class);
+        this.componentName = new ComponentName(context, DigitalWatchfaceService.class);
 
         this.prefs = prefs;
 
@@ -164,10 +163,6 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page, parent, false);
                 view.setId(BackgroundPanel.CONFIG_ID);
                 return new ImageSetPageViewHolder(watchfaceConfig, view, type);
-            case HANDS:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page, parent, false);
-                view.setId(WatchHands.CONFIG_ID);
-                return new ImageSetPageViewHolder(watchfaceConfig, view, type);
             case COMPLICATIONS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
                 return new ComplicationsConfigViewHolder(view);
@@ -181,15 +176,15 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
                 view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
                 view.setId(BgGraph.CONFIG_ID);
                 return new ConfigItemListPageViewHolder(view);
-            case DATE_PANEL:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
-                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
-                view.setId(DatePanel.CONFIG_ID);
-                return new ConfigItemListPageViewHolder(view);
             case ALARMS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
                 view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
                 view.setId(BgAlarmController.CONFIG_ID);
+                return new ConfigItemListPageViewHolder(view);
+            case TIME_PANEL:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
+                view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
+                view.setId(DigitalTimePanel.CONFIG_ID);
                 return new ConfigItemListPageViewHolder(view);
         }
         throw new IllegalArgumentException();
@@ -201,8 +196,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
             Log.d(LOG_TAG, "onBindViewHolder: " + holder + ", " + position);
         }
         if (holder instanceof ImageSetPageViewHolder) {
-            ImageSetPageViewHolder imageSetHolder = (ImageSetPageViewHolder) holder;
-            onBindImageSetViewHolder((ImageSetPageViewHolder) holder, imageSetHolder.getDataType(), position);
+            onBindBackgroundViewHolder((ImageSetPageViewHolder)holder, position);
         } else if (holder instanceof ComplicationsConfigViewHolder) {
             onBindComplicationViewHolder((ComplicationsConfigViewHolder) holder, position);
         } else if (holder instanceof ConfigItemListPageViewHolder) {
@@ -211,10 +205,10 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
                 onBindBgPanelConfigViewHolder(listHolder, position);
             } else if (BgGraph.CONFIG_ID == listHolder.getViewId()) {
                 onBindBgGraphConfigViewHolder(listHolder, position);
-            } else if (DatePanel.CONFIG_ID == listHolder.getViewId()) {
-                onBindDatePanelConfigViewHolder(listHolder, position);
             } else if (BgAlarmController.CONFIG_ID == listHolder.getViewId()) {
                 onBindAlarmsConfigViewHolder(listHolder, position);
+            } else if (DigitalTimePanel.CONFIG_ID == listHolder.getViewId()) {
+                onBindTimePanelConfigViewHolder(listHolder, position);
             }
         }
     }
@@ -224,18 +218,18 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
     }
 
-    private void onBindImageSetViewHolder(ImageSetPageViewHolder holder, ConfigPageData.ConfigType type, int position) {
+    private void onBindBackgroundViewHolder(ImageSetPageViewHolder holder, int position) {
         ConfigPageData pageData = watchfaceConfig.getPageData(position);
         holder.getTitle().setText(context.getString(pageData.getTitleId()));
 
         holder.getVerticalPager().setAdapter(new ConfigPageAdapter(
                 pageData,
-                watchfaceConfig.getItems(type),
+                watchfaceConfig.getItems(ConfigPageData.ConfigType.BACKGROUND),
                 watchfaceConfig,
                 holder.getVerticalPager(),
                 prefs));
 
-        holder.getVerticalPager().setCurrentItem(watchfaceConfig.getSelectedIdx(context, type));
+        holder.getVerticalPager().setCurrentItem(watchfaceConfig.getSelectedIdx(context, ConfigPageData.ConfigType.BACKGROUND));
         holder.getVerticalPager().setTag(TAG_VERTICAL_SCROLLABLE + position);
         holder.getVerticalPager().requestFocus();
     }
@@ -276,7 +270,6 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
     }
 
-
     private void onBindBgGraphConfigViewHolder(ConfigItemListPageViewHolder holder, int position) {
         ConfigItemListAdapter adapter = new ConfigItemListAdapter(
                 context,
@@ -295,12 +288,12 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
     }
 
-    private void onBindDatePanelConfigViewHolder(ConfigItemListPageViewHolder holder, int position) {
+    private void onBindAlarmsConfigViewHolder(ConfigItemListPageViewHolder holder, int position) {
         ConfigItemListAdapter adapter = new ConfigItemListAdapter(
                 context,
                 holder.getRecyclerView(),
-                DatePanel.CONFIG_ID,
-                DatePanelMenuItems.items,
+                BgAlarmController.CONFIG_ID,
+                AlarmsMenuItems.items,
                 prefs,
                 watchfaceConfig);
 
@@ -313,12 +306,12 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
     }
 
-    private void onBindAlarmsConfigViewHolder(ConfigItemListPageViewHolder holder, int position) {
+    private void onBindTimePanelConfigViewHolder(ConfigItemListPageViewHolder holder, int position) {
         ConfigItemListAdapter adapter = new ConfigItemListAdapter(
                 context,
                 holder.getRecyclerView(),
-                BgAlarmController.CONFIG_ID,
-                AlarmsMenuItems.items,
+                DigitalTimePanel.CONFIG_ID,
+                DigitalTimePanelMenuItems.items,
                 prefs,
                 watchfaceConfig);
 

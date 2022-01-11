@@ -17,7 +17,13 @@
 package sk.trupici.gwatch.wear.watchface;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -25,6 +31,10 @@ import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.util.Log;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.ComplicationAttrs;
 import sk.trupici.gwatch.wear.components.DigitalTimePanel;
@@ -47,17 +57,20 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
     protected class Engine extends WatchfaceServiceBase.Engine {
 
-        private ComplicationAttrs topLeftComplAttrs;
-        private ComplicationAttrs topRightComplAttrs;
-        private ComplicationAttrs bottomLeftComplAttrs;
-        private ComplicationAttrs bottomRightComplAttrs;
-
-        private RectF topLeftComplCoefs;
-        private RectF topRightComplCoefs;
-        private RectF bottomLeftComplCoefs;
-        private RectF bottomRightComplCoefs;
-
         private DigitalTimePanel timePanel;
+
+        private Canvas canvas;
+        private Bitmap bitmap;
+        private Paint paint;
+        private Paint clearPaint;
+        private int backgroundPathColor;
+
+        private int pbPadding;
+        private int pbMaxAngle;
+
+        private RectF pbCircleBounds;
+
+        private Map<ComplicationId, ComplicationSettings> complSettingsMap;
 
         protected Engine() {
             //  Ask for a hardware accelerated canvas.
@@ -73,74 +86,119 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         void initializeComplications(Context context) {
-            topLeftComplCoefs = new RectF(
+
+            bitmap = Bitmap.createBitmap((int)screenWidth, (int)screenHeight, Bitmap.Config.ARGB_8888);
+            canvas = new Canvas(bitmap);
+
+            paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeWidth(context.getResources().getInteger(R.integer.digital_compl_progressbar_width));
+
+            clearPaint = new Paint();
+            clearPaint.setStyle(Paint.Style.FILL);
+            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            clearPaint.setColor(Color.TRANSPARENT);
+
+            backgroundPathColor = context.getColor(R.color.digital_compl_progressbar_bkg_color);
+
+            pbPadding = context.getResources().getInteger(R.integer.digital_compl_progressbar_padding);
+            pbMaxAngle = context.getResources().getInteger(R.integer.digital_compl_progressbar_angle);
+            pbCircleBounds = new RectF(pbPadding, pbPadding, screenWidth-pbPadding, screenHeight-pbPadding);
+
+            RectF topLeftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.digital_layout_top_left_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_top_left_compl_top) / screenHeight,
                     getResources().getDimension(R.dimen.digital_layout_top_left_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_top_left_compl_bottom) / screenHeight
             );
-            topLeftComplAttrs = new ComplicationAttrs();
-            topLeftComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_LEFT_PREFIX);
-
-            topRightComplCoefs = new RectF(
+            RectF topRightComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.digital_layout_top_right_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_top_right_compl_top) / screenHeight,
                     getResources().getDimension(R.dimen.digital_layout_top_right_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_top_right_compl_bottom) / screenHeight
             );
-            topRightComplAttrs = new ComplicationAttrs();
-            topRightComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_RIGHT_PREFIX);
-
-            bottomLeftComplCoefs = new RectF(
+            RectF bottomLeftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_top) / screenHeight,
                     getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_bottom) / screenHeight
             );
-            bottomLeftComplAttrs = new ComplicationAttrs();
-            bottomLeftComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_LEFT_PREFIX);
-
-            bottomRightComplCoefs = new RectF(
+            RectF bottomRightComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_left) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_top) / screenHeight,
                     getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_right) / screenWidth,
                     getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_bottom) / screenHeight
             );
-            bottomRightComplAttrs = new ComplicationAttrs();
-            bottomRightComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_RIGHT_PREFIX);
 
-            // FIXME -> do not draw anything
-            setDefaultSystemComplicationProvider (ComplicationId.TOP_LEFT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
-            setDefaultSystemComplicationProvider (ComplicationId.TOP_RIGHT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
-            setDefaultSystemComplicationProvider (ComplicationId.BOTTOM_LEFT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
-            setDefaultSystemComplicationProvider (ComplicationId.BOTTOM_RIGHT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
+            float angleOffset = (90 - pbMaxAngle) / 2f;
+            ProgressBarAttrs topLeftProgressBarAttrs = new ProgressBarAttrs(
+                    180 + angleOffset,
+                    pbMaxAngle,
+                    new RectF(0, 0, screenWidth/2f, screenHeight/2f)
+            );
+            ProgressBarAttrs topRightProgressBarAttrs = new ProgressBarAttrs(
+                    270 + angleOffset,
+                    pbMaxAngle,
+                    new RectF(screenWidth/2f, 0, screenWidth, screenHeight/2f)
+            );
+            ProgressBarAttrs bottomLeftProgressBarAttrs = new ProgressBarAttrs(
+                    90 + angleOffset,
+                    pbMaxAngle,
+                    new RectF(0, screenHeight/2f, screenWidth/2f, screenHeight)
+            );
+            ProgressBarAttrs bottomRightProgressBarAttrs = new ProgressBarAttrs(
+                    angleOffset,
+                    pbMaxAngle,
+                    new RectF(screenWidth/2f, screenHeight/2f, screenWidth, screenHeight)
+            );
 
-            // Creates a ComplicationDrawable for each location where the user can render a
-            // complication on the watch face.
-            ComplicationDrawable complicationDrawable = new ComplicationDrawable(context);
-            complicationDrawable.setRangedValueProgressHidden(true);
-            watchfaceConfig.getComplicationConfig(ComplicationId.TOP_LEFT)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, topLeftComplAttrs));
+            complSettingsMap = new HashMap<>(4);
+            complSettingsMap.put(ComplicationId.TOP_LEFT, new ComplicationSettings(
+                    ComplicationId.TOP_LEFT,
+                    watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_LEFT_PREFIX,
+                    new ComplicationAttrs(),
+                    topLeftProgressBarAttrs,
+                    topLeftComplCoefs));
+            complSettingsMap.put(ComplicationId.TOP_RIGHT, new ComplicationSettings(
+                    ComplicationId.TOP_RIGHT,
+                    watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_RIGHT_PREFIX,
+                    new ComplicationAttrs(),
+                    topRightProgressBarAttrs,
+                    topRightComplCoefs));
+            complSettingsMap.put(ComplicationId.BOTTOM_LEFT, new ComplicationSettings(
+                    ComplicationId.BOTTOM_LEFT,
+                    watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_LEFT_PREFIX,
+                    new ComplicationAttrs(),
+                    bottomLeftProgressBarAttrs,
+                    bottomLeftComplCoefs));
+            complSettingsMap.put(ComplicationId.BOTTOM_RIGHT, new ComplicationSettings(
+                    ComplicationId.BOTTOM_RIGHT,
+                    watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_RIGHT_PREFIX,
+                    new ComplicationAttrs(),
+                    bottomRightProgressBarAttrs,
+                    bottomRightComplCoefs));
 
-            complicationDrawable = new ComplicationDrawable(context);
-            complicationDrawable.setRangedValueProgressHidden(true);
-            watchfaceConfig.getComplicationConfig(ComplicationId.TOP_RIGHT)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, topRightComplAttrs));
+            for (ComplicationSettings settings : complSettingsMap.values()) {
+                settings.getAttrs().load(context, sharedPrefs, settings.getPrefix());
 
-            complicationDrawable = new ComplicationDrawable(context);
-            complicationDrawable.setRangedValueProgressHidden(true);
-            watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_LEFT)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, bottomLeftComplAttrs));
+                // pre-set no complication content
+                setDefaultSystemComplicationProvider(settings.getId().ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
 
-            complicationDrawable = new ComplicationDrawable(context);
-            complicationDrawable.setRangedValueProgressHidden(true);
-            watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_RIGHT)
-                    .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, bottomRightComplAttrs));
+                // Creates a ComplicationDrawable for each location where the user can render a
+                // complication on the watch face.
+                ComplicationDrawable complicationDrawable = new ComplicationDrawable(context);
+                complicationDrawable.setRangedValueProgressHidden(true);
+                watchfaceConfig.getComplicationConfig(settings.getId())
+                        .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, settings.getAttrs()));
+
+            }
 
             setActiveComplications(watchfaceConfig.getComplicationIds());
         }
 
-        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComplicationAttrs settings) {
+        private ComplicationDrawable updateComplicationDrawable(ComplicationDrawable drawable, ComplicationAttrs attrs) {
             /*
             More settings to do:
                 app:highlightColor="@color/fuchsia"
@@ -152,26 +210,25 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                 app:titleTypeface="sans-serif">
              */
 
-            drawable.setBackgroundColorActive(settings.getBackgroundColor());
-            drawable.setIconColorActive(settings.getDataColor());
-            drawable.setTextColorActive(settings.getDataColor());
-            drawable.setTitleColorActive(settings.getDataColor());
+            drawable.setBackgroundColorActive(attrs.getBackgroundColor());
+            drawable.setIconColorActive(attrs.getDataColor());
+            drawable.setTextColorActive(attrs.getDataColor());
+            drawable.setTitleColorActive(attrs.getDataColor());
 
-            int borderStyle = settings.getBorderDrawableStyle();
+            int borderStyle = attrs.getBorderDrawableStyle();
             drawable.setBorderStyleActive(borderStyle);
             if (borderStyle != ComplicationDrawable.BORDER_STYLE_NONE) {
-                Log.d(LOG_TAG, "updateComplicationDrawable: " + settings.toString());
-                drawable.setBorderColorActive(settings.getBorderColor());
+                drawable.setBorderColorActive(attrs.getBorderColor());
                 drawable.setBorderWidthActive(1);
                 if (borderStyle == ComplicationDrawable.BORDER_STYLE_DASHED) {
                     drawable.setBorderWidthActive(1);
                     drawable.setBorderDashGapActive(1);
-                    drawable.setBorderDashWidthActive(settings.isBorderDotted() ? 1 : 2);
+                    drawable.setBorderDashWidthActive(attrs.isBorderDotted() ? 1 : 2);
                 }
 
-                if (settings.isBorderRounded()) {
+                if (attrs.isBorderRounded()) {
                     drawable.setBorderRadiusActive(15);
-                } else if (settings.isBorderRing()) {
+                } else if (attrs.isBorderRing()) {
                     drawable.setBorderRadiusActive(150);
                 } else {
                     drawable.setBorderRadiusActive(0);
@@ -185,18 +242,15 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         public void onComplicationDataUpdate(int complicationId, ComplicationData complicationData) {
-            Log.d(LOG_TAG, "onComplicationDataUpdate() id: " + complicationId);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onComplicationDataUpdate() id: " + complicationId);
+            }
             // Updates correct ComplicationDrawable with updated data.
-            ComplicationConfig complicationConfig = watchfaceConfig.getComplicationConfig(ComplicationId.valueOf(complicationId));
-            complicationConfig.getComplicationDrawable().setComplicationData(complicationData);
+            ComplicationId id = ComplicationId.valueOf(complicationId);
+            watchfaceConfig.getComplicationConfig(id).getComplicationDrawable().setComplicationData(complicationData);
 
-            if (complicationData != null && complicationData.getType() == ComplicationData.TYPE_RANGED_VALUE) {
-                float minValue = complicationData.getMinValue();
-                float maxValue = complicationData.getMaxValue();
-                float currentValue = complicationData.getValue();
-
-                // TODO draw custom progress bar on the outer watch ring
+            if (complicationData != null) {
+                drawComplicationProgressBar(id, complicationData);
             }
 
             invalidate();
@@ -204,8 +258,9 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
-            Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
+            }
             super.onPropertiesChanged(properties);
 
             Context context = getApplicationContext();
@@ -214,49 +269,48 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         protected void adjustSize(int width, int height) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "adjustSize: " + width + " x " + height);
+            }
             super.adjustSize(width, height);
             Context context = getApplicationContext();
             timePanel.onSizeChanged(context, width, height);
 
+            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+            canvas = new Canvas(bitmap);
+
             /*
-             * Calculates location bounds for right and left circular complications. Please note,
-             * we are not demonstrating a long text complication in this watch face.
+             * Calculates location bounds for right and left circular complications.
              *
              * We suggest using at least 1/4 of the screen width for circular (or squared)
              * complications and 2/3 of the screen width for wide rectangular complications for
              * better readability.
              */
+            for (ComplicationSettings settings : complSettingsMap.values()) {
+                RectF boundsCoefs = settings.getBoundsCoefs();
+                watchfaceConfig.getComplicationConfig(settings.getId())
+                        .getComplicationDrawable()
+                        .setBounds(new Rect(
+                                (int) (boundsCoefs.left * width),
+                                (int) (boundsCoefs.top * height),
+                                (int) (boundsCoefs.right * width),
+                                (int) (boundsCoefs.bottom * height)
+                        ));
+            }
 
-            // top left complication
-            int left = (int) (topLeftComplCoefs.left * width);
-            int top = (int) (topLeftComplCoefs.top * height);
-            int right = (int) (topLeftComplCoefs.right * width);
-            int bottom = (int) (topLeftComplCoefs.bottom * height);
-            Rect bounds = new Rect(left, top, right, bottom);
-            watchfaceConfig.getComplicationConfig(ComplicationId.TOP_LEFT).getComplicationDrawable().setBounds(bounds);
-
-            // top right complication
-            left = (int) (topRightComplCoefs.left * width);
-            top = (int) (topRightComplCoefs.top * height);
-            right = (int) (topRightComplCoefs.right * width);
-            bottom = (int) (topRightComplCoefs.bottom * height);
-            bounds = new Rect(left, top, right, bottom);
-            watchfaceConfig.getComplicationConfig(ComplicationId.TOP_RIGHT).getComplicationDrawable().setBounds(bounds);
-
-            left = (int) (bottomLeftComplCoefs.left * width);
-            top = (int) (bottomLeftComplCoefs.top * height);
-            right = (int) (bottomLeftComplCoefs.right * width);
-            bottom = (int) (bottomLeftComplCoefs.bottom * height);
-            bounds = new Rect(left, top, right, bottom);
-            watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_LEFT).getComplicationDrawable().setBounds(bounds);
-
-            // top right complication
-            left = (int) (bottomRightComplCoefs.left * width);
-            top = (int) (bottomRightComplCoefs.top * height);
-            right = (int) (bottomRightComplCoefs.right * width);
-            bottom = (int) (bottomRightComplCoefs.bottom * height);
-            bounds = new Rect(left, top, right, bottom);
-            watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_RIGHT).getComplicationDrawable().setBounds(bounds);
+            // update progress bars bounds
+            complSettingsMap.get(ComplicationId.TOP_LEFT).getProgressAttrs().setBounds(
+                    new RectF(0, 0, width/2f, height/2f)
+            );
+            complSettingsMap.get(ComplicationId.TOP_RIGHT).getProgressAttrs().setBounds(
+                    new RectF(width/2f, 0, width, height/2f)
+            );
+            complSettingsMap.get(ComplicationId.BOTTOM_LEFT).getProgressAttrs().setBounds(
+                    new RectF(0, height/2f, width/2f, height)
+            );
+            complSettingsMap.get(ComplicationId.BOTTOM_RIGHT).getProgressAttrs().setBounds(
+                    new RectF(width/2f, height/2f, width, height)
+            );
         }
 
         @Override
@@ -266,23 +320,18 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         public void onVisibilityChanged(boolean visible) {
-            Log.d(LOG_TAG, "onVisibilityChanged: " + visible);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onVisibilityChanged: " + visible);
+            }
             if (visible) {
                 // Preferences might have changed since last time watch face was visible.
                 Context context = getApplicationContext();
 
-                topLeftComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_LEFT_PREFIX);
-                updateComplicationDrawable(watchfaceConfig.getComplicationConfig(ComplicationId.TOP_LEFT).getComplicationDrawable(), topLeftComplAttrs);
-
-                topRightComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.TOP_RIGHT_PREFIX);
-                updateComplicationDrawable(watchfaceConfig.getComplicationConfig(ComplicationId.TOP_RIGHT).getComplicationDrawable(), topRightComplAttrs);
-
-                bottomLeftComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_LEFT_PREFIX);
-                updateComplicationDrawable(watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_LEFT).getComplicationDrawable(), bottomLeftComplAttrs);
-
-                bottomRightComplAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.BOTTOM_RIGHT_PREFIX);
-                updateComplicationDrawable(watchfaceConfig.getComplicationConfig(ComplicationId.BOTTOM_RIGHT).getComplicationDrawable(), bottomRightComplAttrs);
+                for (ComplicationSettings settings : complSettingsMap.values()) {
+                    ComplicationAttrs attrs = settings.getAttrs();
+                    attrs.load(context, sharedPrefs, settings.getPrefix());
+                    updateComplicationDrawable(watchfaceConfig.getComplicationConfig(settings.getId()).getComplicationDrawable(), attrs);
+                }
 
                 timePanel.onConfigChanged(context, sharedPrefs);
 
@@ -291,6 +340,121 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                 timePanel.unregisterReceiver(DigitalWatchfaceService.this);
             }
             super.onVisibilityChanged(visible);
+        }
+
+        @Override
+        protected void drawComplications(Canvas canvas, boolean isAmbientMode) {
+            super.drawComplications(canvas, isAmbientMode);
+
+            if (!isAmbientMode && bitmap != null) {
+                canvas.drawBitmap(bitmap, null, getSurfaceHolder().getSurfaceFrame(), null);
+            }
+        }
+
+        private void drawComplicationProgressBar(ComplicationId complicationId, ComplicationData complicationData) {
+            ComplicationSettings settings = complSettingsMap.get(complicationId);
+            ProgressBarAttrs progressBarAttrs = settings.getProgressAttrs();
+            ComplicationAttrs complicationAttrs = settings.getAttrs();
+
+            // clear complication bitmap portion
+            canvas.drawRect(progressBarAttrs.getBounds(), clearPaint);
+
+            if (complicationData.getType() == ComplicationData.TYPE_RANGED_VALUE) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "drawComplicationProgressBar: " + complicationId);
+                }
+
+                float minValue = complicationData.getMinValue();
+                float maxValue = complicationData.getMaxValue();
+                float currentValue = complicationData.getValue();
+
+                float startAngle = progressBarAttrs.getStartAngle();
+                float maxAngle = progressBarAttrs.getMaxAngle();
+
+                // draw background path
+                Path path = new Path();
+                path.arcTo(pbCircleBounds, startAngle, maxAngle);
+                paint.setColor(backgroundPathColor);
+                canvas.drawPath(path, paint);
+
+                float percent = 0;
+                float range = Math.abs(maxValue - minValue); // avoid negative values
+                if (range > 0) {
+                    percent = (currentValue - minValue) / range;
+                    percent = Math.max(0, percent);
+                }
+                float sweepAngle = maxAngle * percent;
+
+                // draw current value path
+                path = new Path();
+                path.arcTo(pbCircleBounds, startAngle, sweepAngle);
+                paint.setColor(complicationAttrs.getDataColor());
+                canvas.drawPath(path, paint);
+            }
+        }
+    }
+
+    private static class ProgressBarAttrs {
+        final private float startAngle;
+        final private float maxAngle;
+        private RectF bounds; // drawing area (screen quarter)
+
+        public ProgressBarAttrs(float startAngle, float maxAngle, RectF bounds) {
+            this.startAngle = startAngle;
+            this.maxAngle = maxAngle;
+            this.bounds = bounds;
+        }
+
+        public float getStartAngle() {
+            return startAngle;
+        }
+
+        public float getMaxAngle() {
+            return maxAngle;
+        }
+
+        public RectF getBounds() {
+            return bounds;
+        }
+
+        public void setBounds(RectF bounds) {
+            this.bounds = bounds;
+        }
+    }
+
+    private static class ComplicationSettings {
+        final private ComplicationId id;
+        final private String prefix;
+        final private ComplicationAttrs attrs;
+        final private ProgressBarAttrs progressAttrs;
+        final private RectF boundsCoefs;
+
+        public ComplicationSettings(ComplicationId id, String prefix, ComplicationAttrs attrs, ProgressBarAttrs progressAttrs, RectF boundsCoefs) {
+            this.id = id;
+            this.prefix = prefix;
+            this.attrs = attrs;
+            this.progressAttrs = progressAttrs;
+            this.boundsCoefs = boundsCoefs;
+        }
+
+        public ComplicationId getId() {
+            return id;
+        }
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public ComplicationAttrs getAttrs() {
+            return attrs;
+        }
+
+        public ProgressBarAttrs getProgressAttrs() {
+            return progressAttrs;
+        }
+
+        public RectF getBoundsCoefs() {
+            return boundsCoefs;
         }
     }
 }

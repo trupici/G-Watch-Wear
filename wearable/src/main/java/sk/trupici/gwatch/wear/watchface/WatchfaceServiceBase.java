@@ -304,7 +304,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             bkgPanel.onDraw(canvas, isAmbientMode);
             bgGraph.onDraw(canvas, isAmbientMode);
             bgPanel.onDraw(canvas, isAmbientMode);
-            drawComplications(canvas);
+            drawComplications(canvas, isAmbientMode);
             drawCustomPanels(canvas, isAmbientMode);
 
             if (now - lastMinute > CommonConstants.MINUTE_IN_MILLIS) {
@@ -313,7 +313,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             }
         }
 
-        private void drawComplications(Canvas canvas) {
+        protected void drawComplications(Canvas canvas, boolean isAmbientMode) {
             long currentTimeMillis = System.currentTimeMillis();
             for (ComplicationConfig complicationConfig : watchfaceConfig.getComplicationConfigs()) {
                 complicationConfig.getComplicationDrawable().draw(canvas, currentTimeMillis);

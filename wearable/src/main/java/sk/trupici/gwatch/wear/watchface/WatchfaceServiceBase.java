@@ -105,8 +105,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         // indicating there are unread notifications.
         protected SharedPreferences sharedPrefs;
 
-        protected float screenWidth;
-        protected float screenHeight;
+        protected float refScreenWidth;
+        protected float refScreenHeight;
 
         private BackgroundPanel bkgPanel;
         private BgGraph bgGraph;
@@ -147,23 +147,23 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
                 PreferenceUtils.dumpPreferences(sharedPrefs);
             }
 
-            screenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
-            screenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
+            refScreenWidth = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_width);
+            refScreenHeight = getResources().getDimensionPixelSize(R.dimen.layout_ref_screen_height);
 
-            bkgPanel = new BackgroundPanel((int) screenWidth, (int) screenHeight, watchfaceConfig);
+            bkgPanel = new BackgroundPanel((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
             bkgPanel.onCreate(context, sharedPrefs);
 
-            bgPanel = new BgPanel((int) screenWidth, (int) screenHeight, watchfaceConfig);
+            bgPanel = new BgPanel((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
             bgPanel.onCreate(context, sharedPrefs);
 
-            bgGraph = new BgGraph((int) screenWidth, (int) screenHeight, watchfaceConfig);
+            bgGraph = new BgGraph((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
             bgGraph.onCreate(context, sharedPrefs);
 
             bgAlarmController = new BgAlarmController();
             bgAlarmController.onCreate(context, sharedPrefs);
 
             initializeComplications(context);
-            initializeCustomPanels(context, (int) screenWidth, (int) screenHeight);
+            initializeCustomPanels(context, (int) refScreenWidth, (int) refScreenHeight);
 
             registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
             registerReceiver(context, bgGraph, CommonConstants.BG_RECEIVER_ACTION);
@@ -264,9 +264,6 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         }
 
         protected void adjustSize(int width, int height) {
-            this.screenWidth = width;
-            this.screenHeight = height;
-
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
             bgGraph.onSizeChanged(context, width, height);
@@ -334,7 +331,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
                 bgGraph.onConfigChanged(context, sharedPrefs);
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
-                adjustSize((int)screenWidth, (int)screenHeight);
+//                Rect surfaceRect = getSurfaceHolder().getSurfaceFrame();
+//                adjustSize(surfaceRect.width(), surfaceRect.height());
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */

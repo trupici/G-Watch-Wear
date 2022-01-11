@@ -21,7 +21,6 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.util.Log;
 
@@ -75,25 +74,22 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
         @Override
         void initializeComplications(Context context) {
             leftComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.analog_layout_left_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.analog_layout_left_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.analog_layout_left_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.analog_layout_left_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.analog_layout_left_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.analog_layout_left_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.analog_layout_left_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.analog_layout_left_compl_bottom) / refScreenHeight
             );
             leftComplicationAttrs = new ComplicationAttrs();
             leftComplicationAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.LEFT_PREFIX);
 
             rightComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.analog_layout_right_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.analog_layout_right_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.analog_layout_right_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.analog_layout_right_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.analog_layout_right_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.analog_layout_right_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.analog_layout_right_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.analog_layout_right_compl_bottom) / refScreenHeight
             );
             rightComplicationAttrs = new ComplicationAttrs();
             rightComplicationAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.RIGHT_PREFIX);
-
-            setDefaultSystemComplicationProvider (ComplicationId.LEFT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
-            setDefaultSystemComplicationProvider (ComplicationId.RIGHT.ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
 
             // Creates a ComplicationDrawable for each location where the user can render a
             // complication on the watch face.

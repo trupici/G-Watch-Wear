@@ -87,7 +87,7 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
         @Override
         void initializeComplications(Context context) {
 
-            bitmap = Bitmap.createBitmap((int)screenWidth, (int)screenHeight, Bitmap.Config.ARGB_8888);
+            bitmap = Bitmap.createBitmap((int) refScreenWidth, (int) refScreenHeight, Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bitmap);
 
             paint = new Paint();
@@ -105,53 +105,53 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
             pbPadding = context.getResources().getInteger(R.integer.digital_compl_progressbar_padding);
             pbMaxAngle = context.getResources().getInteger(R.integer.digital_compl_progressbar_angle);
-            pbCircleBounds = new RectF(pbPadding, pbPadding, screenWidth-pbPadding, screenHeight-pbPadding);
+            pbCircleBounds = new RectF(pbPadding, pbPadding, refScreenWidth -pbPadding, refScreenHeight -pbPadding);
 
             RectF topLeftComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_top_left_compl_bottom) / refScreenHeight
             );
             RectF topRightComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_top_right_compl_bottom) / refScreenHeight
             );
             RectF bottomLeftComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_left_compl_bottom) / refScreenHeight
             );
             RectF bottomRightComplCoefs = new RectF(
-                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_left) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_top) / screenHeight,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_right) / screenWidth,
-                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_bottom) / screenHeight
+                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_left) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_top) / refScreenHeight,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_right) / refScreenWidth,
+                    getResources().getDimension(R.dimen.digital_layout_bottom_right_compl_bottom) / refScreenHeight
             );
 
             float angleOffset = (90 - pbMaxAngle) / 2f;
             ProgressBarAttrs topLeftProgressBarAttrs = new ProgressBarAttrs(
                     180 + angleOffset,
                     pbMaxAngle,
-                    new RectF(0, 0, screenWidth/2f, screenHeight/2f)
+                    new RectF(0, 0, refScreenWidth /2f, refScreenHeight /2f)
             );
             ProgressBarAttrs topRightProgressBarAttrs = new ProgressBarAttrs(
                     270 + angleOffset,
                     pbMaxAngle,
-                    new RectF(screenWidth/2f, 0, screenWidth, screenHeight/2f)
+                    new RectF(refScreenWidth /2f, 0, refScreenWidth, refScreenHeight /2f)
             );
             ProgressBarAttrs bottomLeftProgressBarAttrs = new ProgressBarAttrs(
                     90 + angleOffset,
                     pbMaxAngle,
-                    new RectF(0, screenHeight/2f, screenWidth/2f, screenHeight)
+                    new RectF(0, refScreenHeight /2f, refScreenWidth /2f, refScreenHeight)
             );
             ProgressBarAttrs bottomRightProgressBarAttrs = new ProgressBarAttrs(
                     angleOffset,
                     pbMaxAngle,
-                    new RectF(screenWidth/2f, screenHeight/2f, screenWidth, screenHeight)
+                    new RectF(refScreenWidth /2f, refScreenHeight /2f, refScreenWidth, refScreenHeight)
             );
 
             complSettingsMap = new HashMap<>(4);
@@ -183,16 +183,12 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             for (ComplicationSettings settings : complSettingsMap.values()) {
                 settings.getAttrs().load(context, sharedPrefs, settings.getPrefix());
 
-                // pre-set no complication content
-                setDefaultSystemComplicationProvider(settings.getId().ordinal(), 0, ComplicationData.TYPE_NOT_CONFIGURED);
-
                 // Creates a ComplicationDrawable for each location where the user can render a
                 // complication on the watch face.
                 ComplicationDrawable complicationDrawable = new ComplicationDrawable(context);
                 complicationDrawable.setRangedValueProgressHidden(true);
                 watchfaceConfig.getComplicationConfig(settings.getId())
                         .setComplicationDrawable(updateComplicationDrawable(complicationDrawable, settings.getAttrs()));
-
             }
 
             setActiveComplications(watchfaceConfig.getComplicationIds());
@@ -248,10 +244,8 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             // Updates correct ComplicationDrawable with updated data.
             ComplicationId id = ComplicationId.valueOf(complicationId);
             watchfaceConfig.getComplicationConfig(id).getComplicationDrawable().setComplicationData(complicationData);
-
-            if (complicationData != null) {
-                drawComplicationProgressBar(id, complicationData);
-            }
+            complSettingsMap.get(id).setComplicationData(complicationData);
+            drawComplicationProgressBar(id);
 
             invalidate();
         }
@@ -273,10 +267,15 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                 Log.d(LOG_TAG, "adjustSize: " + width + " x " + height);
             }
             super.adjustSize(width, height);
+
+            if (width == bitmap.getWidth() && height == bitmap.getHeight()) {
+                return; // no real size change
+            }
+
             Context context = getApplicationContext();
             timePanel.onSizeChanged(context, width, height);
 
-            bitmap = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bitmap);
 
             /*
@@ -311,6 +310,10 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             complSettingsMap.get(ComplicationId.BOTTOM_RIGHT).getProgressAttrs().setBounds(
                     new RectF(width/2f, height/2f, width, height)
             );
+
+            for (ComplicationId complicationId : complSettingsMap.keySet()) {
+                drawComplicationProgressBar(complicationId);
+            }
         }
 
         @Override
@@ -351,15 +354,16 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             }
         }
 
-        private void drawComplicationProgressBar(ComplicationId complicationId, ComplicationData complicationData) {
+        private void drawComplicationProgressBar(ComplicationId complicationId) {
             ComplicationSettings settings = complSettingsMap.get(complicationId);
             ProgressBarAttrs progressBarAttrs = settings.getProgressAttrs();
             ComplicationAttrs complicationAttrs = settings.getAttrs();
+            ComplicationData complicationData = settings.getComplicationData();
 
             // clear complication bitmap portion
             canvas.drawRect(progressBarAttrs.getBounds(), clearPaint);
 
-            if (complicationData.getType() == ComplicationData.TYPE_RANGED_VALUE) {
+            if (complicationData != null && complicationData.getType() == ComplicationData.TYPE_RANGED_VALUE) {
                 if (BuildConfig.DEBUG) {
                     Log.d(LOG_TAG, "drawComplicationProgressBar: " + complicationId);
                 }
@@ -428,6 +432,7 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
         final private ComplicationAttrs attrs;
         final private ProgressBarAttrs progressAttrs;
         final private RectF boundsCoefs;
+        private ComplicationData complicationData;
 
         public ComplicationSettings(ComplicationId id, String prefix, ComplicationAttrs attrs, ProgressBarAttrs progressAttrs, RectF boundsCoefs) {
             this.id = id;
@@ -455,6 +460,14 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         public RectF getBoundsCoefs() {
             return boundsCoefs;
+        }
+
+        public ComplicationData getComplicationData() {
+            return complicationData;
+        }
+
+        public void setComplicationData(ComplicationData complicationData) {
+            this.complicationData = complicationData;
         }
     }
 }

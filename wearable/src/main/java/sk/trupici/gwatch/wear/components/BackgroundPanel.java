@@ -27,7 +27,6 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.wearable.watchface.WatchFaceService;
 
-import sk.trupici.gwatch.wear.config.ConfigItemData;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 
@@ -42,9 +41,10 @@ public class BackgroundPanel implements ComponentPanel {
 
     final private WatchfaceConfig watchfaceConfig;
 
-    private Paint backgroundPaint;
-    private Bitmap backgroundBitmap;
-    private Bitmap ambientBackgroundBitmap;
+    private Paint paint;
+    private Paint grayPaint;
+
+    private Bitmap bitmap;
 
     private boolean lowBitAmbient;
     private boolean burnInProtection;
@@ -57,33 +57,26 @@ public class BackgroundPanel implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        backgroundPaint = new Paint();
+        paint = new Paint();
+        paint.setAntiAlias(true);
+
+        grayPaint = new Paint();
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0);
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+        grayPaint.setColorFilter(filter);
+
         onConfigChanged(context, sharedPrefs);
     }
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
-
-        backgroundBitmap = Bitmap.createScaledBitmap(backgroundBitmap, width, height, true);
-
-        /*
-         * Create a gray version of the image only if it will look nice on the device in
-         * ambient mode. That means we don"t want devices that support burn-in
-         * protection (slight movements in pixels, not great for images going all the way to
-         * edges) and low ambient mode (degrades image quality).
-         *
-         * Also, if your watch face will know about all images ahead of time (users aren"t
-         * selecting their own photos for the watch face), it will be more
-         * efficient to create a black/white version (png, etc.) and load that when you need it.
-         */
-        if (!burnInProtection && !lowBitAmbient) {
-            initGrayBackgroundBitmap();
-        }
+        bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
     }
 
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-        backgroundBitmap = BitmapFactory.decodeResource(context.getResources(),
+        bitmap = BitmapFactory.decodeResource(context.getResources(),
                 watchfaceConfig.getSelectedItem(context, ConfigPageData.ConfigType.BACKGROUND).getResourceId()
         );
     }
@@ -94,10 +87,10 @@ public class BackgroundPanel implements ComponentPanel {
             if (lowBitAmbient || burnInProtection) {
                 canvas.drawColor(Color.BLACK);
             } else {
-                canvas.drawBitmap(ambientBackgroundBitmap, 0, 0, backgroundPaint);
+                canvas.drawBitmap(bitmap, null, canvas.getClipBounds(), grayPaint);
             }
         } else {
-            canvas.drawBitmap(backgroundBitmap, 0, 0, backgroundPaint);
+            canvas.drawBitmap(bitmap, null, canvas.getClipBounds(), paint);
         }
     }
 
@@ -105,20 +98,6 @@ public class BackgroundPanel implements ComponentPanel {
     public void onPropertiesChanged(Context context, Bundle properties) {
         lowBitAmbient = properties.getBoolean(WatchFaceService.PROPERTY_LOW_BIT_AMBIENT, false);
         burnInProtection = properties.getBoolean(WatchFaceService.PROPERTY_BURN_IN_PROTECTION, false);
-    }
-
-    private void initGrayBackgroundBitmap() {
-        ambientBackgroundBitmap = Bitmap.createBitmap(
-                backgroundBitmap.getWidth(),
-                backgroundBitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(ambientBackgroundBitmap);
-        Paint grayPaint = new Paint();
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        grayPaint.setColorFilter(filter);
-        canvas.drawBitmap(backgroundBitmap, 0, 0, grayPaint);
     }
 
 }

@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.util.Log;
 
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.ComplicationAttrs;
 import sk.trupici.gwatch.wear.components.DatePanel;
@@ -124,7 +125,6 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
             int borderStyle = settings.getBorderDrawableStyle();
             drawable.setBorderStyleActive(borderStyle);
             if (borderStyle != ComplicationDrawable.BORDER_STYLE_NONE) {
-                Log.d(LOG_TAG, "updateComplicationDrawable: " + settings.toString());
                 drawable.setBorderColorActive(settings.getBorderColor());
                 drawable.setBorderWidthActive(1);
                 if (borderStyle == ComplicationDrawable.BORDER_STYLE_DASHED) {
@@ -148,8 +148,9 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
-            Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onPropertiesChanged: " + properties);
+            }
             super.onPropertiesChanged(properties);
 
             Context context = getApplicationContext();
@@ -159,6 +160,9 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         protected void adjustSize(int width, int height) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "adjustSize: " + width + " x " + height);
+            }
             super.adjustSize(width, height);
             Context context = getApplicationContext();
 
@@ -166,8 +170,7 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
             datePanel.onSizeChanged(context, width, height);
 
             /*
-             * Calculates location bounds for right and left circular complications. Please note,
-             * we are not demonstrating a long text complication in this watch face.
+             * Calculates location bounds for right and left circular complications.
              *
              * We suggest using at least 1/4 of the screen width for circular (or squared)
              * complications and 2/3 of the screen width for wide rectangular complications for
@@ -199,8 +202,9 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         public void onVisibilityChanged(boolean visible) {
-            Log.d(LOG_TAG, "onVisibilityChanged: " + visible);
-
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "onVisibilityChanged: " + visible);
+            }
             if (visible) {
                 // Preferences might have changed since last time watch face was visible.
                 Context context = getApplicationContext();

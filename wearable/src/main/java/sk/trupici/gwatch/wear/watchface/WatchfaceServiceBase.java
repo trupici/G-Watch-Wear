@@ -331,8 +331,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
                 bgGraph.onConfigChanged(context, sharedPrefs);
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
-//                Rect surfaceRect = getSurfaceHolder().getSurfaceFrame();
-//                adjustSize(surfaceRect.width(), surfaceRect.height());
+                Rect surfaceRect = getSurfaceHolder().getSurfaceFrame();
+                adjustSize(surfaceRect.width(), surfaceRect.height());
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */

@@ -212,7 +212,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
 
     @Override
     public ComplicationConfig[] getComplicationConfigs() {
-        return new ComplicationConfig[0];
+        return complicationConfig;
     }
 
     @Override

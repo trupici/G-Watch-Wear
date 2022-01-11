@@ -199,7 +199,7 @@ public class DigitalTimePanel implements ComponentPanel {
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
 
-        if (timeFormat == null) {
+        if (bkgBitmap == null || timeFormat == null) {
             return; // not ready yet
         }
 

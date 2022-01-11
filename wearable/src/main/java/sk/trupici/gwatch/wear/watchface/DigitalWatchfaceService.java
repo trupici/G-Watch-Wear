@@ -268,10 +268,6 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             }
             super.adjustSize(width, height);
 
-            if (width == bitmap.getWidth() && height == bitmap.getHeight()) {
-                return; // no real size change
-            }
-
             Context context = getApplicationContext();
             timePanel.onSizeChanged(context, width, height);
 

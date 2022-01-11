@@ -45,13 +45,13 @@
     <dimen name="digital_layout_bg_pnel_left">164px</dimen>
     <dimen name="digital_layout_bg_panel_top">294px</dimen>
     <dimen name="digital_layout_bg_panel_right">288px</dimen>
-    <dimen name="digital_layout_bg_panel_bottom">361px</dimen>
+    <dimen name="digital_layout_bg_panel_bottom">360px</dimen>
     <dimen name="digital_layout_bg_panel_top_offset">0px</dimen>
 
     <dimen name="digital_layout_bg_graph_panel_left">89px</dimen>
     <dimen name="digital_layout_bg_graph_panel_top">172px</dimen>
     <dimen name="digital_layout_bg_graph_panel_right">362px</dimen>
-    <dimen name="digital_layout_bg_graph_panel_bottom">285px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_bottom">284px</dimen>
 
     <dimen name="digital_layout_bg_graph_left_padding">2px</dimen>
     <dimen name="digital_layout_bg_graph_right_padding">2px</dimen>
@@ -63,7 +63,7 @@
     <dimen name="digital_layout_time_panel_right">362px</dimen>
     <dimen name="digital_layout_time_panel_bottom">161px</dimen>
 
-    <integer name="digital_compl_progressbar_angle">76</integer>
+    <integer name="digital_compl_progressbar_angle">72</integer>
     <integer name="digital_compl_progressbar_padding">12</integer>
     <integer name="digital_compl_progressbar_width">12</integer>
     <color name="digital_compl_progressbar_bkg_color">#88888888</color>

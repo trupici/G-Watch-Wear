@@ -16,6 +16,7 @@
 
 package sk.trupici.gwatch.wear.services;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.PowerManager;
 import android.util.Log;
@@ -26,6 +27,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.data.ConfigData;
@@ -41,7 +43,6 @@ import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HYPER;
 import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HYPO;
 import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_LOW;
 import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_UNIT_CONVERSION;
-import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
 
 public class ConfigListenerService extends WearableListenerService {
 
@@ -94,11 +95,10 @@ public class ConfigListenerService extends WearableListenerService {
                 }
                 persistConfig(tlv, cfg, edit);
             }
+            edit.apply();
 
             // notify watchface that config has changed
-            // FIXME - change to LocalBroadcast and single receivers
-            edit.putLong(PREF_CONFIG_CHANGED, System.currentTimeMillis());
-            edit.apply();
+            LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(CommonConstants.REMOTE_CONFIG_ACTION));
         } finally {
             wakeLock.release();
         }

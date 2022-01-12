@@ -18,6 +18,7 @@ package sk.trupici.gwatch.wear.util;
 
 public interface CommonConstants {
     String BG_RECEIVER_ACTION = "sk.trupici.gwatch.wear.BG_RECEIVER_ACTION";
+    String REMOTE_CONFIG_ACTION = "sk.trupici.gwatch.wear.REMOTE_CONFIG_ACTION";
 
     long SECOND_IN_MILLIS = 1000L;
     int MINUTE_IN_SECONDS = 60;
@@ -35,11 +36,7 @@ public interface CommonConstants {
     String PREF_HYPO_THRESHOLD = "bg_threshold_hypo";
     String PREF_NO_DATA_THRESHOLD = "bg_threshold_no_data";
 
-    String PREF_CONFIG_CHANGED = "config_changed";
-
     int COMPLICATION_CONFIG_REQUEST_CODE = 101;
     int UPDATE_COLORS_CONFIG_REQUEST_CODE = 102;
     int BORDER_TYPE_CONFIG_REQUEST_CODE = 103;
-    int NUMBER_TYPE_CONFIG_REQUEST_CODE = 104;
-    int TIME_TYPE_CONFIG_REQUEST_CODE = 105;
 }

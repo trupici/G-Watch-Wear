@@ -53,8 +53,6 @@ import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
-import static sk.trupici.gwatch.wear.util.CommonConstants.PREF_CONFIG_CHANGED;
-
 /**
  * Watch face parent base class with common functionality
  **/
@@ -94,7 +92,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         }
     }
 
-    protected abstract class Engine extends CanvasWatchFaceService.Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
+    protected abstract class Engine extends CanvasWatchFaceService.Engine {
 
         /* Handler to update the time once a second in interactive mode. */
         private final Handler updateTimeHandler = new EngineHandler(this);
@@ -142,7 +140,6 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             // Used throughout watch face to pull user's preferences.
             Context context = getApplicationContext();
             sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPrefs.registerOnSharedPreferenceChangeListener(this);
             if (BuildConfig.DEBUG) {
                 PreferenceUtils.dumpPreferences(sharedPrefs);
             }
@@ -165,8 +162,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             initializeComplications(context);
             initializeCustomPanels(context, (int) refScreenWidth, (int) refScreenHeight);
 
-            registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION);
-            registerReceiver(context, bgGraph, CommonConstants.BG_RECEIVER_ACTION);
+            registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION, CommonConstants.REMOTE_CONFIG_ACTION);
+            registerReceiver(context, bgGraph, CommonConstants.BG_RECEIVER_ACTION, CommonConstants.REMOTE_CONFIG_ACTION);
             registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);
         }
 
@@ -186,7 +183,6 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         @Override
         public void onDestroy() {
             updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
-            sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
 
             // unregister all receivers
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
@@ -372,25 +368,16 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         /**
          * Register goven <code>BroadcastReceiver</code> for specified action
          * @param receiver <code>BroadcastReceiver</code> to register
-         * @param action action to register receiver for
+         * @param actions actions to register receiver for
          */
-        private void registerReceiver(Context context, BroadcastReceiver receiver, String action) {
+        private void registerReceiver(Context context, BroadcastReceiver receiver, String ... actions) {
             IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(action);
             intentFilter.setPriority(100);
+            for (String action : actions) {
+                intentFilter.addAction(action);
+            }
             LocalBroadcastManager.getInstance(context).registerReceiver(receiver, intentFilter);
             receivers.add(receiver);
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Log.d(LOG_TAG, "onSharedPreferenceChanged: " + key);
-            if (PREF_CONFIG_CHANGED.equals(key)) { // FIXME - change to LocalBroadcast and single receivers
-                Log.d(LOG_TAG, "onSharedPreferenceChanged: signaled config change");
-                Context context = getApplicationContext();
-                bgPanel.onConfigChanged(context, sharedPrefs);
-                bgGraph.onConfigChanged(context, sharedPrefs);
-            }
         }
     }
 }

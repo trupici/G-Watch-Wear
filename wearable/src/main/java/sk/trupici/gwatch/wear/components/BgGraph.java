@@ -535,14 +535,19 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Bundle extras = intent.getExtras();
-        BgData bgData = BgData.fromBundle(extras);
-        if (bgData.getValue() == 0 || bgData.getTimestamp() == 0) {
-            return;
-        }
-
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
+        if (CommonConstants.BG_RECEIVER_ACTION.equals(intent.getAction())) {
+            Bundle extras = intent.getExtras();
+            BgData bgData = BgData.fromBundle(extras);
+            if (bgData.getValue() == 0 || bgData.getTimestamp() == 0) {
+                return;
+            }
+            updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
+        } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
+            onConfigChanged(context, sharedPrefs);
+        } else {
+            Log.e(LOG_TAG, "onReceive: unsupported intent: " + intent.getAction());
+        }
     }
 
     static class GraphRange {

@@ -30,6 +30,7 @@ import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.text.TextPaint;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.BorderType;
@@ -108,8 +109,14 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Bundle extras = intent.getExtras();
-        onDataUpdate(context, BgData.fromBundle(extras));
+        if (CommonConstants.BG_RECEIVER_ACTION.equals(intent.getAction())) {
+            Bundle extras = intent.getExtras();
+            onDataUpdate(context, BgData.fromBundle(extras));
+        } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
+            onConfigChanged(context, PreferenceManager.getDefaultSharedPreferences(context));
+        } else {
+            Log.e(LOG_TAG, "onReceive: unsupported intent: " + intent.getAction());
+        }
     }
 
     @Override

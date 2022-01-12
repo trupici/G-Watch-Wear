@@ -18,9 +18,8 @@ package sk.trupici.gwatch.wear.config.complications;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
 import android.graphics.ColorFilter;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationHelperActivity;
@@ -65,7 +64,8 @@ public abstract class ComplicationViewHolder extends RecyclerView.ViewHolder imp
 
         this.watchfaceConfig = watchfaceConfig;
         this.complicationAdapter = complicationAdapter;
-        defaultComplicationDrawable = view.getContext().getDrawable(R.drawable.config_add_complication); // FIXME change drawable
+
+        defaultComplicationDrawable = complicationAdapter.getDefaultComplicationDrawable();
 
         bkgViewGroup = view.findViewById(R.id.backgrounds);
         initComplicationViews(view);
@@ -148,11 +148,8 @@ public abstract class ComplicationViewHolder extends RecyclerView.ViewHolder imp
         return true;
     }
 
-    public boolean updateComplicationView(Context context, ComplicationProviderInfo complicationProviderInfo, Integer id) {
-        if (id == null) {
-            return false;
-        }
-        ComplicationId complicationId = ComplicationId.valueOf(id);
+    public boolean updateComplicationView(Context context, ComplicationProviderInfo complicationProviderInfo, ComplicationId complicationId) {
+        Log.e(LOG_TAG, "updateComplicationView: " + complicationId + ", " + complicationProviderInfo);
         ImageButton complication = getComplicationViews(complicationId).complication;
         if (complication == null) {
             return false;
@@ -161,16 +158,17 @@ public abstract class ComplicationViewHolder extends RecyclerView.ViewHolder imp
         complication.setImageIcon(null);
         if (complicationProviderInfo != null) {
             try {
+                context.getPackageManager().getApplicationInfo(complicationProviderInfo.providerIcon.getResPackage(), PackageManager.GET_SHARED_LIBRARY_FILES);
                 complication.setImageIcon(complicationProviderInfo.providerIcon);
             } catch (Exception e) {
-                Log.e(LOG_TAG, "updateComplicationView: " + e.getLocalizedMessage());
+                Log.e(LOG_TAG, "updateComplicationView: unable to retrieve icon from provider info");
             }
             complication.setContentDescription(context.getString(R.string.edit_complication));
         } else {
             complication.setContentDescription(context.getString(R.string.add_complication));
         }
         if (complication.getDrawable() == null) {
-            complication.setImageDrawable(defaultComplicationDrawable != null ? defaultComplicationDrawable : new ColorDrawable(Color.TRANSPARENT));
+            complication.setImageDrawable(defaultComplicationDrawable);
         }
         return true;
     }

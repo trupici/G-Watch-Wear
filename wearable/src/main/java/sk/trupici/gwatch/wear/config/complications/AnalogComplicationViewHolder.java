@@ -16,19 +16,10 @@
 
 package sk.trupici.gwatch.wear.config.complications;
 
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
  * Displays Analog watch face preview with complication locations.

@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -76,7 +77,7 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
 
     private ComplicationId selectedComplicationId;
 
-    final private Drawable defaultComplicationDrawable;
+    private Drawable defaultComplicationDrawable;
 
     // Maintains reference view holder to dynamically update watch face preview. Used instead of
     // notifyItemChanged(int position) to avoid flicker and re-inflating the view.
@@ -96,7 +97,9 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
         this.prefs = prefs;
         this.watchfaceConfig = watchfaceConfig;
 
-        defaultComplicationDrawable = context.getDrawable(R.drawable.config_add_complication);
+        try {
+            defaultComplicationDrawable = context.getDrawable(android.R.drawable.ic_menu_report_image);
+        } catch (Exception e) { }
 
         // Initialization of code to retrieve active complication data for the watch face.
         this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
@@ -217,17 +220,17 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
                 case COMPLICATION_CONFIG_REQUEST_CODE:
                     // Retrieves information for selected Complication provider.
                     ComplicationProviderInfo complicationProviderInfo = data.getParcelableExtra(ProviderChooserIntent.EXTRA_PROVIDER_INFO);
-                    Integer id = data.getParcelableExtra(ProviderChooserIntent.EXTRA_COMPLICATION_ID);
+                    ComplicationId complicationId = selectedComplicationId;
                     if (BuildConfig.DEBUG) {
-                        Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
+                        Log.d(LOG_TAG, "onActivityResult: complicationId=" + complicationId);
                     }
                     // Updates preview with new complication information for selected complication id.
                     // Note: complication id is saved and tracked in the adapter class.
-                    return complicationViewHolder.updateComplicationView(context, complicationProviderInfo, id);
+                    return complicationViewHolder.updateComplicationView(context, complicationProviderInfo, complicationId);
                 case UPDATE_COLORS_CONFIG_REQUEST_CODE:
                     int color = data.getIntExtra(ColorPickerActivity.EXTRA_COLOR, Color.TRANSPARENT);
                     ConfigItem.Type type = ConfigItem.Type.valueOf(data.getExtras().getInt(ColorPickerActivity.EXTRA_ITEM_TYPE));
-                    id = (Integer) data.getExtras().get(ColorPickerActivity.EXTRA_ITEM_ID);
+                    Integer id = (Integer) data.getExtras().get(ColorPickerActivity.EXTRA_ITEM_ID);
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "onActivityResult: complicationId=" + id);
                     }
@@ -505,7 +508,13 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
                             }
                             if (complicationProviderInfo != null) {
                                 ComplicationId complicationId = ComplicationId.valueOf(watchFaceComplicationId);
-                                complicationViewHolder.setIcon(complicationId, complicationProviderInfo.providerIcon);
+                                try {
+                                    context.getPackageManager().getApplicationInfo(complicationProviderInfo.providerIcon.getResPackage(), PackageManager.GET_SHARED_LIBRARY_FILES);
+                                    complicationViewHolder.setIcon(complicationId, complicationProviderInfo.providerIcon);
+                                } catch (Exception e) {
+                                    Log.e(LOG_TAG, "updateComplicationView: unable to retrieve icon from provider info");
+                                    complicationViewHolder.setDrawable(complicationId, defaultComplicationDrawable);
+                                }
                             }
                         }
                     },
@@ -520,5 +529,9 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
 
     public void setSelectedComplicationId(ComplicationId selectedComplicationId) {
         this.selectedComplicationId = selectedComplicationId;
+    }
+
+    public Drawable getDefaultComplicationDrawable() {
+        return defaultComplicationDrawable;
     }
 }

@@ -119,20 +119,10 @@ public class BgDataProviderService extends ComplicationProviderService {
                     .setShortText(ComplicationText.plainText(text))
                     .setShortTitle(ComplicationText.plainText(title))
                     .build();
-        } else if (type == ComplicationData.TYPE_LONG_TEXT) {
+        } else {//if (type == ComplicationData.TYPE_LONG_TEXT) {
             data = new ComplicationData.Builder(type)
                     .setLongText(ComplicationText.plainText(text))
                     .setLongTitle(ComplicationText.plainText(title))
-                    .build();
-        } else { //if (type == ComplicationData.TYPE_RANGED_VALUE) {
-            int minValue = 40;
-            int maxValue = 400;
-            data = new ComplicationData.Builder(type)
-                    .setMinValue(minValue)
-                    .setMaxValue(maxValue)
-                    .setValue(value)
-                    .setShortText(ComplicationText.plainText(text))
-                    .setShortTitle(ComplicationText.plainText(title))
                     .build();
         }
         manager.updateComplicationData(complicationId, data);

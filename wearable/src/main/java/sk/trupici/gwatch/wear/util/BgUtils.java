@@ -68,7 +68,7 @@ public class BgUtils {
     }
 
     public static String formatBgValueString(int value, Trend trend, boolean isUnitConversion) {
-        return isUnitConversion ? convertGlucoseToMmolLStr(value) : Integer.toString(value)
+        return (isUnitConversion ? convertGlucoseToMmolLStr(value) : Integer.toString(value))
                 + getTrendChar(trend);
     }
 

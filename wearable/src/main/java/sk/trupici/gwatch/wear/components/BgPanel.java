@@ -111,7 +111,9 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public void onReceive(Context context, Intent intent) {
         if (CommonConstants.BG_RECEIVER_ACTION.equals(intent.getAction())) {
             Bundle extras = intent.getExtras();
-            onDataUpdate(BgData.fromBundle(extras));
+            if (extras != null) {
+                onDataUpdate(BgData.fromBundle(extras));
+            }
         } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
             onConfigChanged(context, PreferenceManager.getDefaultSharedPreferences(context));
         } else {

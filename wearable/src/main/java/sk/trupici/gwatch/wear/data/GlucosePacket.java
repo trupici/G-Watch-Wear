@@ -22,7 +22,7 @@ import android.content.Context;
 
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PacketUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 public class GlucosePacket extends GlucosePacketBase {
     public static final int PACKET_MIN_DATA_SIZE = (2 + 4 + 1);
@@ -63,7 +63,7 @@ public class GlucosePacket extends GlucosePacketBase {
     public String toText(Context context, String header) {
         StringBuffer text = new StringBuffer(super.toText(context, header));
         text.append(context.getString(R.string.packet_battery, battery)).append("\n");
-        text.append(context.getString(R.string.packet_trend, UiUtils.getStringOrNoData(rawTrend)));
+        text.append(context.getString(R.string.packet_trend, StringUtils.getStringOrNoData(rawTrend)));
         return text.toString();
     }
 

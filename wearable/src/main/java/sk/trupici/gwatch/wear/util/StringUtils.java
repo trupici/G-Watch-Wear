@@ -16,9 +16,14 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import java.util.Date;
+
 public class StringUtils {
 
     public static final String EMPTY_STRING = "";
+
+    public static final String NO_DATA_STR = "-";
+
 
     public static String formatColorStr(int color) {
         return String.format("#%08x", color);
@@ -26,5 +31,25 @@ public class StringUtils {
 
     public static String notNullString(String str) {
         return str != null ? str : EMPTY_STRING;
+    }
+
+    public static String formatDateTime(Date date) {
+        return java.text.DateFormat.getDateTimeInstance().format(date);
+    }
+
+    public static String formatTime(Date date) {
+        return java.text.DateFormat.getTimeInstance().format(date);
+    }
+
+    public static String formatTimeOrNoData(long timestamp) {
+        return timestamp == 0 ? NO_DATA_STR : java.text.DateFormat.getTimeInstance().format(new Date(timestamp));
+    }
+
+    public static String formatDoubleOrNoData(Double value) {
+        return (value == null || value == -1) ? NO_DATA_STR : String.format("%.2f", value);
+    }
+
+    public static String getStringOrNoData(String str) {
+        return (str == null) ? NO_DATA_STR : str;
     }
 }

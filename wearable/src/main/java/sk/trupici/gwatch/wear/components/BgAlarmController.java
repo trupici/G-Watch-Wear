@@ -33,9 +33,9 @@ import java.util.Date;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.BgData;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
 import static android.content.Context.POWER_SERVICE;
@@ -599,7 +599,8 @@ public class BgAlarmController extends BroadcastReceiver {
             extras.putSerializable(BgAlarmActivity.EXTRAS_SOUNDS_CONFIG, sounds);
         }
         if (alarmConfig.type != Type.NO_DATA) {
-            extras.putString(BgAlarmActivity.EXTRAS_BG_VALUE, isUnitConv ? UiUtils.convertGlucoseToMmolLStr(bgValue) : String.valueOf(bgValue));
+            extras.putString(BgAlarmActivity.EXTRAS_BG_VALUE, isUnitConv
+                    ? BgUtils.convertGlucoseToMmolLStr(bgValue) : String.valueOf(bgValue));
         }
         extras.putInt(BgAlarmActivity.EXTRAS_ALARM_TEXT_COLOR, getAlarmTextColor(alarmConfig));
         intent.putExtras(extras);

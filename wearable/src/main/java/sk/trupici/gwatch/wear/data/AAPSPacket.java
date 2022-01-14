@@ -23,7 +23,7 @@ import android.util.Log;
 
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PacketUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 /**
  * Packet from AndroidAPS app containing
@@ -126,11 +126,11 @@ public class AAPSPacket extends GlucosePacketBase {
     public String toText(Context context, String header) {
         StringBuffer text = new StringBuffer(super.toText(context, header));
 
-        text.append(context.getString(R.string.aaps_packet_cob, UiUtils.formatDoubleOrNoData(cob))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_iob, UiUtils.formatDoubleOrNoData(iob))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_profile, UiUtils.getStringOrNoData(basalProfile))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_tbr, UiUtils.getStringOrNoData(tempBasalString))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_pump, UiUtils.getStringOrNoData(pumpStatus))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_cob, StringUtils.formatDoubleOrNoData(cob))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_iob, StringUtils.formatDoubleOrNoData(iob))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_profile, StringUtils.getStringOrNoData(basalProfile))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_tbr, StringUtils.getStringOrNoData(tempBasalString))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_pump, StringUtils.getStringOrNoData(pumpStatus))).append("\n");
         return text.toString();
     }
 

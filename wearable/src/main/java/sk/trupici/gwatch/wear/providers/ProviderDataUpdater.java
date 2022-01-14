@@ -30,9 +30,9 @@ import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.BgData;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.StringUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.DumpUtils;
 
 
 public class ProviderDataUpdater extends BroadcastReceiver {
@@ -42,7 +42,8 @@ public class ProviderDataUpdater extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (BuildConfig.DEBUG) {
-            Log.i(LOG_TAG, "onReceive: " + intent);
+            Log.i(LOG_TAG, "onReceive: ");
+            DumpUtils.dumpIntent(intent);
         }
 
         Bundle extras = intent.getExtras();
@@ -56,7 +57,7 @@ public class ProviderDataUpdater extends BroadcastReceiver {
                 Log.i(LOG_TAG, "onReceive: last ts > bg ts. Back-filling?");
             }
             if (lastBgTimestamp - bgData.getTimestamp() > CommonConstants.DAY_IN_MILLIS) {
-                invalidTimestampDiff = true;
+                invalidTimestampDiff = true; // save the last timestamp, maybe the stored value is invalid
             } else { // back filling ?
                 return;
             }
@@ -65,32 +66,30 @@ public class ProviderDataUpdater extends BroadcastReceiver {
         SharedPreferences.Editor edit = prefs.edit();
         edit.putLong(BgDataProviderService.PREF_LAST_UPDATE, bgData.getTimestamp());
 
+        if (bgData.getTimestampDiff() < 0) {
+            invalidTimestampDiff = true; // historical data ?
+        }
+
         long timeDiff = System.currentTimeMillis() - bgData.getTimestamp();
-        if (invalidTimestampDiff || timeDiff > CommonConstants.HOUR_IN_MILLIS) {
+        if (invalidTimestampDiff || timeDiff > CommonConstants.DAY_IN_MILLIS) {
             // signal no data
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: data is too old: " + new Date(bgData.getTimestamp()));
-                Log.i(LOG_TAG, "onComplicationUpdate: ts diff=" + (System.currentTimeMillis() - bgData.getTimestamp()) + " vs " + CommonConstants.HOUR_IN_MILLIS);
+                Log.i(LOG_TAG, "onReceive: ts diff=" + (System.currentTimeMillis() - bgData.getTimestamp()) + " vs " + CommonConstants.HOUR_IN_MILLIS);
             }
             edit.remove(BgDataProviderService.PREF_TEXT);
             edit.remove(BgDataProviderService.PREF_TITLE);
             edit.remove(BgDataProviderService.PREF_VALUE);
         } else {
-            long noDataThreshold = prefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data)) * CommonConstants.SECOND_IN_MILLIS;
-            boolean invalidTimestamp = (timeDiff > noDataThreshold) || bgData.getTimestampDiff() < 0;
-
-            char trendArrow = UiUtils.getTrendChar(bgData.getTrend());
-
-            String text;
-            String title;
             boolean isUnitConversion = prefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION, context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
-            if (isUnitConversion) {
-                text = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + trendArrow;
-                title = invalidTimestamp ? StringUtils.EMPTY_STRING : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
-            } else {
-                text = Integer.toString(bgData.getValue()) + trendArrow;
-                title = invalidTimestamp ? StringUtils.EMPTY_STRING : "Δ " + bgData.getValueDiff();
-            }
+            String text = BgUtils.formatBgValueString(bgData.getValue(), bgData.getTrend(), isUnitConversion);
+            // do not send time delta to complications - since the content might not be updated regularly
+            String title = BgUtils.formatBgDeltaForComplication(
+                    bgData.getValueDiff(),
+                    timeDiff,
+                    isUnitConversion,
+                    prefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data))
+            );
 
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: saving: text=" + text + ", title=" + title + ", value=" + bgData.getValue());

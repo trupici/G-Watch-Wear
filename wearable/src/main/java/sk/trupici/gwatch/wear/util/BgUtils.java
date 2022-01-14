@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2019 Juraj Antal
- *
- * Originally created in G-Watch App
+ * Copyright (C) 2021 Juraj Antal
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,49 +16,24 @@
 
 package sk.trupici.gwatch.wear.util;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import java.text.DecimalFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import sk.trupici.gwatch.wear.data.Trend;
 
-public class UiUtils {
+public class BgUtils {
 
     public static final Double GLUCOSE_CONV_FACTOR = 18.018018;
     public static final String GLUCOSE_UNITS_MGDL = "mg/dl";
     public static final String GLUCOSE_UNITS_MMOLL = "mmol/l";
 
-    public static final String NO_DATA_STR = "-";
-
     private static final char[] TREND_SET = {' ', '⇈', '↑', '↗', '→', '↘', '↓', '⇊'}; // standard arrows
     private static final char[] TREND_SET_2 = {' ', '⮅', '⭡', '⭧', '⭢', '⭨', '⭣', '⮇'}; // triangle arrows (not all chars on watch)
+
 
     public static char getTrendChar(Trend trend) {
         int idx = trend == null ? 0 : trend.ordinal();
         return TREND_SET[idx];
-    }
-
-    public static String formatDateTime(Date date) {
-        return java.text.DateFormat.getDateTimeInstance().format(date);
-    }
-
-    public static String formatTime(Date date) {
-        return java.text.DateFormat.getTimeInstance().format(date);
-    }
-
-    public static String formatTimeOrNoData(long timestamp) {
-        return timestamp == 0 ? NO_DATA_STR : java.text.DateFormat.getTimeInstance().format(new Date(timestamp));
-    }
-
-    public static String formatDoubleOrNoData(Double value) {
-        return (value == null || value == -1) ? UiUtils.NO_DATA_STR : String.format("%.2f", value);
-    }
-
-    public static String getStringOrNoData(String str) {
-        return (str == null) ? UiUtils.NO_DATA_STR : str;
     }
 
     public static Double convertGlucoseToMmolL(double glucoseValue) {
@@ -90,16 +63,54 @@ public class UiUtils {
         return String.valueOf(value).replace('.', decimalSeparator);
     }
 
-    public static void runOnUiThread(Runnable runnable) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            new Handler(Looper.getMainLooper()).post(runnable);
-        } else {
-            runnable.run();
-        }
-    }
-
     public static String getGlucoseUnitsStr(boolean isUnitConv) {
         return isUnitConv ? GLUCOSE_UNITS_MMOLL : GLUCOSE_UNITS_MGDL;
     }
 
+    public static String formatBgValueString(int value, Trend trend, boolean isUnitConversion) {
+        return isUnitConversion ? convertGlucoseToMmolLStr(value) : Integer.toString(value)
+                + getTrendChar(trend);
+    }
+
+    public static String formatBgDeltaString(int valueDiff, long timeDiff, boolean isUnitConversion) {
+        if (timeDiff < 0) {
+            return StringUtils.EMPTY_STRING;
+        }
+
+        StringBuffer str = new StringBuffer();
+        if (valueDiff >= 0) {
+            str.append("+");
+        }
+        if (isUnitConversion) {
+            str.append(convertGlucoseToMmolL2Str(valueDiff));
+        } else {
+            str.append(valueDiff);
+        }
+        if (timeDiff <= CommonConstants.HOUR_IN_MILLIS) {
+            str.append(" ")
+                    .append(timeDiff/CommonConstants.MINUTE_IN_MILLIS)
+                    .append("'");
+        }
+        return str.toString();
+    }
+
+    public static String formatBgDeltaForComplication(int valueDiff, long timeDiff, boolean isUnitConversion, long noDataThreshold) {
+        if (timeDiff < 0 || timeDiff > CommonConstants.HOUR_IN_MILLIS) {
+            return StringUtils.EMPTY_STRING;
+        }
+        if (timeDiff < noDataThreshold) {
+            return "(!)";
+        }
+
+        StringBuffer str = new StringBuffer();
+        if (valueDiff >= 0) {
+            str.append("+");
+        }
+        if (isUnitConversion) {
+            str.append(convertGlucoseToMmolL2Str(valueDiff));
+        } else {
+            str.append(valueDiff);
+        }
+        return str.toString();
+    }
 }

@@ -38,10 +38,9 @@ import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.StringUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -82,6 +81,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private String bgLine2;
 
     private BgData lastBgData;
+    private long lastBgUpdate;
 
     boolean isUnitConversion;
 
@@ -111,7 +111,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public void onReceive(Context context, Intent intent) {
         if (CommonConstants.BG_RECEIVER_ACTION.equals(intent.getAction())) {
             Bundle extras = intent.getExtras();
-            onDataUpdate(context, BgData.fromBundle(extras));
+            onDataUpdate(BgData.fromBundle(extras));
         } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
             onConfigChanged(context, PreferenceManager.getDefaultSharedPreferences(context));
         } else {
@@ -170,7 +170,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
 
-        onDataUpdate(context, lastBgData);
+        onDataUpdate(lastBgData);
     }
 
     @Override
@@ -181,6 +181,10 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
         if (!isAmbientMode) {
+            if (lastBgData.getValue() > 0 && System.currentTimeMillis() - lastBgUpdate > CommonConstants.MINUTE_IN_MILLIS) {
+                onDataUpdate(lastBgData);
+            }
+
             // draw background
             paint.setColor(backgroundColor);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -312,37 +316,29 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         return (bgTimeDiff > noDataThreshold * CommonConstants.SECOND_IN_MILLIS) ? Color.DKGRAY : Color.LTGRAY;
     }
 
-    private void onDataUpdate(Context context, BgData bgData) {
+    private void onDataUpdate(BgData bgData) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "onDataUpdate: " + bgData.toString());
         }
-
-        boolean invalidData = bgData.getValue() == 0;
 
         if (bgData.getTimestampDiff() < 0) {
             return; // historical data
         }
 
-        long bgTimestampDiff = bgData.getTimestampDiff() / CommonConstants.MINUTE_IN_MILLIS; // to minutes
-        if (bgTimestampDiff > CommonConstants.DAY_IN_MINUTES) {
-            invalidData = true;
-        }
-
-        if (invalidData) {
+        long now = System.currentTimeMillis();
+        long timeDiff = now - bgData.getTimestamp();
+        if (bgData.getValue() <= 0 || timeDiff > CommonConstants.DAY_IN_MILLIS) {
+            // too old sample or invalid data
             bgLine1 = "--";
             bgLine2 = "--";
         } else {
-            if (isUnitConversion) {
-                bgLine1 = UiUtils.convertGlucoseToMmolLStr(bgData.getValue()) + UiUtils.getTrendChar(bgData.getTrend());
-                bgLine2 = bgTimestampDiff < 0 ? StringUtils.EMPTY_STRING : "Δ " + UiUtils.convertGlucoseToMmolL2Str(bgData.getValueDiff());
-            } else {
-                bgLine1 = Integer.toString(bgData.getValue()) + UiUtils.getTrendChar(bgData.getTrend());
-                bgLine2 = bgTimestampDiff < 0 ? StringUtils.EMPTY_STRING : "Δ " + bgData.getValueDiff();
-            }
+            bgLine1 = BgUtils.formatBgValueString(bgData.getValue(), bgData.getTrend(), isUnitConversion);
+            bgLine2 = BgUtils.formatBgDeltaString(bgData.getValueDiff(), timeDiff, isUnitConversion);
         }
 
         Log.d(LOG_TAG, "onDataUpdate: " + bgLine1 + " / " + bgLine2);
 
         this.lastBgData = bgData;
+        this.lastBgUpdate = now;
     }
 }

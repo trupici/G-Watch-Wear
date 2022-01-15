@@ -379,9 +379,10 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
                 float percent = 0;
                 float range = Math.abs(maxValue - minValue); // avoid negative values
-                if (range > 0) {
-                    percent = (currentValue - minValue) / range;
+                if (range != 0) {
+                    percent = Math.abs(currentValue - minValue) / range;
                     percent = Math.max(0, percent);
+                    percent = Math.min(1, percent);
                 }
                 float sweepAngle = maxAngle * percent;
 

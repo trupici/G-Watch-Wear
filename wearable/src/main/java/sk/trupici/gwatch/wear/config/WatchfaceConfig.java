@@ -129,6 +129,10 @@ public interface WatchfaceConfig {
     RectF getBgPanelBounds(Context context);
     float getBgPanelTopOffset(Context context);
     float getBgPanelBottomOffset(Context context);
+    boolean showBgPanelIndicator(Context context);
+    RectF getBgPanelLowIndicatorBounds(Context context);
+    RectF getBgPanelInRangeIndicatorBounds(Context context);
+    RectF getBgPanelHighIndicatorBounds(Context context);
 
     /**
      * Get watch face specific BG Graph layout attributes

@@ -67,6 +67,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     public static final String PREF_BORDER_COLOR = "bg_border_color";
     public static final String PREF_BORDER_TYPE = "bg_border_type";
 
+    private static final int BG_INDICATOR_INACTIVE_MASK = 0x30FFFFFF;
+
     final private int refScreenWidth;
     final private int refScreenHeight;
 
@@ -87,10 +89,14 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     boolean isUnitConversion;
 
     private int backgroundColor;
-    private int criticalColor;
-    private int warnColor;
+    private int hyperColor;
+    private int highColor;
+    private int lowColor;
+    private int hypoColor;
     private int inRangeColor;
     private int noDataColor;
+
+
 
     private int hyperThreshold;
     private int highThreshold;
@@ -100,6 +106,16 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     private int borderColor;
     private BorderType borderType;
+
+    private Paint indicatorPaint;
+    private boolean showBgIndicator;
+    private RectF lowIndicatorBounds;
+    private RectF inRangeIndicatorBounds;
+    private RectF highIndicatorBounds;
+
+    private RectF lowIndicatorSizeFactors;
+    private RectF inRangeIndicatorSizeFactors;
+    private RectF highIndicatorSizeFactors;
 
     public BgPanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
@@ -140,15 +156,65 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         paint = new TextPaint();
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
+
+
+        indicatorPaint = new Paint();
+        indicatorPaint.setAntiAlias(true);
+        indicatorPaint.setStyle(Paint.Style.FILL);
+
+        showBgIndicator = watchfaceConfig.showBgPanelIndicator(context);
+        if (showBgIndicator) {
+            lowIndicatorBounds = watchfaceConfig.getBgPanelLowIndicatorBounds(context);
+            lowIndicatorSizeFactors = new RectF(
+                    lowIndicatorBounds.left / (float) refScreenWidth,
+                    lowIndicatorBounds.top / (float) refScreenHeight,
+                    lowIndicatorBounds.right / (float) refScreenWidth,
+                    lowIndicatorBounds.bottom / (float) refScreenHeight
+            );
+            inRangeIndicatorBounds = watchfaceConfig.getBgPanelInRangeIndicatorBounds(context);
+            inRangeIndicatorSizeFactors = new RectF(
+                    inRangeIndicatorBounds.left / (float) refScreenWidth,
+                    inRangeIndicatorBounds.top / (float) refScreenHeight,
+                    inRangeIndicatorBounds.right / (float) refScreenWidth,
+                    inRangeIndicatorBounds.bottom / (float) refScreenHeight
+            );
+            highIndicatorBounds = watchfaceConfig.getBgPanelHighIndicatorBounds(context);
+            highIndicatorSizeFactors = new RectF(
+                    highIndicatorBounds.left / (float) refScreenWidth,
+                    highIndicatorBounds.top / (float) refScreenHeight,
+                    highIndicatorBounds.right / (float) refScreenWidth,
+                    highIndicatorBounds.bottom / (float) refScreenHeight
+            );
+        }
     }
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
-        int left = (int) (sizeFactors.left * width);
-        int top = (int) (sizeFactors.top * height);
-        int right = (int) (sizeFactors.right * width);
-        int bottom = (int) (sizeFactors.bottom * height);
-        bounds = new Rect(left, top, right, bottom);
+        bounds = new Rect(
+                (int) (sizeFactors.left * width),
+                (int) (sizeFactors.top * height),
+                (int) (sizeFactors.right * width),
+                (int) (sizeFactors.bottom * height));
+
+        if (showBgIndicator) {
+            lowIndicatorBounds = new RectF(
+                    lowIndicatorSizeFactors.left * width,
+                    lowIndicatorSizeFactors.top * height,
+                    lowIndicatorSizeFactors.right * width,
+                    lowIndicatorSizeFactors.bottom * height);
+
+            inRangeIndicatorBounds = new RectF(
+                    inRangeIndicatorSizeFactors.left * width,
+                    inRangeIndicatorSizeFactors.top * height,
+                    inRangeIndicatorSizeFactors.right * width,
+                    inRangeIndicatorSizeFactors.bottom * height);
+
+            highIndicatorBounds = new RectF(
+                    highIndicatorSizeFactors.left * width,
+                    highIndicatorSizeFactors.top * height,
+                    highIndicatorSizeFactors.right * width,
+                    highIndicatorSizeFactors.bottom * height);
+        }
     }
 
     @Override
@@ -167,10 +233,13 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
         // colors
         backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));
-        criticalColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_COLOR, context.getColor(R.color.def_bg_critical));
-        warnColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_WARN_COLOR, context.getColor(R.color.def_bg_warn));
+        int criticalColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_COLOR, context.getColor(R.color.def_bg_critical));
+        int warnColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_WARN_COLOR, context.getColor(R.color.def_bg_warn));
         inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range));
         noDataColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
+        // FIXME use new color settings
+        hyperColor = highColor = warnColor;
+        hypoColor = lowColor = criticalColor;
 
         // border
         borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
@@ -186,6 +255,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
+        // FIXME use bitmap backed drawing
+
         if (!isAmbientMode) {
             if (lastBgData.getValue() > 0 && System.currentTimeMillis() - lastBgUpdate > CommonConstants.MINUTE_IN_MILLIS) {
                 onDataUpdate(lastBgData);
@@ -226,6 +297,12 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
                     canvas.drawRect(bounds, paint);
                 }
             }
+
+            if (showBgIndicator) {
+                drawIndicatorBar(canvas, indicatorPaint, lowIndicatorBounds, getLowIndicatorColor());
+                drawIndicatorBar(canvas, indicatorPaint, inRangeIndicatorBounds, getInRangeIndicatorColor());
+                drawIndicatorBar(canvas, indicatorPaint, highIndicatorBounds, getHighIndicatorColor());
+            }
         }
 
         // draw bg value
@@ -253,53 +330,28 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         paint.setFakeBoldText(false);
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
                 x, bounds.bottom - bottomOffset - height / 10f, paint);
-
-//        if (!isAmbientMode) {
-//            drawRangeIndicator(canvas);
-//        }
     }
 
-    // range indicator - EXPERIMENTAL
-    private void drawRangeIndicator(Canvas canvas) {
-        Paint indicatorPaint = new Paint();
-        int padding = 10;
-        float height = (bounds.height() - padding) / 3f - padding;
-        RectF indicatorBounds = new RectF();
-        indicatorBounds.left = bounds.left + 6;
-        indicatorBounds.right = indicatorBounds.left + 10;
-        indicatorBounds.bottom = bounds.bottom - padding;
-        indicatorBounds.top = indicatorBounds.bottom - height;
-        boolean isCritical = isBgCritical(lastBgData.getValue());
-        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isCritical ? criticalColor : criticalColor & 0x60FFFFFF);
-        indicatorBounds.bottom = indicatorBounds.top - padding;
-        indicatorBounds.top = indicatorBounds.bottom - height;
-        boolean isInRange = !isCritical && isBgInRange(lastBgData.getValue());
-        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, isInRange ? inRangeColor : inRangeColor & 0x60FFFFFF);
-        indicatorBounds.top = bounds.top + padding;
-        indicatorBounds.bottom = indicatorBounds.top + height;
-        paintIndicatorBar(canvas, indicatorPaint, indicatorBounds, !isInRange && !isCritical ? warnColor : warnColor & 0x60FFFFFF);
-    }
-
-    private void paintIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
-        paint.reset();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1f);
-        canvas.drawRoundRect(bounds, 10f, 10f, paint);
-        paint.reset();
-        paint.setAntiAlias(true);
+    private void drawIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "drawIndicatorBar: " + Integer.toHexString(fillColor) + ", " + bounds);
+        }
         paint.setColor(fillColor);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRoundRect(bounds, 10f, 10f, paint);
+        canvas.drawRoundRect(
+                new RectF(
+                    bounds.left + 1,
+                    bounds.top + 1,
+                    bounds.right - 1,
+                    bounds.bottom - 1
+                ),
+                10f,
+                10f,
+                paint);
     }
 
-    private boolean isBgCritical(int bgValue) {
-        return bgValue >= hyperThreshold || bgValue <= hypoThreshold;
-    }
-
-    private boolean isBgInRange(int bgValue) {
-        return lowThreshold < bgValue && bgValue < highThreshold;
+    private boolean isNoData() {
+        return lastBgData.getValue() == 0
+                || (System.currentTimeMillis() - lastBgData.getTimestamp()) > noDataThreshold * CommonConstants.SECOND_IN_MILLIS;
     }
 
     private int getRangedColor(int bgValue, long bgTimeDiff) {
@@ -310,13 +362,51 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         }
 
         if (bgValue <= lowThreshold) {
-            return bgValue <= hypoThreshold ? criticalColor : warnColor;
+            return bgValue <= hypoThreshold ? hypoColor : lowColor;
         } else if (bgValue >= highThreshold) {
-            return bgValue >= hyperThreshold ? criticalColor : warnColor;
+            return bgValue >= hyperThreshold ? hyperColor : highColor;
         } else {
             return inRangeColor;
         }
     }
+
+    private int getLowIndicatorColor() {
+        if (isNoData()) {
+            return lowColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+        if (lastBgData.getValue() <= hypoThreshold) {
+            return hypoColor;
+        } else if (lastBgData.getValue() <= lowThreshold) {
+            return lowColor;
+        } else {
+            return lowColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+    }
+
+    private int getInRangeIndicatorColor() {
+        if (isNoData()) {
+            return inRangeColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+        if (lowThreshold < lastBgData.getValue() && lastBgData.getValue() < highThreshold) {
+            return inRangeColor;
+        } else {
+            return inRangeColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+    }
+
+    private int getHighIndicatorColor() {
+        if (isNoData()) {
+            return highColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+        if (lastBgData.getValue() >= hyperThreshold) {
+            return hyperColor;
+        } else if (lastBgData.getValue() > highThreshold) {
+            return highColor;
+        } else {
+            return highColor & BG_INDICATOR_INACTIVE_MASK; // inactive
+        }
+    }
+
 
     private int getAmbientRangedColor(int bgValue, long bgTimeDiff) {
         return (bgTimeDiff > noDataThreshold * CommonConstants.SECOND_IN_MILLIS) ? Color.DKGRAY : Color.LTGRAY;

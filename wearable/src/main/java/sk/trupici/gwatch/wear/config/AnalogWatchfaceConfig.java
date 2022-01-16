@@ -17,6 +17,7 @@
 package sk.trupici.gwatch.wear.config;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.wearable.complications.ComplicationData;
@@ -238,7 +239,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     @Override
     public RectF getBgPanelBounds(Context context) {
         return new RectF(
-                context.getResources().getDimension(R.dimen.analog_layout_bg_pnel_left),
+                context.getResources().getDimension(R.dimen.analog_layout_bg_panel_left),
                 context.getResources().getDimension(R.dimen.analog_layout_bg_panel_top),
                 context.getResources().getDimension(R.dimen.analog_layout_bg_panel_right),
                 context.getResources().getDimension(R.dimen.analog_layout_bg_panel_bottom)
@@ -253,6 +254,44 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     @Override
     public float getBgPanelBottomOffset(Context context) {
         return context.getResources().getDimension(R.dimen.analog_layout_bg_panel_bottom_offset);
+    }
+
+    @Override
+    public boolean showBgPanelIndicator(Context context) {
+        return context.getResources().getBoolean(R.bool.analog_layout_bg_panel_use_indicator);
+    }
+
+    @Override
+    public RectF getBgPanelLowIndicatorBounds(Context context) {
+        Resources res = context.getResources();
+        return new RectF(
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_low_left),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_low_top),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_low_right),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_low_bottom)
+        );
+    }
+
+    @Override
+    public RectF getBgPanelInRangeIndicatorBounds(Context context) {
+        Resources res = context.getResources();
+        return new RectF(
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_in_range_left),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_in_range_top),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_in_range_right),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_in_range_bottom)
+        );
+    }
+
+    @Override
+    public RectF getBgPanelHighIndicatorBounds(Context context) {
+        Resources res = context.getResources();
+        return new RectF(
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_high_left),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_high_top),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_high_right),
+                res.getDimension(R.dimen.analog_layout_bg_panel_indicator_high_bottom)
+        );
     }
 
     @Override

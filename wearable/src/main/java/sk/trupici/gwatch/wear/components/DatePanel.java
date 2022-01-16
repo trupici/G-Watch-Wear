@@ -149,10 +149,10 @@ public class DatePanel implements ComponentPanel {
     @Override
     public void onSizeChanged(Context context, int width, int height) {
         bounds = new RectF(
-                width * sizeFactors.left,
-                height * sizeFactors.top,
-                width * sizeFactors.right,
-                height * sizeFactors.bottom);
+                width * sizeFactors.left + 2,
+                height * sizeFactors.top + 2,
+                width * sizeFactors.right - 2,
+                height * sizeFactors.bottom - 2);
 
         bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
         bkgBitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
@@ -216,6 +216,9 @@ public class DatePanel implements ComponentPanel {
 
     private String formatDayMonth(DateFormat format, DateFormat fullNameFormat, Date date) {
         String formatted = format.format(date).toUpperCase();
+        if (formatted.endsWith(".")) {
+            formatted = formatted.substring(0, formatted.length()-1);
+        }
         if (formatted.length() == 3) {
             return formatted;
         } else if (formatted.length() > 3) {
@@ -303,15 +306,7 @@ public class DatePanel implements ComponentPanel {
     }
 
     private void configureFormats() {
-        Locale locale;
-        try {
-            locale = new Locale(
-                    StringUtils.notNullString(System.getProperty("user.language")),
-                    StringUtils.notNullString(System.getProperty("user.country")));
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to get user locale: " + e.getLocalizedMessage(), e);
-            locale = Locale.getDefault();
-        }
+        Locale locale = Locale.getDefault(); // user language and country properties shows incorrect values
 
         calendar.setTimeZone(TimeZone.getDefault());
         dayOfWeekFormat = new SimpleDateFormat("EEE", locale);

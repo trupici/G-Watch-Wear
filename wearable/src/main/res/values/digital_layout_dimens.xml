@@ -47,6 +47,7 @@
     <dimen name="digital_layout_bg_panel_right">288px</dimen>
     <dimen name="digital_layout_bg_panel_bottom">360px</dimen>
     <dimen name="digital_layout_bg_panel_top_offset">0px</dimen>
+    <dimen name="digital_layout_bg_panel_bottom_offset">0px</dimen>
 
     <dimen name="digital_layout_bg_graph_panel_left">89px</dimen>
     <dimen name="digital_layout_bg_graph_panel_top">172px</dimen>

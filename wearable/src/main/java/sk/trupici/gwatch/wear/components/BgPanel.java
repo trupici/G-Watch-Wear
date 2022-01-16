@@ -74,6 +74,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     private RectF sizeFactors;
     private float topOffset;
+    private float bottomOffset;
 
     private Rect bounds;
     private TextPaint paint;
@@ -131,7 +132,10 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
                 bounds.bottom / (float)refScreenHeight
         );
         topOffset = watchfaceConfig.getBgPanelTopOffset(context);
-        Log.w(LOG_TAG, "Rect: " + sizeFactors + ", offset: " + topOffset);
+        bottomOffset = watchfaceConfig.getBgPanelBottomOffset(context);
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "Rect: " + sizeFactors + ", offset: " + topOffset + ", " + bottomOffset);
+        }
 
         paint = new TextPaint();
         paint.setAntiAlias(true);
@@ -229,7 +233,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         // line 1
         float x = bounds.left + bounds.width() / 2f; // text will be centered around
         float top = bounds.top + topOffset;
-        float height = bounds.height() - topOffset;
+        float height = bounds.height() - topOffset - bottomOffset;
         long bgTimeDiff = System.currentTimeMillis() - lastBgData.getTimestamp();
         if (isAmbientMode) {
             paint.setColor(getAmbientRangedColor(lastBgData.getValue(), bgTimeDiff));
@@ -248,7 +252,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         paint.setTextSize(height / 3f);
         paint.setFakeBoldText(false);
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
-                x, bounds.bottom - height / 10f, paint);
+                x, bounds.bottom - bottomOffset - height / 10f, paint);
 
 //        if (!isAmbientMode) {
 //            drawRangeIndicator(canvas);

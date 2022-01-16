@@ -233,6 +233,11 @@ public class DigitalWatchfaceConfig implements WatchfaceConfig {
     }
 
     @Override
+    public float getBgPanelBottomOffset(Context context) {
+        return context.getResources().getDimension(R.dimen.digital_layout_bg_panel_bottom_offset);
+    }
+
+    @Override
     public RectF getBgGraphBounds(Context context) {
         return new RectF(
                 context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_left),

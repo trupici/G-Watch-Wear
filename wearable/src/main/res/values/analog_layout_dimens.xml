@@ -33,16 +33,17 @@
     <dimen name="analog_layout_right_compl_bottom">325px</dimen>
 
 
-    <dimen name="analog_layout_date_panel_left">198px</dimen>
-    <dimen name="analog_layout_date_panel_top">240px</dimen>
-    <dimen name="analog_layout_date_panel_right">252px</dimen>
-    <dimen name="analog_layout_date_panel_bottom">298px</dimen>
+    <dimen name="analog_layout_date_panel_left">191px</dimen>
+    <dimen name="analog_layout_date_panel_top">233px</dimen>
+    <dimen name="analog_layout_date_panel_right">260px</dimen>
+    <dimen name="analog_layout_date_panel_bottom">306px</dimen>
 
     <dimen name="analog_layout_bg_pnel_left">166px</dimen>
     <dimen name="analog_layout_bg_panel_top">315px</dimen>
     <dimen name="analog_layout_bg_panel_right">284px</dimen>
     <dimen name="analog_layout_bg_panel_bottom">409px</dimen>
-    <dimen name="analog_layout_bg_panel_top_offset">25px</dimen>
+    <dimen name="analog_layout_bg_panel_top_offset">0px</dimen>
+    <dimen name="analog_layout_bg_panel_bottom_offset">20px</dimen>
 
     <dimen name="analog_layout_bg_graph_panel_left">91px</dimen>
     <dimen name="analog_layout_bg_graph_panel_top">85px</dimen>

@@ -46,6 +46,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.util.BorderUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -88,6 +89,8 @@ public class DatePanel implements ComponentPanel {
     private DateFormat dayOfWeekFormat;
     private DateFormat monthFormat;
     private DateFormat dayOfMonthFormat;
+    private DateFormat dayOfWeekFullNameFormat;
+    private DateFormat monthFullNameFormat;
 
     private RectF sizeFactors;
     private RectF bounds;
@@ -195,10 +198,10 @@ public class DatePanel implements ComponentPanel {
         String line1;
         if (showMonth) { // Month
             paint.setColor(monthColor);
-            line1 = monthFormat.format(date);
+            line1 = formatDayMonth(monthFormat, monthFullNameFormat, date);
         } else { // Day of week
             paint.setColor(dayOfWeekColor);
-            line1 = dayOfWeekFormat.format(date);
+            line1 = formatDayMonth(dayOfWeekFormat, dayOfWeekFullNameFormat, date);
         }
 
         final float centerX = bounds.width() / 2f;
@@ -209,6 +212,18 @@ public class DatePanel implements ComponentPanel {
         // Day of Month
         paint.setColor(dayOfMonthColor);
         canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 5, paint);
+    }
+
+    private String formatDayMonth(DateFormat format, DateFormat fullNameFormat, Date date) {
+        String formatted = format.format(date).toUpperCase();
+        if (formatted.length() == 3) {
+            return formatted;
+        } else if (formatted.length() > 3) {
+            return formatted.substring(0, 3);
+        } else { // < 3
+            formatted = fullNameFormat.format(date).toUpperCase();
+            return formatted.length() <= 3 ? formatted : formatted.substring(0, 3);
+        }
     }
 
     private void drawBackgroundAndBorder() {
@@ -266,10 +281,8 @@ public class DatePanel implements ComponentPanel {
     @Override
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
         /* Update time zone in case it changed while we weren"t visible. */
-        calendar.setTimeZone(TimeZone.getDefault());
-        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
+
+        configureFormats();
 
         showMonth = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_SHOW_MONTH, context.getResources().getBoolean(R.bool.def_date_show_month));
 
@@ -286,10 +299,27 @@ public class DatePanel implements ComponentPanel {
 
     @Override
     public void onPropertiesChanged(Context context, Bundle properties) {
+        configureFormats();
+    }
+
+    private void configureFormats() {
+        Locale locale;
+        try {
+            locale = new Locale(
+                    StringUtils.notNullString(System.getProperty("user.language")),
+                    StringUtils.notNullString(System.getProperty("user.country")));
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to get user locale: " + e.getLocalizedMessage(), e);
+            locale = Locale.getDefault();
+        }
+
         calendar.setTimeZone(TimeZone.getDefault());
-        dayOfWeekFormat = new SimpleDateFormat("EEE", Locale.getDefault());
-        monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-        dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
+        dayOfWeekFormat = new SimpleDateFormat("EEE", locale);
+        monthFormat = new SimpleDateFormat("MMM", locale);
+        dayOfMonthFormat = new SimpleDateFormat("d", locale);
+
+        dayOfWeekFullNameFormat = new SimpleDateFormat("EEEE", locale);
+        monthFullNameFormat = new SimpleDateFormat("MMM", locale);
     }
 
     public void registerReceiver(WatchFaceService watchFaceService) {

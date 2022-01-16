@@ -65,11 +65,11 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         protected void initializeCustomPanels(Context context, int screenWidth, int screenHeight) {
-            watchHands = new WatchHands((AnalogWatchfaceConfig) watchfaceConfig);
-            watchHands.onCreate(context, sharedPrefs);
-
             datePanel = new DatePanel(screenWidth, screenHeight, watchfaceConfig);
             datePanel.onCreate(context, sharedPrefs);
+
+            watchHands = new WatchHands((AnalogWatchfaceConfig) watchfaceConfig);
+            watchHands.onCreate(context, sharedPrefs);
         }
 
         @Override
@@ -154,8 +154,8 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
             super.onPropertiesChanged(properties);
 
             Context context = getApplicationContext();
-            watchHands.onPropertiesChanged(context, properties);
             datePanel.onPropertiesChanged(context, properties);
+            watchHands.onPropertiesChanged(context, properties);
         }
 
         @Override
@@ -166,8 +166,8 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
             super.adjustSize(width, height);
             Context context = getApplicationContext();
 
-            watchHands.onSizeChanged(context, width, height);
             datePanel.onSizeChanged(context, width, height);
+            watchHands.onSizeChanged(context, width, height);
 
             /*
              * Calculates location bounds for right and left circular complications.
@@ -196,8 +196,8 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
 
         @Override
         void drawCustomPanels(Canvas canvas, boolean isAmbientMode) {
-            watchHands.onDraw(canvas, isAmbientMode);
             datePanel.onDraw(canvas, isAmbientMode);
+            watchHands.onDraw(canvas, isAmbientMode);
         }
 
         @Override
@@ -217,8 +217,8 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
                 updateComplicationDrawable(watchfaceConfig.getComplicationConfig(ComplicationId.RIGHT)
                         .getComplicationDrawable(), rightComplicationAttrs);
 
-                watchHands.onConfigChanged(context, sharedPrefs);
                 datePanel.onConfigChanged(context, sharedPrefs);
+                watchHands.onConfigChanged(context, sharedPrefs);
 
                 datePanel.registerReceiver(AnalogWatchfaceService.this);
             } else {

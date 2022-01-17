@@ -45,17 +45,22 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     final public static int DEF_HANDS_SET_IDX = 0;
 
     private final static ConfigItemData[] backgroundConfig = new ConfigItemData[]{
-            new ConfigItemData(0, "Stripes", R.drawable.analog_background_default),
-            new ConfigItemData(1, "Circuit Board", R.drawable.analog_background_1),
-            new ConfigItemData(2, "Classic Silver", R.drawable.analog_classic_background_1),
-            new ConfigItemData(3, "Classic Coral", R.drawable.analog_classic_background_2),
+            new ConfigItemData(0, "Stripes", R.drawable.analog__active_background_default),
+            new ConfigItemData(1, "Circuit Board", R.drawable.analog_active_background_1),
+            new ConfigItemData(2, "Halftone", R.drawable.analog_active_background_2),
+            new ConfigItemData(3, "Classic Silver", R.drawable.analog_classic_background_1),
+            new ConfigItemData(4, "Classic Coral", R.drawable.analog_classic_background_2),
     };
 
     private final static ConfigItemData[] handsConfig = new ConfigItemData[]{
-            new HandsConfigData(0, "", R.drawable.analog_hands_preview_default,
+            new HandsConfigData(0, "", R.drawable.hands_default_preview,
                     R.drawable.hours_default, R.drawable.hours_shadow_default,
                     R.drawable.minutes_default, R.drawable.minutes_shadow_default,
                     R.drawable.seconds_default, R.drawable.seconds_shadow_default),
+            new HandsConfigData(1, "", R.drawable.hands_1_preview,
+                    R.drawable.hours_default, R.drawable.hours_shadow_default,
+                    R.drawable.minutes_default, R.drawable.minutes_shadow_default,
+                    R.drawable.seconds_1, R.drawable.seconds_shadow_default),
     };
 
     private final static ConfigPageData[] CONFIG = {

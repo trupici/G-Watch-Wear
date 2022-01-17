@@ -97,7 +97,7 @@
                 android:resource="@xml/digital_watchface" />
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
-                android:resource="@drawable/preview_analog" />
+                android:resource="@drawable/preview_digital" />
 
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"

@@ -238,6 +238,26 @@ public class DigitalWatchfaceConfig implements WatchfaceConfig {
     }
 
     @Override
+    public boolean showBgPanelIndicator(Context context) {
+        return false;
+    }
+
+    @Override
+    public RectF getBgPanelLowIndicatorBounds(Context context) {
+        return null;
+    }
+
+    @Override
+    public RectF getBgPanelInRangeIndicatorBounds(Context context) {
+        return null;
+    }
+
+    @Override
+    public RectF getBgPanelHighIndicatorBounds(Context context) {
+        return null;
+    }
+
+    @Override
     public RectF getBgGraphBounds(Context context) {
         return new RectF(
                 context.getResources().getDimension(R.dimen.digital_layout_bg_graph_panel_left),

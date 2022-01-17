@@ -70,6 +70,9 @@ public class DatePanel implements ComponentPanel {
     public static final String PREF_BORDER_COLOR = "date_border_color";
     public static final String PREF_BORDER_TYPE = "date_border_type";
 
+    private static final int PADDING = 2;
+    private static final int TOP_OFFSET = 2;
+
     final private int refScreenWidth;
     final private int refScreenHeight;
 
@@ -149,10 +152,10 @@ public class DatePanel implements ComponentPanel {
     @Override
     public void onSizeChanged(Context context, int width, int height) {
         bounds = new RectF(
-                width * sizeFactors.left + 2,
-                height * sizeFactors.top + 2,
-                width * sizeFactors.right - 2,
-                height * sizeFactors.bottom - 2);
+                width * sizeFactors.left + PADDING,
+                height * sizeFactors.top + PADDING + TOP_OFFSET,
+                width * sizeFactors.right - PADDING,
+                height * sizeFactors.bottom - PADDING);
 
         bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
         bkgBitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);

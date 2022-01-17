@@ -171,8 +171,11 @@ public class BgAlarmController extends BroadcastReceiver {
     private int hypoThreshold;
     private boolean isUnitConv;
 
-    private int warnColor;
-    private int urgentColor;
+    private int hyperColor;
+    private int highColor;
+    private int lowColor;
+    private int hypoColor;
+    private int fastDropColor;
     private int noDataColor;
 
     // FIXME
@@ -224,8 +227,11 @@ public class BgAlarmController extends BroadcastReceiver {
         criticalLowThreshold = res.getInteger(R.integer.def_alarms_critical_threshold_low);
         criticalHighThreshold = res.getInteger(R.integer.def_alarms_critical_threshold_high);
 
-        warnColor = res.getColor(R.color.alarms_warn_color, null);
-        urgentColor = res.getColor(R.color.alarms_urgent_color, null);
+        hyperColor = res.getColor(R.color.alarms_hyper_color, null);
+        highColor = res.getColor(R.color.alarms_high_color, null);
+        lowColor = res.getColor(R.color.alarms_low_color, null);
+        hypoColor = res.getColor(R.color.alarms_hypo_color, null);
+        fastDropColor = res.getColor(R.color.alarms_fast_drop_color, null);
         noDataColor = res.getColor(R.color.alarms_no_data_color, null);
 
         newBgNotificationEffect = VibrationEffect.createOneShot(
@@ -610,13 +616,19 @@ public class BgAlarmController extends BroadcastReceiver {
 
     private int getAlarmTextColor(AlarmConfig alarmConfig) {
         switch (alarmConfig.type) {
+            case HYPER:
+                return hyperColor;
             case HIGH:
+                return highColor;
             case LOW:
-                return warnColor;
+                return lowColor;
+            case HYPO:
+                return hypoColor;
+            case FAST_DROP:
+                return fastDropColor;
             case NO_DATA:
-                return noDataColor;
             default:
-                return urgentColor;
+                return noDataColor;
         }
     }
 

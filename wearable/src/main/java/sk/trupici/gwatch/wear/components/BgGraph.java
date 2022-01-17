@@ -46,9 +46,11 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     public static final int CONFIG_ID = 12;
 
     public static final String PREF_BKG_COLOR = "graph_color_background";
-    public static final String PREF_CRITICAL_COLOR = "graph_color_critical";
-    public static final String PREF_WARN_COLOR = "graph_color_warn";
+    public static final String PREF_HYPO_COLOR = "graph_color_hypo";
+    public static final String PREF_LOW_COLOR = "graph_color_low";
     public static final String PREF_IN_RANGE_COLOR = "graph_color_in_range";
+    public static final String PREF_HIGH_COLOR = "graph_high_low";
+    public static final String PREF_HYPER_COLOR = "graph_hyper_low";
 
     public static final String PREF_VERT_LINE_COLOR = "graph_color_vert_line";
     public static final String PREF_LOW_LINE_COLOR = "graph_color_low_line";
@@ -106,9 +108,11 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     private Paint ambientPaint;
 
     private int backgroundColor;
-    private int criticalColor;
-    private int warnColor;
+    private int hypoColor;
+    private int lowColor;
     private int inRangeColor;
+    private int highColor;
+    private int hyperColor;
 
     private int vertLineColor;
     private int lowLineColor;
@@ -186,9 +190,11 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
         // colors
         backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_graph_color_background));
-        criticalColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_COLOR, context.getColor(R.color.def_graph_color_critical));
-        warnColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_WARN_COLOR, context.getColor(R.color.def_graph_color_warn));
+        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_graph_color_hypo));
+        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_graph_color_low));
         inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_graph_color_in_range));
+        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_graph_color_high));
+        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_graph_color_hyper));
 
         // lines
         vertLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));
@@ -420,15 +426,15 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
             y = yOffset - ((value - graphRange.min) * graphRange.scale);
 
             if (value <= hypoThreshold) {
-                color = criticalColor;
+                color = hypoColor;
             } else if (value <= lowThreshold) {
-                color = warnColor;
+                color = lowColor;
             } else if (value < highThreshold) {
                 color = inRangeColor;
             } else if (value < hyperThreshold) {
-                color = warnColor;
+                color = highColor;
             } else {
-                color = criticalColor;
+                color = hyperColor;
             }
 
             paint.setColor(color);

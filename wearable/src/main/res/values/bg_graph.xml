@@ -17,14 +17,16 @@
 <resources>
 
     <color name="def_graph_color_background">#00000000</color>
-    <color name="def_graph_color_critical">#FFFC0709</color>
-    <color name="def_graph_color_warn">#FFFFBB09</color>
+    <color name="def_graph_color_hypo">#FFBC0007</color>
+    <color name="def_graph_color_low">#FFFC0709</color>
     <color name="def_graph_color_in_range">#FF28EE09</color>
+    <color name="def_graph_color_high">#FFFFBB09</color>
+    <color name="def_graph_color_hyper">#FFFF6909</color>
 
     <color name="def_graph_color_vert_line">#FF888888</color>
     <color name="def_graph_color_low_line">#FFFC0709</color>
     <color name="def_graph_color_high_line">#FFFFBB09</color>
-    <color name="def_graph_color_critical_line">#FFFC0709</color>
+    <color name="def_graph_color_critical_line">#FFBC0007</color>
 
     <bool name="def_graph_enable_vert_lines">true</bool>
     <bool name="def_graph_enable_critical_lines">true</bool>

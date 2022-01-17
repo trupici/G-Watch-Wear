@@ -15,9 +15,11 @@
  limitations under the License.
 -->
 <resources>
-
-    <color name="alarms_urgent_color">#FFFC0709</color>
-    <color name="alarms_warn_color">#FFFFBB09</color>
+    <color name="alarms_hypo_color">#FFBC0007</color>
+    <color name="alarms_low_color">#FFFC0709</color>
+    <color name="alarms_high_color">#FFFFBB09</color>
+    <color name="alarms_hyper_color">#FFFF6909</color>
+    <color name="alarms_fast_drop_color">#FFFC0709</color>
     <color name="alarms_no_data_color">#FF008BE4</color>
 
     <bool name="def_notification_new_value_enabled">true</bool>

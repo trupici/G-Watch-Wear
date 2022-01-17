@@ -49,6 +49,20 @@
     <dimen name="digital_layout_bg_panel_top_offset">0px</dimen>
     <dimen name="digital_layout_bg_panel_bottom_offset">0px</dimen>
 
+    <bool name="digital_layout_bg_panel_use_indicator">true</bool>
+    <dimen name="digital_layout_bg_panel_indicator_low_left">178px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_low_top">367px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_low_right">204px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_low_bottom">378px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_in_range_left">212px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_in_range_top">367px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_in_range_right">238px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_in_range_bottom">378px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_high_left">246px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_high_top">367px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_high_right">272px</dimen>
+    <dimen name="digital_layout_bg_panel_indicator_high_bottom">378px</dimen>
+
     <dimen name="digital_layout_bg_graph_panel_left">89px</dimen>
     <dimen name="digital_layout_bg_graph_panel_top">172px</dimen>
     <dimen name="digital_layout_bg_graph_panel_right">362px</dimen>

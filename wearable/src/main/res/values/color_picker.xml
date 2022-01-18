@@ -34,7 +34,7 @@
     <dimen name="bar_pointer_halo_radius">10dp</dimen>
     <dimen name="bar_transparency_square_size">4dp</dimen>
 
-    <color name="bar_pointer_halo_color">#A0202020</color>
+    <color name="bar_pointer_halo_color">#33ffffff</color>
     <color name="bar_pointer_default_color">#ff81ff00</color>
 
 </resources>

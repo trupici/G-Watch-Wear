@@ -234,13 +234,13 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         noDataThreshold = sharedPrefs.getInt(CommonConstants.PREF_NO_DATA_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_no_data));
 
         // colors
-        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background));
-        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_bg_hypo));
-        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_bg_low));
-        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range));
-        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_bg_high));
-        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_bg_hyper));
-        noDataColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data));
+        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background_color));
+        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_bg_hypo_color));
+        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_bg_low_color));
+        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range_color));
+        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_bg_high_color));
+        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_bg_hyper_color));
+        noDataColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_NO_DATA_COLOR, context.getColor(R.color.def_bg_no_data_color));
 
         // border
         borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));

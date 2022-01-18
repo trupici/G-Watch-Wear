@@ -189,12 +189,12 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
 
         // colors
-        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_graph_color_background));
-        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_graph_color_hypo));
-        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_graph_color_low));
-        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_graph_color_in_range));
-        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_graph_color_high));
-        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_graph_color_hyper));
+        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background_color));
+        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_bg_hypo_color));
+        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_bg_low_color));
+        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range_color));
+        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_bg_high_color));
+        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_bg_hyper_color));
 
         // lines
         vertLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));

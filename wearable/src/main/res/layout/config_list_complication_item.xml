@@ -23,14 +23,14 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+            android:background="@color/transparent"
             />
 
         <ImageButton
             android:id="@+id/complication"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+            android:background="@color/transparent"
             android:scaleType="centerInside"
             />
 
@@ -38,7 +38,7 @@
             android:id="@+id/border"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+            android:background="@color/transparent"
             />
 
         <ImageView
@@ -48,7 +48,7 @@
             android:src="@drawable/frame_50"
             android:scaleType="centerCrop"
             android:tint="@color/red"
-            android:background="@android:color/transparent"
+            android:background="@color/transparent"
             android:visibility="invisible"
             tools:ignore="UseAppTint" />
 </FrameLayout>

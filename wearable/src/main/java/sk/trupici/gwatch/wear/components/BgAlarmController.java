@@ -227,12 +227,12 @@ public class BgAlarmController extends BroadcastReceiver {
         criticalLowThreshold = res.getInteger(R.integer.def_alarms_critical_threshold_low);
         criticalHighThreshold = res.getInteger(R.integer.def_alarms_critical_threshold_high);
 
-        hyperColor = res.getColor(R.color.alarms_hyper_color, null);
-        highColor = res.getColor(R.color.alarms_high_color, null);
-        lowColor = res.getColor(R.color.alarms_low_color, null);
-        hypoColor = res.getColor(R.color.alarms_hypo_color, null);
-        fastDropColor = res.getColor(R.color.alarms_fast_drop_color, null);
-        noDataColor = res.getColor(R.color.alarms_no_data_color, null);
+        hyperColor = res.getColor(R.color.def_bg_hyper_color, null);
+        highColor = res.getColor(R.color.def_bg_high_color, null);
+        lowColor = res.getColor(R.color.def_bg_low_color, null);
+        hypoColor = res.getColor(R.color.def_bg_hypo_color, null);
+        fastDropColor = res.getColor(R.color.def_bg_fast_drop_color, null);
+        noDataColor = res.getColor(R.color.def_bg_no_data_color, null);
 
         newBgNotificationEffect = VibrationEffect.createOneShot(
                 res.getInteger(R.integer.def_notification_new_value_duration),

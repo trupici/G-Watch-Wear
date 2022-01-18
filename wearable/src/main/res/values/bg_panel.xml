@@ -16,14 +16,6 @@
 -->
 <resources>
 
-    <color name="def_bg_background">#00000000</color>
-    <color name="def_bg_no_data">#FF008BE4</color>
-    <color name="def_bg_hypo">#FFBC0007</color>
-    <color name="def_bg_low">#FFFC0709</color>
-    <color name="def_bg_in_range">#FF28EE09</color>
-    <color name="def_bg_high">#FFFFBB09</color>
-    <color name="def_bg_hyper">#FFFF6909</color>
-
     <integer name="def_bg_threshold_hyper">270</integer>
     <integer name="def_bg_threshold_high">170</integer>
     <integer name="def_bg_threshold_low">80</integer>

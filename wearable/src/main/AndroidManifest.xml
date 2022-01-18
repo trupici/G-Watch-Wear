@@ -75,7 +75,6 @@
 
         <activity
             android:name=".config.AnalogWatchfaceConfigActivity"
-            android:label="@string/analog_config_name"
             android:exported="true"
             >
             <intent-filter>
@@ -111,7 +110,6 @@
 
         <activity
             android:name=".config.DigitalWatchfaceConfigActivity"
-            android:label="@string/digital_config_name"
             android:exported="true"
             >
             <intent-filter>
@@ -123,13 +121,11 @@
 
         <activity
             android:name=".config.ColorPickerActivity"
-            android:label="@string/digital_config_name"
             android:exported="true"
             >
         </activity>
         <activity
             android:name=".config.BorderPickerActivity"
-            android:label="@string/digital_config_name"
             android:exported="true"
             >
         </activity>

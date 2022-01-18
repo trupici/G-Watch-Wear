@@ -18,12 +18,8 @@
     <string name="app_name" translatable="false">G-Watch Wear App</string>
     <string name="provider_name" translatable="false">G-Watch BG Provider</string>
 
-    <string name="analog_watchface_name">G-Watch Analog</string>
-    <string name="analog_config_name">G-Watch Digital Config</string>
-    <string name="digital_watchface_name">G-Watch Digital</string>
-    <string name="digital_config_name">G-Watch Digital Config</string>
-
-    <string name="color_config_name">G-Watch Color Config</string>
+    <string name="analog_watchface_name" translatable="false">G-Watch Analog</string>
+    <string name="digital_watchface_name" translatable="false">G-Watch Digital</string>
 
     <string name="add_complication">Add Complication</string>
     <string name="edit_complication">Edit Complication</string>
@@ -42,16 +38,19 @@
     <string name="config_item_text_color_label">Text color</string>
     <string name="config_item_bkg_color_label">Background color</string>
 
-    <string name="config_item_bg_critical_color_label">Critical color</string>
-    <string name="config_item_bg_warn_color_label">Warn color</string>
+    <string name="config_item_bg_hypo_color_label">Hypo color</string>
+    <string name="config_item_bg_low_color_label">Low color</string>
     <string name="config_item_bg_in_range_color_label">In range color</string>
+    <string name="config_item_bg_high_color_label">High color</string>
+    <string name="config_item_bg_hyper_color_label">Hyper color</string>
     <string name="config_item_no_data_color_label">No data color</string>
+
     <string name="config_item_is_unit_conversion">Use mmol/l</string>
 
     <string name="config_item_graph_show_critical_lines">Show critical lines</string>
     <string name="config_item_graph_critical_lines_color">Critical lines color</string>
     <string name="config_item_graph_show_high_line">Show high line</string>
-    <string name="config_item_graph_high_line_color">High lines color</string>
+    <string name="config_item_graph_high_line_color">High line color</string>
     <string name="config_item_graph_show_low_line">Show low line</string>
     <string name="config_item_graph_low_line_color">Low line color</string>
     <string name="config_item_graph_show_vert_lines">Show hour lines</string>
@@ -84,7 +83,7 @@
     <string name="config_item_alarms_enable_new_data_notifications">New data notifications</string>
 
     <string name="config_item_time_show_seconds">Show seconds</string>
-    <string name="config_item_time_24hr_time">24 hours format</string>
+    <string name="config_item_time_24hr_time">24hr format</string>
 
     <string name="border_type_none">No border</string>
     <string name="border_type_rect">Rect</string>

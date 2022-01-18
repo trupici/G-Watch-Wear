@@ -4,6 +4,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url "https://maven.localazy.com/repository/release/" }
     }
 }
 rootProject.name = "G-Watch Wear App"

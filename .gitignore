@@ -76,3 +76,5 @@ fabric.properties
 
 # *.iml
 # modules.xml
+wearable/.localazy
+mobile/.localazy

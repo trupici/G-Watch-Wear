@@ -14,7 +14,7 @@ android {
         minSdk 25
         targetSdk 30
         versionCode 1
-        versionName "1.0"
+        versionName "0.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,4 +58,41 @@ dependencies {
 
 
     wearApp project(':wearable')
+}
+
+
+apply plugin: 'com.localazy.gradle'
+
+localazy {
+    readKey "a8358596450190348286-6c93f41a75d8ced983708bf35c1da00c0bb4bda7c986e350f15809df8c3fd25b"
+//    writeKey "${localazy.writeKey}"
+
+    injection {
+        installRepositories false
+        enabledForRelease false
+        enabledForDebug false
+    }
+
+    upload {
+        deprecateMissing false
+        defaultLang "en"
+        files {
+            include "**/strings.xml"
+        }
+        include {
+        }
+        projects {
+            include project(":wearable")
+        }
+    }
+
+    download {
+        enabledForRelease true
+        errorOnFailureDebug false
+        redownloadInterval 900
+    }
+
+    resources {
+        enabledForRelease true
+    }
 }

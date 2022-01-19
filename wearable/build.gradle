@@ -10,7 +10,7 @@ android {
         minSdk 30
         targetSdk 30
         versionCode 1
-        versionName "0.9.0"
+        versionName "0.9"
 
         multiDexEnabled true
     }
@@ -41,8 +41,6 @@ dependencies {
 
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
-    // color picker lib
-//    implementation 'com.larswerkman:HoloColorPicker:1.5'
     implementation files('libs/holocolorpicker-2.0.aar')
 }
 
@@ -60,6 +58,7 @@ localazy {
     }
 
     upload {
+        deprecateMissing false
         defaultLang "en"
         files {
             include "**/strings.xml"

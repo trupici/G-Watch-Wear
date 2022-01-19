@@ -20,17 +20,16 @@
 
     <!-- MAIN SCREEN -->
 
-    <string name="app_desc_title">G-Watch App</string>
-    <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung TizenOS smart watch then this is the ideal app for you!</string>
-    <string name="app_desc_text">G-Watch App is an Android application for a Samsung smart watch companion watch face. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch face then displays received values to its user.</string>
-    <string name="app_main_diagram">G-Watch ecosystem</string>
+    <string name="app_desc_title" translatable="false">G-Watch App</string>
+    <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!</string>
+    <string name="app_desc_text">G-Watch App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
 
-    <string name="app_desc_config">The appearance and behavior of G-Watch native watch face can be configured remotely from the G-Watch App Settings screen. Results are visible immediately after you send new configuration to the watch. Select Settings menu option or swipe left on the main app screen to see all configuration options. </string>
-    <string name="app_desc_user_guide">You can find detailed installation and configuration description in G-Watch user manual which is available on app facebook page fb.me/gwatchapp</string>
+    <string name="app_desc_config">The appearance and behavior of G-Watch watch faces can be configured directly on the watch. BG data source to use to get readings is configured in mobile app Settings. Select Settings menu option or swipe left on the main app screen to see all configuration options.</string>
+    <string name="app_desc_user_guide">If you have any question or you want share your experiences, please visit our fb group http://facebook.com/groups/gwatchapp</string>
     <string name="app_desc_first_run">The first run</string>
-    <string name="app_desc_first_run_text">G-Watch native watch face needs 1&#8208;2 glucose samples (up to 10 minutes) to display correct values. During this initial time no glucose value, trend or status is displayed. See user guide for detailed setup description.</string>
+    <string name="app_desc_first_run_text">G-Watch watch face needs 1&#8208;2 glucose samples (up to 10 minutes) to display correct values. During this initial time no glucose value, trend or status is displayed.</string>
     <string name="app_desc_important_note_title"><b>Important note</b></string>
-    <string name="app_desc_disable_batt_opt_text">Don\&#39;t forget to disable all battery optimizations for G-Watch App otherwise you can miss glucose values if app is stopped by power manager. The same applies for apps required to transfer data to watch: Galaxy Wearable, its watch plugin, Samsung Accessory Library and system Bluetooth app.</string>
+    <string name="app_desc_disable_batt_opt_text">Don\&#39;t forget to disable all battery optimizations for G-Watch App otherwise you can miss glucose values if app is stopped by power manager. The same applies for apps required to transfer data to watch: Galaxy Wearable, its watch plugin and system Bluetooth app.</string>
 
 
     <!-- Dialog actions -->
@@ -38,9 +37,6 @@
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
     <string name="action_console">Packet console</string>
-    <string name="action_sync">Force sync</string>
-    <string name="action_send">Send last glucose</string>
-    <string name="action_status">Connection status</string>
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_reset">Reset</string>
@@ -58,7 +54,6 @@
 
     <string name="action_navigation_up">Navigate up</string>
 
-
     <!-- Watchface connection status -->
 
     <string name="conn_status_connected">CONNECTED</string>
@@ -69,21 +64,31 @@
 
     <!-- ABOUT dialog -->
 
-    <string name="about_app_name" translatable="false">G-Watch Wear App 1.0.0</string>
-<!--    <string name="about_author">Authors: Juraj Antal</string>-->
-<!--    <string name="about_copyright" translatable="false">Copyright © 2021</string>-->
-<!--    <string name="about_email">email: trupici.sk@gmail.com</string>-->
-<!--    <string name="about_fb">facebook: fb.me/gwatchapp</string>-->
+    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9</string>
 
-<!--    <string name="about_themes_title">Themes and app icons</string>-->
-<!--    <string name="about_themes_author" translatable="false">Frederik Wagner</string>-->
-<!--    <string name="about_themes_profile" translatable="false">https://getwatchmaker.com/user/Bkd6tbYxr</string>-->
+    <string name="about_code_dev_title">Code:</string>
+    <string name="about_code_dev" translatable="false">Juraj Antal</string>
+
+    <string name="about_design_title">Design and art work:</string>
+    <string name="about_design" translatable="false">Frederik Wagner</string>
+    <string name="about_design_profile" translatable="false">https://getwatchmaker.com/user/Bkd6tbYxr</string>
+
+    <string name="about_copyright" translatable="false">Copyright © 2022</string>
+    <string name="about_email" translatable="false">email: trupici.sk@gmail.com</string>
+    <string name="about_fb" translatable="false">facebook: fb.me/gwatchapp</string>
+    <string name="about_source_code_title">Source code:</string>
+    <string name="about_source_code" translatable="false">https://github.com/trupici/G-Watch-Wear</string>
+
 
     <string name="about_disclaimer_title">DISCLAIMER</string>
     <string name="about_license">By using this application, you agree to the following terms and conditions:</string>
     <string name="about_disclaimer">G-WATCH MUST NOT be used to make medical decisions. DO NOT use or rely on this system for treatment decisions or use as a substitute for professional healthcare judgement. Always seek the advice of a qualified healthcare professional for any medical questions. Use this software at your own risk.</string>
     <string name="about_warranty">THIS PROGRAM IS PROVIDED FREE OF CHARGE. THIS PROGRAM IS PROVIDED \'AS IS\' WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL SERVICING, REPAIR OR CORRECTION.</string>
     <string name="about_other_trademarks">This software is not associated with or endorsed by any equipment manufacturer and all trademarks are those of their respective owners.</string>
+
+    <string name="about_apache_license_1">Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="about_apache_license_link">http://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="about_apache_license_2">Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
 
     <string name="compatible_cgm_apps">Supported 3rd party CGM applications:</string>
     <string name="about_glimp"><body><b>Glimp</b> application by CTAPP Software, www.deebee.it</body></string>
@@ -100,14 +105,15 @@
     <string name="about_localazy"><body><b>Localazy</b> free localization portal, visit https://localazy.com</body></string>
 
     <string name="about_libraries">This application uses the following open-source libraries:</string>
+
     <string name="about_colorpicker_name" translatable="false">HSV-Alpha Color Picker for Android v3.0.1</string>
     <string name="about_colorpicker_copyright" translatable="false">Copyright 2019 Martin Stone</string>
+
     <string name="about_okhttp_name" translatable="false">OkHttp v4.8.0</string>
     <string name="about_okhttp_copyright" translatable="false">Copyright 2019 Square, Inc.</string>
-    <string name="about_apache_license_1">Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0</string>
-    <string name="about_apache_license_link">http://www.apache.org/licenses/LICENSE-2.0</string>
-    <string name="about_apache_license_2">Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
 
+    <string name="about_watch_colorpicker_name" translatable="false">Android Holo ColorPicker v1.5</string>
+    <string name="about_watch_colorpicker_copyright" translatable="false">Copyright 2018 Lars Werkman</string>
 
     <!-- PREFERENCES -->
 
@@ -119,17 +125,9 @@
     <string name="settings_save_changes_message">Settings changed. Do you want to send these changes to the watch?</string>
     <string name="settings_reset_all_message">Do you want to reset all settings on this page and its sub-pages to default values?</string>
 
-    <string name="pref_connection_title">Connection</string>
-    <string name="pref_connection_summary">Connection type to use for G-Watch communication</string>
-    <string name="pref_connection_bt">Bluetooth</string>
-    <string name="pref_connection_bt_summary">Direct local connection over bluetooth</string>
-    <string name="pref_connection_wifi">Remote connection</string>
-    <string name="pref_connection_wifi_summary">Remote connection over wireless network</string>
-
     <string name="pref_data_source_title">Data Source</string>
     <string name="pref_data_source_summary">Select application to use as data source for glucose values</string>
-    <string name="pref_data_source_libre_summary">Requires patched version with implicit broadcasts</string>
-    <string name="pref_data_source_dexcom_summary">Requires patched version with data broadcasts</string>
+    <string name="pref_data_source_patched_app">Requires patched version with data broadcasts</string>
 
     <string name="pref_glucose_levels_title">Glucose Levels</string>
     <string name="pref_glucose_levels_summary">Personalize thresholds for glucose ranges</string>
@@ -149,95 +147,10 @@
     <string name="pref_watch_appearance_title">Watch Appearance</string>
     <string name="pref_watch_appearance_summary">Personalize watch appearance</string>
 
-    <string name="pref_aod_title">Watch Always On Display</string>
-    <string name="pref_aod_summary">Watch face ambient mode (AOD) configuration</string>
-    <string name="pref_aod_type_title">Always On Display Type</string>
-    <string name="pref_aod_type_analog_title">Analog watch</string>
-    <string name="pref_aod_type_sport_title">Sport mode</string>
-    <string name="pref_aod_type_sport_summary">AOD mode for intensive sport activities. It shows a big current glucose value and delta with digital time info.</string>
-    <string name="pref_aod_type_digital_title">Digital watch</string>
-    <string name="pref_aod_background_title">AOD background</string>
-    <string name="pref_aod_background_type_custom_title">Enable custom background</string>
-    <string name="pref_aod_background_custom_summary">On Pixel Ratio (OPR) must be always below 15% otherwise nothing is displayed. Also, for older watch models with low color ambient mode colors will be degraded to 3-bit colors (8 colors total). See user guide for details.</string>
-
-    <string name="pref_aod_analog_settings_title">Analog AOD Settings</string>
-    <string name="pref_aod_analog_indicator_title">Enable glucose indicator</string>
-    <string name="pref_aod_analog_indicator_type_label_title">G-Watch label</string>
-    <string name="pref_aod_analog_indicator_type_value_title">Glucose value</string>
-    <string name="pref_aod_analog_indicator_type_value_big_title">Big glucose value</string>
-    <string name="pref_aod_analog_indicator_type_hands_title">Clock hands color</string>
-    <string name="pref_aod_analog_dial_title">Show dial</string>
-    <string name="pref_aod_analog_dial_type_standard_title">Standard</string>
-    <string name="pref_aod_analog_dial_type_simple_title">Simple</string>
-
-    <string name="pref_aod_colors_title">Glucose Value Colors</string>
-    <string name="pref_aod_colors_summary">For older watch models with low color ambient mode colors will be degraded to 3-bit colors (8 colors total).</string>
-    <string name="pref_aod_trend_colors_title">Trend Indicator Colors</string>
-
-    <string name="pref_background_title">Background Options</string>
-    <string name="pref_background_summary">Personalize background appearance</string>
-    <string name="pref_background_image">Show image</string>
-    <string name="pref_background_standard">Standard</string>
-    <string name="pref_background_custom">Custom</string>
-    <string name="pref_background_custom_size">360x360</string>
-    <string name="pref_background_fill">Fill with color</string>
-    <string name="pref_background_color">Background color</string>
-
     <string name="selected_file_title">Custom background file:</string>
-    <string name="error_file_resolution">Invalid image resolution!</string>
-    <string name="error_file_or_format">Invalid file or format!</string>
-    <string name="error_file_path">Failed to load media file!</string>
-    <string name="error_file_size">Invalid file size!</string>
 
-    <string name="selected_file_not_selected">(none)</string>
-
-    <string name="pref_dial_title">Dial Options</string>
-    <string name="pref_dial_summary">Personalize dial appearance</string>
-    <string name="pref_dial_enable">Show dial</string>
-    <string name="pref_dial_standard">Standard</string>
-    <string name="pref_dial_simple">Simple</string>
-
-    <string name="pref_color_danger">Critical</string>
-    <string name="pref_color_danger_summary">Color when glucose is in Hyper/Hypo range</string>
-    <string name="pref_color_warn">Warning</string>
-    <string name="pref_color_warn_summary">Color when glucose is in High/Low range</string>
-    <string name="pref_color_in_range">In range</string>
-    <string name="pref_color_in_range_summary">Color when glucose is in target range</string>
-    <string name="pref_color_no_data">No data</string>
-    <string name="pref_color_no_data_summary">Color when no data is received from source in specified time</string>
-    <string name="pref_color_disconnected">Disconnected</string>
-    <string name="pref_color_disconnected_summary">Color when G-Watch is disconnected</string>
-
-    <string name="pref_hand_colors">Colors</string>
-    <string name="pref_hand_dimensions">Dimensions</string>
-
-    <string name="pref_hand_width">Width: </string>
-    <string name="pref_hand_width_summary">Width of hand in pixels</string>
-    <string name="pref_hand_length">Length: </string>
-    <string name="pref_hand_length_summary">Length from the rotation center in pixels</string>
-    <string name="pref_hand_tail">Tail: </string>
-    <string name="pref_hand_tail_summary">Tail length from the rotation center in pixels</string>
-    <string name="pref_hand_tail_width">Tail width: </string>
-    <string name="pref_hand_tail_width_summary">Tail width in pixels</string>
-    <string name="pref_hand_cap">Cap radius: </string>
-    <string name="pref_hand_cap_summary">Radius of hand cap in pixels</string>
-    <string name="pref_hand_tail_negative">Negative tail</string>
-    <string name="pref_hand_tail_negative_summary">If set then tail represents the hand offset from the center of rotation</string>
-    <string name="pref_hand_round_endings">Round endings</string>
-    <string name="pref_sec_hand_round_endings_summary">If tail is not negative (offset) and tail width differs from hand width then tail ending is always round</string>
-
-    <string name="pref_hour_hand_title">Hour Hand</string>
-    <string name="pref_hour_hand_summary">Personalize hour hand appearance</string>
-    <string name="pref_hour_hand_enable">Show hour hand</string>
-    <string name="pref_min_hand_title">Minute Hand</string>
-    <string name="pref_min_hand_summary">Personalize minute hand appearance</string>
-    <string name="pref_min_hand_enable">Show minute hand</string>
-    <string name="pref_sec_hand_title">Second Hand</string>
-    <string name="pref_sec_hand_summary">Personalize second hand appearance</string>
-    <string name="pref_sec_hand_enable">Show second hand</string>
-
-    <string name="pref_glucose_panel_title">Glucose Panel</string>
-    <string name="pref_glucose_panel_summary">Personalize panel with glucose values</string>
+<!--    <string name="pref_glucose_panel_title">Glucose Panel</string>-->
+<!--    <string name="pref_glucose_panel_summary">Personalize panel with glucose values</string>-->
     <string name="pref_glucose_panel_colors">Text colors</string>
     <string name="pref_glucose_panel_color_critical">Critical</string>
     <string name="pref_glucose_panel_color_critical_summary">Text color for critical glucose values (hyper/hypo-glycemia)</string>
@@ -246,8 +159,6 @@
     <string name="pref_glucose_panel_color_in_range">In range</string>
     <string name="pref_glucose_panel_color_in_range_summary">Text color for glucose values in target range</string>
 
-    <string name="pref_trend_panel_title">Glucose Trend Panel</string>
-    <string name="pref_trend_panel_summary">Personalize panel with glucose trend indicator</string>
     <string name="pref_trend_panel_colors">Trend indicator colors</string>
     <string name="pref_trend_color_steep">Steep</string>
     <string name="pref_trend_color_steep_summary">Color for rapid changing glucose trend indicator</string>
@@ -256,35 +167,7 @@
     <string name="pref_trend_color_flat">Flat</string>
     <string name="pref_trend_color_flat_summary">Color for flat glucose trend indicator</string>
 
-    <string name="pref_status_panel_title">Status Panel</string>
-    <string name="pref_status_panel_summary">Personalize panel with status info</string>
-    <string name="pref_status_panel_show_time_after">Status time info threshold: </string>
-    <string name="pref_status_panel_show_time_after_summary">Time in seconds after which to show current status time information. Value 0 means to not show time information</string>
-    <string name="pref_status_panel_no_data_time">No data time threshold: </string>
-    <string name="pref_status_panel_no_data_time_summary">Time in seconds to wait for data before timeout is signaled</string>
-    <string name="pref_status_panel_colors">Status content colors</string>
-    <string name="pref_status_panel_color_no_data">No data</string>
-    <string name="pref_status_panel_color_no_data_summary">Color for status indicator when no data is received from source in specified time</string>
-    <string name="pref_status_panel_color_disconnected">Offline</string>
-    <string name="pref_status_panel_color_disconnected_summary">Color for status indicator when G-Watch is disconnected</string>
-
-    <string name="pref_calendar_panel_title">Calendar Panel</string>
-    <string name="pref_calendar_panel_summary">Personalize panel with current day</string>
-    <string name="pref_calendar_panel_enable">Show calendar panel</string>
-    <string name="pref_calendar_panel_color">Calendar content color</string>
-    <string name="pref_calendar_panel_color_summary"></string>
-    <string name="pref_calendar_standard">Day of month</string>
-    <string name="pref_calendar_day_of_week">With day of week</string>
-    <string name="pref_calendar_on_click_summary">If enabled then tap on panel opens calendar settings widget</string>
-
-    <string name="pref_battery_panel_title">Battery Panel</string>
-    <string name="pref_battery_panel_summary">Personalize panel with battery indicator</string>
-    <string name="pref_battery_panel_enable">Show battery indicator</string>
-    <string name="pref_battery_panel_color">Battery indicator color</string>
-    <string name="pref_battery_panel_color_summary"></string>
-    <string name="pref_battery_panel_color_critical">Critical battery indicator color</string>
-    <string name="pref_battery_panel_color_critical_summary"></string>
-    <string name="pref_battery_on_click_summary">If enabled then tap on panel opens battery widget</string>
+    <string name="pref_data_source_aaps_ignore_bg_title">Ignore glucose values from AAPS</string>
 
     <string name="pref_on_click_action">OnClick Action</string>
     <string name="pref_on_click_title">Enable OnClick Action</string>
@@ -327,146 +210,54 @@
     <string name="pref_graph_background_title">Graph Background</string>
     <string name="pref_graph_background_color">Background color</string>
 
-    <string name="pref_graph_panel_title">Glucose Graph</string>
-    <string name="pref_graph_panel_summary">Personalize watch graph appearance</string>
-    <string name="pref_graph_type_title">Graph Type</string>
-    <string name="pref_graph_panel_show">Show glucose graph</string>
-    <string name="pref_graph_panel_show_summary">If also other info panels are configured (AndroidAPS, Digital time) then tap on center of the watch face to toggle between them</string>
-    <string name="pref_graph_panel_always_on_title">Graph always on</string>
-    <string name="pref_graph_panel_always_on_summary">Show graph as a background for other info panels. You can still toggle the graph to be shown on the foreground.</string>
-    <string name="pref_graph_type_line_title">Line</string>
-    <string name="pref_graph_type_dots_title">Dots</string>
-    <string name="pref_graph_lines_title">Graph Lines</string>
-    <string name="pref_graph_horz_lines">Draw critical glucose boundaries</string>
-    <string name="pref_graph_horz_lines_summary">Horizontal lines showing critical range boundaries (hyper, hypo)</string>
-    <string name="pref_graph_horz_lines_color">Critical boundaries color</string>
-    <string name="pref_graph_vert_lines">Draw hour lines</string>
-    <string name="pref_graph_vert_lines_summary">Vertical lines showing 1 hour intervals</string>
-    <string name="pref_graph_vert_lines_color">Hour lines color</string>
-    <string name="pref_graph_high_line">Draw high glucose boundary</string>
-    <string name="pref_graph_high_line_color">High glucose boundary color</string>
-    <string name="pref_graph_low_line">Draw low glucose boundary</string>
-    <string name="pref_graph_low_line_color">Low glucose boundary color</string>
-    <string name="pref_graph_dynamic_scale_title">Dynamic range</string>
-    <string name="pref_graph_dynamic_scale_summary_off">Static graph range, fits whole glucose range</string>
-    <string name="pref_graph_dynamic_scale_summary_on">Dynamic graph range, scaled to fit displayed values</string>
-    <string name="pref_graph_time_range_toggle_title">Enable time range toggle</string>
-    <string name="pref_graph_time_range_toggle_summary">If enabled, tap 2 times on graph to toggle between standard 2.5 hours and longer 5 hour graph time range.</string>
-
-    <string name="pref_aaps_panel_title">AndroidAPS Data Panel</string>
-    <string name="pref_aaps_panel_summary">Personalize panel with data from AndroidAPS</string>
-    <string name="pref_aaps_panel_enable">Show AndroidAPS panel</string>
-    <string name="pref_aaps_panel_enable_summary">If also other info panels are configured (Glucose graph, Digital time) then tap on center of the watch face to toggle between them</string>
-    <string name="pref_aaps_colors">Colors</string>
-    <string name="pref_aaps_cob_color">Carbohydrates On Board</string>
-    <string name="pref_aaps_cob_color_summary">Customize COB field color</string>
-    <string name="pref_aaps_iob_color">Insulin On Board</string>
-    <string name="pref_aaps_iob_color_summary">Customize IOB field color</string>
-    <string name="pref_aaps_tbr_color">Temporary Basal Rate</string>
-    <string name="pref_aaps_tbr_color_summary">Customize TBR field color</string>
-    <string name="pref_aaps_bkg_color">Background color</string>
-    <string name="pref_aaps_bkg_color_summary">Customize panel background color</string>
-    <string name="pref_aaps_popup_always_active">AAPS popup always active</string>
-    <string name="pref_aaps_popup_always_active_summary">Enable to show AAPS popup even if AAPS panel is not visible or enabled</string>
-    <string name="pref_data_source_aaps_ignore_bg_title">Ignore glucose values from AAPS</string>
-
-    <string name="pref_sensors_title">Sensor Areas</string>
-    <string name="pref_sensors_summary">Select and configure sensors to show on watch</string>
-    <string name="pref_sensor1_title">Left Sensor</string>
-    <string name="pref_sensor2_title">Right Sensor</string>
-    <string name="pref_sensor_enable_title">Enable sensor</string>
-    <string name="pref_sensor_enable_summary_on">Show sensor</string>
-    <string name="pref_sensor_enable_summary_off">Hide sensor</string>
-    <string name="pref_sensor_type_bat_title">Watch Battery</string>
-    <string name="pref_sensor_type_bat_summary">Secondary battery indicator</string>
-    <string name="pref_sensor_type_hrm_title">HRM</string>
-    <string name="pref_sensor_type_hrm_summary">Heart rate monitor</string>
-    <string name="pref_sensor_type_pdm_title">Pedometer</string>
-    <string name="pref_sensor_type_pdm_summary">Steps monitor</string>
-    <string name="pref_sensors_bat_title">Watch Battery Settings</string>
-    <string name="pref_sensors_bat_summary">Customize secondary battery indicator. Configuration is not shared with primary battery panel.</string>
-    <string name="pref_sensors_bat_color">Standard color</string>
-    <string name="pref_sensors_bat_critical_color">Critical color</string>
-    <string name="pref_sensors_hrm_title">HRM Settings</string>
-    <string name="pref_sensors_hrm_color">HRM color</string>
-    <string name="pref_sensors_hrm_period">Measurements period:</string>
-    <string name="pref_sensors_hrm_period_summary">Set the number of minutes between heart rate measurements (10&#8211;120 mins)</string>
-    <string name="pref_sensors_hrm_now">Start measurement now</string>
-    <string name="pref_sensors_pdm_title">Pedometer Settings</string>
-    <string name="pref_sensors_pdm_color">Pedometer color</string>
-    <string name="pref_sensors_pdm_reset">Reset counter</string>
-    <string name="pref_sensors_shealth_enable_title">Use S-Health</string>
-    <string name="pref_sensors_shealth_enable_summary_on">Use Samsung Health App as sensors data provider</string>
-    <string name="pref_sensors_shealth_enable_summary_off">Use data provided directly from watch sensors</string>
-    <string name="pref_sensor_type_phone_bat_title">Phone Battery</string>
-    <string name="pref_sensor_type_phone_bat_summary">Phone battery indicator</string>
-    <string name="pref_sensors_phone_bat_title">Phone Battery Settings</string>
-    <string name="pref_sensors_phone_bat_summary">Customize phone battery indicator.</string>
-
-    <string name="pref_alarms_title">Watch Alarms</string>
-    <string name="pref_alarms_summary">Configure glucose level alarms on the watch</string>
-    <string name="pref_alarms_category_title">Alarms</string>
-    <string name="pref_alarms_notifications_title">Notifications</string>
-    <string name="pref_alarms_enable_title">Enable watch alarms</string>
-    <string name="pref_alarms_enable_summary">Enable watch alarms if you want to show alerts when glucose values are out of target range. It is recommended to disable glucose notifications from phone when alarms are enabled.</string>
-    <string name="pref_alarms_active_time_title">Only in specific time of the day</string>
-    <string name="pref_alarms_from_title">Start time:</string>
-    <string name="pref_alarms_to_title">End time:</string>
-    <string name="pref_alarms_critical_only_title">Critical alarms only</string>
-    <string name="pref_alarms_critical_only_summary">If set, then only alarms for critical glucose values will be triggered. Critical glucose values are values below 54 mg/dl (3 mmol/l) or above 360 mg/dl (20 mmol/l).</string>
-    <string name="pref_alarms_snooze_duration_title">Snooze duration:</string>
-    <string name="pref_alarms_snooze_duration_summary">Set the number of minutes to snooze alarm if you press Snooze button (5–240).</string>
-    <string name="pref_alarms_snooze_duration_summary_with_note">Set the number of minutes to snooze alarm if you press Snooze button (5–240). Note that you cannot snooze alarms for critical glucose values.</string>
-    <string name="pref_alarms_period_title">Period:</string>
-    <string name="pref_alarms_period_summary">Minimal period in minutes (5–240)</string>
-    <string name="pref_alarms_intensity_title">Vibration intensity:</string>
-    <string name="pref_alarms_intensity_summary">Set vibrations strength 50–100%</string>
-    <string name="pref_alarms_duration_title">Alarm duration:</string>
-    <string name="pref_alarms_duration_summary">Set alarm duration 5–240 seconds</string>
-    <string name="pref_alarms_warn_enable_title">Enable out of target range alarms</string>
-    <string name="pref_alarms_warn_enable_summary">Depends on Low and High glycemia thresholds, see Glucose Levels settings.</string>
-    <string name="pref_alarms_danger_enable_title">Enable hypo/hyper glycemia alarms</string>
-    <string name="pref_alarms_danger_enable_summary">Depends on Hypo and Hyper glycemia thresholds, see Glucose Levels settings.</string>
-    <string name="pref_alarms_period_lows_title">Period of low glycemia alarms:</string>
-    <string name="pref_alarms_period_lows_summary">Minimal period of low/hypo glycemia alarms in minutes (5–240)</string>
-    <string name="pref_alarms_period_highs_title">Period of high glycemia alarms:</string>
-    <string name="pref_alarms_period_highs_summary">Minimal period of high/hyper glycemia alarms in minutes (5–240)</string>
-    <string name="pref_alarms_sound_title">Alarm Sounds</string>
-    <string name="pref_alarms_sound_summary">Alarms audio settings for watch models supporting playback of audio files (Samsung Gear 3 and newer)</string>
-    <string name="pref_alarms_sound_critical_enable_title">Critical alarms sound</string>
-    <string name="pref_alarms_sound_lows_enable_title">Low/hypo glycemia alarms sound</string>
-    <string name="pref_alarms_sound_highs_enable_title">High/hyper glycemia alarms sound</string>
-    <string name="pref_alarms_sound_volume_title">Volume:</string>
-    <string name="pref_alarms_sound_volume_summary">Set alarm volume from range 0–100%. 0 = current volume set in watch will be used.</string>
-    <string name="pref_alarms_sound_custom_title">Custom audio file</string>
-    <string name="pref_alarms_sound_custom_summary">Play custom audio file. Only WAV and OGG formats are supported.</string>
-    <string name="selected_sound_file_title">Select audio file</string>
-    <string name="pref_alarms_nodata_enable_title">Enable no data alarm</string>
-    <string name="pref_alarms_nodata_enable_summary">Depends on No data status threshold, see Status Panel settings.</string>
-    <string name="pref_alarms_sound_nodata_enable_title">No data alarm sound</string>
-    <string name="pref_alarms_fastdrop_enable_title">Enable fast drop alarm</string>
-    <string name="pref_alarms_fastdrop_enable_summary">Fast drop alarm is triggered if delta from the last measured value is bigger than specified threshold</string>
-    <string name="pref_alarms_fastdrop_threshold_title">Fast drop threshold: </string>
-    <string name="pref_alarms_fastdrop_threshold_summary">Minimal glucose value difference from the last measurement to trigger the alarm, value from range 7–45 mg/dl (0.4–2.5 mmol/l)</string>
-    <string name="pref_alarms_sound_fastdrop_enable_title">Fast drop alarm sound</string>
-    <string name="pref_alarms_new_data_title">New data notification</string>
-    <string name="pref_alarms_new_data_summary">If enabled, then on every new glucose value you will be notified with decent vibration</string>
-
-    <string name="pref_digital_panel_title">Digital Watch Panel</string>
-    <string name="pref_digital_panel_summary">Configure digital watch info panel</string>
-    <string name="pref_digital_panel_show">Show digital watch panel</string>
-    <string name="pref_digital_panel_show_summary">If also other info panels are configured (Glucose graph, AndroidAPS) then tap on center of the watch face to toggle between them</string>
-    <string name="pref_digital_panel_seconds">Show seconds</string>
-    <string name="pref_digital_panel_colors">Colors</string>
-    <string name="pref_digital_panel_text_color">Text color</string>
-    <string name="pref_digital_panel_bkg_color">Background color</string>
-    <string name="pref_digital_time_format">Time Format</string>
-    <string name="pref_digital_time_format_system">System time format</string>
-    <string name="pref_digital_time_format_12">12-hour time format</string>
-    <string name="pref_digital_time_format_24">24-hour time format</string>
-    <string name="pref_digital_panel_big_font_summary">If seconds are shown then AM/PM signs are not shown in 12-hour time format</string>
-    <string name="pref_jumbo_font_title">Extra large font</string>
-    <string name="pref_jumbo_font_summary">If enabled, then only hours and minutes will be shown, without seconds and AM/PM signs</string>
+<!--    <string name="pref_alarms_title">Watch Alarms</string>-->
+<!--    <string name="pref_alarms_summary">Configure glucose level alarms on the watch</string>-->
+<!--    <string name="pref_alarms_category_title">Alarms</string>-->
+<!--    <string name="pref_alarms_notifications_title">Notifications</string>-->
+<!--    <string name="pref_alarms_enable_title">Enable watch alarms</string>-->
+<!--    <string name="pref_alarms_enable_summary">Enable watch alarms if you want to show alerts when glucose values are out of target range. It is recommended to disable glucose notifications from phone when alarms are enabled.</string>-->
+<!--    <string name="pref_alarms_active_time_title">Only in specific time of the day</string>-->
+<!--    <string name="pref_alarms_from_title">Start time:</string>-->
+<!--    <string name="pref_alarms_to_title">End time:</string>-->
+<!--    <string name="pref_alarms_critical_only_title">Critical alarms only</string>-->
+<!--    <string name="pref_alarms_critical_only_summary">If set, then only alarms for critical glucose values will be triggered. Critical glucose values are values below 54 mg/dl (3 mmol/l) or above 360 mg/dl (20 mmol/l).</string>-->
+<!--    <string name="pref_alarms_snooze_duration_title">Snooze duration:</string>-->
+<!--    <string name="pref_alarms_snooze_duration_summary">Set the number of minutes to snooze alarm if you press Snooze button (5–240).</string>-->
+<!--    <string name="pref_alarms_snooze_duration_summary_with_note">Set the number of minutes to snooze alarm if you press Snooze button (5–240). Note that you cannot snooze alarms for critical glucose values.</string>-->
+<!--    <string name="pref_alarms_period_title">Period:</string>-->
+<!--    <string name="pref_alarms_period_summary">Minimal period in minutes (5–240)</string>-->
+<!--    <string name="pref_alarms_intensity_title">Vibration intensity:</string>-->
+<!--    <string name="pref_alarms_intensity_summary">Set vibrations strength 50–100%</string>-->
+<!--    <string name="pref_alarms_duration_title">Alarm duration:</string>-->
+<!--    <string name="pref_alarms_duration_summary">Set alarm duration 5–240 seconds</string>-->
+<!--    <string name="pref_alarms_warn_enable_title">Enable out of target range alarms</string>-->
+<!--    <string name="pref_alarms_warn_enable_summary">Depends on Low and High glycemia thresholds, see Glucose Levels settings.</string>-->
+<!--    <string name="pref_alarms_danger_enable_title">Enable hypo/hyper glycemia alarms</string>-->
+<!--    <string name="pref_alarms_danger_enable_summary">Depends on Hypo and Hyper glycemia thresholds, see Glucose Levels settings.</string>-->
+<!--    <string name="pref_alarms_period_lows_title">Period of low glycemia alarms:</string>-->
+<!--    <string name="pref_alarms_period_lows_summary">Minimal period of low/hypo glycemia alarms in minutes (5–240)</string>-->
+<!--    <string name="pref_alarms_period_highs_title">Period of high glycemia alarms:</string>-->
+<!--    <string name="pref_alarms_period_highs_summary">Minimal period of high/hyper glycemia alarms in minutes (5–240)</string>-->
+<!--    <string name="pref_alarms_sound_title">Alarm Sounds</string>-->
+<!--    <string name="pref_alarms_sound_summary">Alarms audio settings for watch models supporting playback of audio files (Samsung Gear 3 and newer)</string>-->
+<!--    <string name="pref_alarms_sound_critical_enable_title">Critical alarms sound</string>-->
+<!--    <string name="pref_alarms_sound_lows_enable_title">Low/hypo glycemia alarms sound</string>-->
+<!--    <string name="pref_alarms_sound_highs_enable_title">High/hyper glycemia alarms sound</string>-->
+<!--    <string name="pref_alarms_sound_volume_title">Volume:</string>-->
+<!--    <string name="pref_alarms_sound_volume_summary">Set alarm volume from range 0–100%. 0 = current volume set in watch will be used.</string>-->
+<!--    <string name="pref_alarms_sound_custom_title">Custom audio file</string>-->
+<!--    <string name="pref_alarms_sound_custom_summary">Play custom audio file. Only WAV and OGG formats are supported.</string>-->
+<!--    <string name="selected_sound_file_title">Select audio file</string>-->
+<!--    <string name="pref_alarms_nodata_enable_title">Enable no data alarm</string>-->
+<!--    <string name="pref_alarms_nodata_enable_summary">Depends on No data status threshold, see Status Panel settings.</string>-->
+<!--    <string name="pref_alarms_sound_nodata_enable_title">No data alarm sound</string>-->
+<!--    <string name="pref_alarms_fastdrop_enable_title">Enable fast drop alarm</string>-->
+<!--    <string name="pref_alarms_fastdrop_enable_summary">Fast drop alarm is triggered if delta from the last measured value is bigger than specified threshold</string>-->
+<!--    <string name="pref_alarms_fastdrop_threshold_title">Fast drop threshold: </string>-->
+<!--    <string name="pref_alarms_fastdrop_threshold_summary">Minimal glucose value difference from the last measurement to trigger the alarm, value from range 7–45 mg/dl (0.4–2.5 mmol/l)</string>-->
+<!--    <string name="pref_alarms_sound_fastdrop_enable_title">Fast drop alarm sound</string>-->
+<!--    <string name="pref_alarms_new_data_title">New data notification</string>-->
+<!--    <string name="pref_alarms_new_data_summary">If enabled, then on every new glucose value you will be notified with decent vibration</string>-->
 
     <string name="pref_data_source_nightscout" translatable="false">NightScout</string>
     <string name="pref_nightscout_enable">Enable NightScout Follower</string>
@@ -492,38 +283,8 @@
     <string name="pref_cloud_request_latency_title">Cloud latency:</string>
     <string name="pref_cloud_request_latency_summary">Delay to be added to regular schedule to avoid retries (delay from collecting value to cloud server response), 10–150 seconds</string>
 
-    <string name="pref_standalone_title">Watch Standalone Mode</string>
-    <string name="pref_standalone_summary">Customize watch standalone mode settings</string>
-    <string name="pref_standalone_menu_active_title">Menu always active</string>
-    <string name="pref_standalone_menu_active_summary">In default the standalone menu is active only if mobile app is not connected or WATCH standalone mode is selected.</string>
-    <string name="pref_standalone_colors">Colors</string>
-    <string name="pref_standalone_indicator_color_title">Indicator color</string>
-    <string name="pref_standalone_indicator_bkg_title">Indicator background</string>
-    <string name="pref_standalone_indicator_bkg_error_title">Indicator background on error</string>
-
-    <string name="warn_battery_panel_hidden">Battery indicator was hidden. Use Battery Panel settings to show it again or secondary battery indicator in sensor area.</string>
-
-    <string name="pref_enable_glucose_units_toggle_title">Enable glucose units toggle</string>
-    <string name="pref_enable_glucose_units_toggle_summary">If enabled then you can tap on Glucose trend panel to toggle between mmol/l and mg/dl units.</string>
-    <string name="pref_glucose_trend_no_units_title">Hide units</string>
-    <string name="pref_glucose_trend_no_units_summary">If enabled, then glucose units won\'t be displayed in trend panel, only the delta from the last value.</string>
-
-    <string name="pref_font">Font size</string>
-    <string name="pref_font_big_size">Use big font size</string>
-
-    <string name="pref_gwatch_logo_title">G-Watch Logo</string>
-    <string name="pref_show_logo_title">Show G-Watch logo</string>
-    <string name="pref_logo_color_title">G-Watch logo color</string>
-
     <string name="cfg_transfer_ok">Configuration sent</string>
     <string name="cfg_transfer_failed">Configuration transfer failed!</string>
-    <string name="image_transfer_ok">Image sent</string>
-    <string name="image_transfer_failed">Image transfer failed!</string>
-    <string name="audio_transfer_ok">Audio file sent</string>
-    <string name="audio_transfer_failed">Audio file transfer failed!</string>
-    <string name="err_file_transfer_not_supported">File transfer is not supported on this device!</string>
-    <string name="err_file_transfer_not_enabled">File transfer is not enabled!</string>
-    <string name="select_file">Select file</string>
     <string name="cfg_applied">Configuration applied</string>
     <string name="cfg_export_success">Settings exported</string>
     <string name="cfg_export_failed">Export failed</string>
@@ -568,15 +329,6 @@
     <string name="follower_err_invalid_session">Invalid session id</string>
 
 
-    <!-- SAP -->
-
-    <string name="sap_title">Samsung Accessory Protocol</string>
-    <string name="sap_err_vendor_not_supported">Vendor is not supported</string>
-    <string name="sap_err_device_not_supported">Device is not supported</string>
-    <string name="sap_err_library_not_installed">Samsung Accessory Protocol library is not installed. Please install Samsung Accessory Service</string>
-    <string name="sap_err_library_update_required">Old version of Samsung Accessory Protocol library is installed. Please install a newer version.</string>
-    <string name="sap_err_library_update_recommended">Old version of Samsung Accessory Protocol library is installed. It is recommended to install a newer version.</string>
-
 
     <!-- PACKETS -->
 
@@ -601,5 +353,5 @@
 
     <string name="dexcom_app_not_installed">Dexcom App is not installed!</string>
 
-    <string name="main_activity_status">Status:</string>
+<!--    <string name="main_activity_status">Status:</string>-->
 </resources>

@@ -63,14 +63,14 @@
         />
     <androidx.preference.CheckBoxPreference
         android:title="DexCom App"
-        android:summary="@string/pref_data_source_dexcom_summary"
+        android:summary="@string/pref_data_source_patched_app"
         android:key="pref_data_source_dexcom"
         android:defaultValue="false"
         app:iconSpaceReserved="false"
         />
     <androidx.preference.CheckBoxPreference
         android:title="LibreLink"
-        android:summary="@string/pref_data_source_libre_summary"
+        android:summary="@string/pref_data_source_patched_app"
         android:key="pref_data_source_libre"
         android:defaultValue="false"
         android:visibility="gone"

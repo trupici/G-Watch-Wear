@@ -64,14 +64,10 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
         setupToolBar();
 
         gestureDetector = new GestureDetector(this, new HorizontalSwipeDetector(this));
-        View.OnTouchListener gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
+        View.OnTouchListener gestureListener = (v, event) -> gestureDetector.onTouchEvent(event);
 
         findViewById(R.id.scroll_view).setOnTouchListener(gestureListener);
-//        findViewById(R.id.image_view).setOnTouchListener(gestureListener);
+        findViewById(R.id.image_view).setOnTouchListener(gestureListener);
 
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),

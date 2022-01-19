@@ -22,14 +22,15 @@
 
     <string name="app_desc_title" translatable="false">G-Watch App</string>
     <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!</string>
-    <string name="app_desc_text">G-Watch App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
+    <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
 
     <string name="app_desc_config">The appearance and behavior of G-Watch watch faces can be configured directly on the watch. BG data source to use to get readings is configured in mobile app Settings. Select Settings menu option or swipe left on the main app screen to see all configuration options.</string>
-    <string name="app_desc_user_guide">If you have any question or you want share your experiences, please visit our fb group http://facebook.com/groups/gwatchapp</string>
+    <string name="app_desc_widget">Use G-Watch Wear App widget to see your bg values also on the phone.</string>
+    <string name="app_desc_more_info">If you have any question or you want share your experiences, please visit our facebook group http://facebook.com/groups/gwatchapp</string>
     <string name="app_desc_first_run">The first run</string>
     <string name="app_desc_first_run_text">G-Watch watch face needs 1&#8208;2 glucose samples (up to 10 minutes) to display correct values. During this initial time no glucose value, trend or status is displayed.</string>
     <string name="app_desc_important_note_title"><b>Important note</b></string>
-    <string name="app_desc_disable_batt_opt_text">Don\&#39;t forget to disable all battery optimizations for G-Watch App otherwise you can miss glucose values if app is stopped by power manager. The same applies for apps required to transfer data to watch: Galaxy Wearable, its watch plugin and system Bluetooth app.</string>
+    <string name="app_desc_disable_batt_opt_text">Don\&#39;t forget to disable all battery optimizations for G-Watch Wear App, otherwise you can miss glucose values if app is stopped by power manager. The same applies for apps required to transfer data to watch: Galaxy Wearable, its watch plugin and system Bluetooth app.</string>
 
 
     <!-- Dialog actions -->

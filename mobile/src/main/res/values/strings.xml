@@ -67,12 +67,10 @@
 
     <string name="about_app_name" translatable="false">G-Watch Wear App 0.9</string>
 
-    <string name="about_code_dev_title">Code:</string>
-    <string name="about_code_dev" translatable="false">Juraj Antal</string>
+    <string name="about_author">Author: Juraj Antal</string>
 
     <string name="about_design_title">Design and art work:</string>
-    <string name="about_design" translatable="false">Frederik Wagner</string>
-    <string name="about_design_profile" translatable="false">https://getwatchmaker.com/user/Bkd6tbYxr</string>
+    <string name="about_designer" translatable="false"><a href="https://getwatchmaker.com/user/Bkd6tbYxr">Frederik Wagner</a></string>
 
     <string name="about_copyright" translatable="false">Copyright © 2022</string>
     <string name="about_email" translatable="false">email: trupici.sk@gmail.com</string>
@@ -87,11 +85,10 @@
     <string name="about_warranty">THIS PROGRAM IS PROVIDED FREE OF CHARGE. THIS PROGRAM IS PROVIDED \'AS IS\' WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL SERVICING, REPAIR OR CORRECTION.</string>
     <string name="about_other_trademarks">This software is not associated with or endorsed by any equipment manufacturer and all trademarks are those of their respective owners.</string>
 
-    <string name="about_apache_license_1">Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0</string>
-    <string name="about_apache_license_link">http://www.apache.org/licenses/LICENSE-2.0</string>
-    <string name="about_apache_license_2">Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
+    <string name="about_license_title">LICENSE</string>
+    <string name="about_apache_license">Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 \nUnless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
 
-    <string name="compatible_cgm_apps">Supported 3rd party CGM applications:</string>
+    <string name="compatible_cgm_apps">Supported 3rd party CGM applications</string>
     <string name="about_glimp"><body><b>Glimp</b> application by CTAPP Software, www.deebee.it</body></string>
     <string name="about_xdrip"><body><b>xDrip+</b> application by Nightscout Foundation, https://github.com/NightscoutFoundation/xDrip</body></string>
     <string name="about_aaps"><body><b>AndroidAPS</b> application by Milos Kozak, https://github.com/nightscout/AndroidAPS</body></string>
@@ -100,12 +97,13 @@
     <string name="about_dexcom"><body><b>DexCom</b> and <b>Dexcom Share</b> application by Dexcom, Inc., www.dexcom.com</body></string>
     <string name="about_nightscout"><body><b>NightScout</b> application by Nightscout Foundation, www.nightscout.info</body></string>
 
+    <string name="about_resources_title">Resources</string>
     <string name="about_resources">This application uses resources from the following sites:</string>
     <string name="about_icons8"><body><b>Icons8</b> free icons, visit https://icons8.com</body></string>
     <string name="about_bigsoundbank"><body><b>BigSoundBank</b> free sounds, visit https://bigsoundbank.com</body></string>
     <string name="about_localazy"><body><b>Localazy</b> free localization portal, visit https://localazy.com</body></string>
 
-    <string name="about_libraries">This application uses the following open-source libraries:</string>
+    <string name="about_libraries_title">Open-source libraries</string>
 
     <string name="about_colorpicker_name" translatable="false">HSV-Alpha Color Picker for Android v3.0.1</string>
     <string name="about_colorpicker_copyright" translatable="false">Copyright 2019 Martin Stone</string>

@@ -65,4 +65,7 @@
     <color name="def_toolbar_bkg">#202020</color>
     <color name="toolbar_button">#ffffff</color>
 
+    <color name="about_cardview_header_bkg">#101010</color>
+    <color name="about_cardview_stroke">#202020</color>
+
 </resources>

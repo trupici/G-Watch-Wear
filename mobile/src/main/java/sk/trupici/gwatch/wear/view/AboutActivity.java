@@ -18,9 +18,16 @@ package sk.trupici.gwatch.wear.view;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
@@ -34,12 +41,88 @@ public class AboutActivity extends LocalizedActivityBase  {
     long startMillis = 0;
     int count = 0;
 
+    ImageButton licenseButton;
+    LinearLayout licenseExpandable;
+    CardView licenseCardView;
+
+    ImageButton disclaimerButton;
+    LinearLayout disclaimerExpandable;
+    CardView disclaimerCardView;
+
+    ImageButton appsButton;
+    LinearLayout appsExpandable;
+    CardView appsCardView;
+
+    ImageButton resourcesButton;
+    LinearLayout resourcesExpandable;
+    CardView resourcesCardView;
+
+    ImageButton libsButton;
+    LinearLayout libsExpandable;
+    CardView libsCardView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_layout);
 
         setupToolBar();
+
+        ((TextView)findViewById(R.id.designer)).setMovementMethod(LinkMovementMethod.getInstance());
+
+        licenseCardView = findViewById(R.id.lic_cardview);
+        licenseExpandable = findViewById(R.id.lic_expandable);
+        licenseButton = findViewById(R.id.lic_button);
+        licenseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (licenseExpandable.getVisibility() == View.VISIBLE) {
+                    TransitionManager.beginDelayedTransition(licenseCardView, new AutoTransition());
+                    licenseExpandable.setVisibility(View.GONE);
+                    licenseButton.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(licenseCardView, new AutoTransition());
+                    licenseExpandable.setVisibility(View.VISIBLE);
+                    licenseButton.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                }
+            }
+        });
+
+        disclaimerCardView = findViewById(R.id.disc_cardview);
+        disclaimerExpandable = findViewById(R.id.disc_expandable);
+        disclaimerButton = findViewById(R.id.disc_button);
+        disclaimerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (disclaimerExpandable.getVisibility() == View.VISIBLE) {
+                    TransitionManager.beginDelayedTransition(disclaimerCardView, new AutoTransition());
+                    disclaimerExpandable.setVisibility(View.GONE);
+                    disclaimerButton.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(disclaimerCardView, new AutoTransition());
+                    disclaimerExpandable.setVisibility(View.VISIBLE);
+                    disclaimerButton.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                }
+            }
+        });
+
+        appsCardView = findViewById(R.id.apps_cardview);
+        appsExpandable = findViewById(R.id.apps_expandable);
+        appsButton = findViewById(R.id.apps_button);
+        appsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (appsExpandable.getVisibility() == View.VISIBLE) {
+                    TransitionManager.beginDelayedTransition(appsCardView, new AutoTransition());
+                    appsExpandable.setVisibility(View.GONE);
+                    appsButton.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(appsCardView, new AutoTransition());
+                    appsExpandable.setVisibility(View.VISIBLE);
+                    appsButton.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                }
+            }
+        });
 
         findViewById(R.id.compatible_cgm_apps).setOnClickListener(v -> {
             long time = System.currentTimeMillis();
@@ -59,6 +142,43 @@ public class AboutActivity extends LocalizedActivityBase  {
                 count = 0;
             }
         });
+
+        resourcesCardView = findViewById(R.id.res_cardview);
+        resourcesExpandable = findViewById(R.id.res_expandable);
+        resourcesButton = findViewById(R.id.res_button);
+        resourcesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (resourcesExpandable.getVisibility() == View.VISIBLE) {
+                    TransitionManager.beginDelayedTransition(resourcesCardView, new AutoTransition());
+                    resourcesExpandable.setVisibility(View.GONE);
+                    resourcesButton.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(resourcesCardView, new AutoTransition());
+                    resourcesExpandable.setVisibility(View.VISIBLE);
+                    resourcesButton.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                }
+            }
+        });
+
+        libsCardView = findViewById(R.id.libs_cardview);
+        libsExpandable = findViewById(R.id.libs_expandable);
+        libsButton = findViewById(R.id.libs_button);
+        libsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (libsExpandable.getVisibility() == View.VISIBLE) {
+                    TransitionManager.beginDelayedTransition(libsCardView, new AutoTransition());
+                    libsExpandable.setVisibility(View.GONE);
+                    libsButton.setImageResource(R.drawable.ic_baseline_expand_more_24);
+                } else {
+                    TransitionManager.beginDelayedTransition(libsCardView, new AutoTransition());
+                    libsExpandable.setVisibility(View.VISIBLE);
+                    libsButton.setImageResource(R.drawable.ic_baseline_expand_less_24);
+                }
+            }
+        });
+
     }
 
     private void setupToolBar() {

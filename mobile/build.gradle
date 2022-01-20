@@ -46,6 +46,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-base:18.0.1'
     implementation 'com.google.android.gms:play-services-wearable:17.1.0'
+    implementation 'com.google.android.material:material:1.0.0'
 
     implementation 'com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
@@ -53,9 +54,9 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
-//    implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.android.gms:play-services-wearable:17.1.0'
 
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     wearApp project(':wearable')
 }

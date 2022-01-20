@@ -39,7 +39,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
+        android:padding="10dp"
         >
 
         <LinearLayout
@@ -47,324 +47,658 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             >
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                >
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_app_name"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/logo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_gwatch"
+                    app:layout_constraintBaseline_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_app_name"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TODO"
-                android:textStyle="bold"
-                android:textSize="40sp"
-                />
-
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_author"-->
-<!--                android:textSize="16sp"-->
-<!--                android:paddingTop="8dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_email"-->
-<!--                android:autoLink="email"-->
-<!--                android:textSize="16sp"-->
-<!--                android:paddingTop="8dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_fb"-->
-<!--                android:autoLink="web"-->
-<!--                android:textSize="16sp"-->
-<!--                android:paddingTop="4dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_copyright"-->
-<!--                android:autoLink="email"-->
-<!--                android:textSize="16sp"-->
-<!--                android:paddingTop="8dp"-->
-<!--                android:paddingBottom="16dp"-->
-<!--                />-->
-
-<!--            <View-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="1dp"-->
-<!--                android:background="@color/disabled_gray"-->
-<!--                android:layout_marginTop="10dp"-->
-<!--                android:layout_marginBottom="18dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_themes_title"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textSize="18sp"-->
-<!--                android:layout_marginBottom="8dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_themes_author"-->
-<!--                android:textSize="16sp"-->
-<!--                android:layout_marginBottom="4dp"-->
-<!--                />-->
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/about_themes_profile"-->
-<!--                android:textSize="16sp"-->
-<!--                android:layout_marginBottom="4dp"-->
-<!--                android:autoLink="all"-->
-<!--                />-->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/disabled_gray"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_disclaimer_title"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginBottom="4dp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_license"
-                android:textStyle="italic|bold"
+                android:text="@string/about_author"
                 android:textSize="16sp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_disclaimer"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_warranty"
-                android:textSize="12sp"
-                android:paddingTop="8dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_other_trademarks"
-                android:textSize="14sp"
                 android:paddingTop="8dp"
                 />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/disabled_gray"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                />
-
-            <TextView
-                android:id="@+id/compatible_cgm_apps"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/compatible_cgm_apps"
-                android:textStyle="italic|bold"
-                android:textSize="16sp"
-                android:paddingBottom="4dp"
-                />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_glimp"
+                android:text="@string/about_email"
+                android:autoLink="email"
                 android:textSize="14sp"
+                android:paddingTop="8dp"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/about_fb"
                 android:autoLink="web"
-                android:paddingTop="8dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_xdrip"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_aaps"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_libre_alarm"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_diabox"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_dexcom"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_nightscout"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/disabled_gray"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_resources"
-                android:textStyle="italic|bold"
-                android:textSize="16sp"
-                android:paddingBottom="4dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_icons8"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_bigsoundbank"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_localazy"
-                android:textSize="14sp"
-                android:paddingTop="8dp"
-                android:autoLink="all"
-                />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/disabled_gray"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_libraries"
-                android:textStyle="italic|bold"
-                android:textSize="16sp"
-                android:paddingBottom="4dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_colorpicker_name"
-                android:textStyle="bold"
                 android:textSize="14sp"
                 android:paddingTop="4dp"
                 />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                >
+                <TextView
+                    android:id="@+id/design_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_design_title"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/designer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/designer_logo"
+                    />
+                <TextView
+                    android:id="@+id/designer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_designer"
+                    android:textStyle="normal"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toBottomOf="@id/design_title"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/designer_logo"
+                    />
+                <ImageView
+                    android:id="@+id/designer_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:src="@drawable/designer_logo"
+                    app:layout_constraintBaseline_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_colorpicker_copyright"
-                android:paddingTop="2dp"
-                android:paddingBottom="4dp"
-                android:textSize="12sp"
+                android:text="@string/about_copyright"
+                android:textSize="16sp"
+                android:paddingBottom="10dp"
                 />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_apache_license_1"
-                android:autoLink="web"
-                android:textSize="12sp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_apache_license_2"
-                android:textSize="12sp"
-                android:paddingBottom="4dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_okhttp_name"
+                android:text="@string/about_source_code_title"
                 android:textStyle="bold"
+                android:textSize="16sp"
+                android:paddingTop="12dp"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/about_source_code"
                 android:textSize="14sp"
-                android:paddingTop="4dp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_okhttp_copyright"
-                android:paddingTop="2dp"
-                android:paddingBottom="4dp"
-                android:textSize="12sp"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_apache_license_1"
                 android:autoLink="web"
-                android:textSize="12sp"
+                android:paddingTop="8dp"
                 />
-            <TextView
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/disc_cardview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_apache_license_2"
-                android:textSize="12sp"
-                android:paddingBottom="4dp"
-                />
+                style="@style/AboutCardView"
+                android:layout_marginTop="24dp"
+            >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/disc_cardview"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="-55dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/disc_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/about_cardview_header_bkg"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0"
+                        >
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_disclaimer_title"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:paddingHorizontal="10dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/disc_button"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/disc_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_baseline_expand_more_24"
+                            app:layout_constraintBaseline_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                        />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/disc_expandable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/disc_heading"
+                        >
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_license"
+                            android:textStyle="italic|bold"
+                            android:textSize="16sp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_disclaimer"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_warranty"
+                            android:textSize="12sp"
+                            android:paddingTop="8dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_other_trademarks"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/lic_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AboutCardView"
+                android:layout_marginTop="10dp"
+                >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/lic_cardview"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="-55dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/lic_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/about_cardview_header_bkg"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="10dp"
+                            android:scrollHorizontally="false"
+                            android:text="@string/about_license_title"
+                            android:textAlignment="viewStart"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/lic_button"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/lic_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_baseline_expand_more_24"
+                            app:layout_constraintBaseline_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/lic_expandable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/lic_heading"
+                        >
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_apache_license"
+                            android:autoLink="web"
+                            android:textSize="14sp"
+                            />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/apps_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AboutCardView"
+                android:layout_marginTop="20dp"
+                >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/apps_cardview"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="-55dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/apps_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/about_cardview_header_bkg"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0">
+
+                        <TextView
+                            android:id="@+id/compatible_cgm_apps"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="10dp"
+                            android:scrollHorizontally="false"
+                            android:text="@string/compatible_cgm_apps"
+                            android:textAlignment="viewStart"
+                            android:textSize="16sp"
+                            android:textStyle="italic|bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/apps_button"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/apps_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_baseline_expand_more_24"
+                            app:layout_constraintBaseline_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/apps_expandable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/apps_heading"
+                        >
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_glimp"
+                            android:textSize="14sp"
+                            android:autoLink="web"
+                            android:paddingTop="8dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_xdrip"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_aaps"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_libre_alarm"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_diabox"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_dexcom"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_nightscout"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/res_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AboutCardView"
+                android:layout_marginTop="10dp"
+                >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/res_cardview"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="-55dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/res_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/about_cardview_header_bkg"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="10dp"
+                            android:scrollHorizontally="false"
+                            android:text="@string/about_resources_title"
+                            android:textAlignment="viewStart"
+                            android:textSize="16sp"
+                            android:textStyle="italic|bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/res_button"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/res_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_baseline_expand_more_24"
+                            app:layout_constraintBaseline_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/res_expandable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/res_heading"
+                        >
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_resources"
+                            android:textStyle="italic|bold"
+                            android:textSize="16sp"
+                            android:paddingBottom="4dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_icons8"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_bigsoundbank"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_localazy"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/libs_cardview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/AboutCardView"
+                android:layout_marginTop="10dp"
+                >
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/libs_cardview"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="-55dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/libs_heading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/about_cardview_header_bkg"
+
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="10dp"
+                            android:scrollHorizontally="false"
+                            android:text="@string/about_libraries_title"
+                            android:textAlignment="viewStart"
+                            android:textSize="16sp"
+                            android:textStyle="italic|bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/libs_button"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageButton
+                            android:id="@+id/libs_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_baseline_expand_more_24"
+                            app:layout_constraintBaseline_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/libs_expandable"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/libs_heading"
+                        >
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_colorpicker_name"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:paddingTop="4dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_colorpicker_copyright"
+                            android:paddingTop="2dp"
+                            android:paddingBottom="4dp"
+                            android:textSize="14sp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_apache_license"
+                            android:autoLink="web"
+                            android:textSize="12sp"
+                            android:paddingBottom="12dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_okhttp_name"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:paddingTop="4dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_okhttp_copyright"
+                            android:paddingTop="2dp"
+                            android:paddingBottom="4dp"
+                            android:textSize="14sp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_apache_license"
+                            android:autoLink="web"
+                            android:textSize="12sp"
+                            android:paddingBottom="12dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_watch_colorpicker_name"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:paddingTop="4dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_watch_colorpicker_copyright"
+                            android:paddingTop="2dp"
+                            android:paddingBottom="4dp"
+                            android:textSize="14sp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_apache_license"
+                            android:autoLink="web"
+                            android:textSize="12sp"
+                            />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

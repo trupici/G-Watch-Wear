@@ -36,21 +36,21 @@ public class BorderTypeMenuItems {
                     R.drawable.config_border_circle_24),
             new BorderConfigItem(BorderType.DASHED_ROUNDED_RECT,
                     R.string.border_type_dashed_round_rect,
-                    R.drawable.config_border_round_rect_24),
+                    R.drawable.config_border_round_rect_dash_24),
             new BorderConfigItem(BorderType.DASHED_RECT,
                     R.string.border_type_dashed_rect,
-                    R.drawable.config_border_rect_24),
+                    R.drawable.config_border_rect_dash_24),
             new BorderConfigItem(BorderType.DASHED_RING,
                     R.string.border_type_dashed_ring,
                     R.drawable.config_border_circle_dash_24),
             new BorderConfigItem(BorderType.DOTTED_ROUNDED_RECT,
                     R.string.border_type_dotted_round_rect,
-                    R.drawable.config_border_round_rect_24),
+                    R.drawable.config_border_round_rect_dot_24),
             new BorderConfigItem(BorderType.DOTTED_RECT,
                     R.string.border_type_dotted_rect,
-                    R.drawable.config_border_rect_24),
+                    R.drawable.config_border_rect_dot_24),
             new BorderConfigItem(BorderType.DOTTED_RING,
                     R.string.border_type_dotted_ring,
-                    R.drawable.config_border_circle_24)
+                    R.drawable.config_border_circle_dot_24)
     };
 }

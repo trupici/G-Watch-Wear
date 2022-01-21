@@ -76,8 +76,8 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     private static final int GRAPH_MAX_VALUE = 400;
     private static final float GRAPH_VALUE_INT = (GRAPH_MAX_VALUE-GRAPH_MIN_VALUE + 1);
 
-    private static final float DOT_RADIUS = 2f;
-    private static final float DEF_DOT_PADDING = 1.5f;
+    private static final float DOT_RADIUS = 2.75f;
+    private static final float DEF_DOT_PADDING = 0f;
 
     private static final float LINE_WIDTH = 3f;
 

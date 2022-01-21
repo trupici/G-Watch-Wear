@@ -38,7 +38,6 @@ import sk.trupici.gwatch.wear.util.DumpUtils;
 public class ProviderDataUpdater extends BroadcastReceiver {
     private static final String LOG_TAG = ProviderDataUpdater.class.getSimpleName();
 
-    /** Receives intents on tap and causes complication states to be toggled and updated. */
     @Override
     public void onReceive(Context context, Intent intent) {
         if (BuildConfig.DEBUG) {

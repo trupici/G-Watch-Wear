@@ -30,8 +30,8 @@
         app:title="@string/action_about"
         app:navigationContentDescription="@string/abc_action_bar_up_description"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-        app:theme="@style/ThemeOverlay.AppCompat"
         app:popupTheme="@style/ThemeOverlay.AppCompat"
+        android:theme="@style/ThemeOverlay.AppCompat"
         android:background="@color/def_toolbar_bkg"
         />
 

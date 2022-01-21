@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2019 Juraj Antal
- *
- * Originally created in G-Watch App
+ * Copyright (C) 2021 Juraj Antal
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +17,13 @@
 package sk.trupici.gwatch.wear.util;
 
 import java.text.Normalizer;
+import java.util.Date;
 
-/**
- * String helper methods
- */
 public class StringUtils {
 
     public static final String EMPTY_STRING = "";
+
+    public static final String NO_DATA_STR = "-";
 
     private static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
@@ -52,5 +50,33 @@ public class StringUtils {
         return str == null ? null : Normalizer
                 .normalize(str, Normalizer.Form.NFD)
                 .replaceAll("[^\\p{ASCII}]", EMPTY_STRING);
+    }
+
+    public static String formatColorStr(int color) {
+        return String.format("#%08x", color);
+    }
+
+    public static String notNullString(String str) {
+        return str != null ? str : EMPTY_STRING;
+    }
+
+    public static String formatDateTime(Date date) {
+        return java.text.DateFormat.getDateTimeInstance().format(date);
+    }
+
+    public static String formatTime(Date date) {
+        return java.text.DateFormat.getTimeInstance().format(date);
+    }
+
+    public static String formatTimeOrNoData(long timestamp) {
+        return timestamp == 0 ? NO_DATA_STR : java.text.DateFormat.getTimeInstance().format(new Date(timestamp));
+    }
+
+    public static String formatDoubleOrNoData(Double value) {
+        return (value == null || value == -1) ? NO_DATA_STR : String.format("%.2f", value);
+    }
+
+    public static String getStringOrNoData(String str) {
+        return (str == null) ? NO_DATA_STR : str;
     }
 }

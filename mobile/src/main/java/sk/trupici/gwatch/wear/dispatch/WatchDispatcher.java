@@ -34,9 +34,15 @@ import java.util.concurrent.ExecutionException;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.data.AAPSPacket;
+import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.ConfigPacket;
+import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.DumpUtils;
+import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
@@ -51,6 +57,7 @@ public class WatchDispatcher implements Dispatcher {
     public boolean dispatch(Packet packet) {
         Log.d(LOG_TAG, "dispatch: " + packet);
         WidgetUpdateService.updateWidget(packet);
+        updateNotificationService(packet);
 
         if (BuildConfig.DEBUG) {
             byte[] data = packet.getData();
@@ -164,6 +171,47 @@ public class WatchDispatcher implements Dispatcher {
         } catch (Throwable e) {
             String errMsg = e.getLocalizedMessage();
             Log.e(GWatchApplication.LOG_TAG, errMsg == null ? e.getClass().getSimpleName() : errMsg, e);
+        }
+    }
+
+    private void updateNotificationService(Packet packet) {
+        try {
+            if (packet instanceof AAPSPacket) {
+                boolean ignoreAppsBG = PreferenceUtils.isConfigured(
+                        GWatchApplication.getAppContext(),
+                        "pref_data_source_aaps_ignore_bg",
+                        false);
+                if (!ignoreAppsBG) {
+                    AAPSPacket aapsPacket = (AAPSPacket) packet;
+                    packet = new GlucosePacket(
+                            aapsPacket.getGlucoseValue(),
+                            aapsPacket.getTimestamp(),
+                            (byte) 0,
+                            null,
+                            null,
+                            aapsPacket.getSource());
+                }
+            }
+
+            if (packet instanceof GlucosePacket) {
+                GlucosePacket glucosePacket = (GlucosePacket) packet;
+
+                // evaluate received values
+                int bgValue = glucosePacket.getGlucoseValue();
+                long bgTimestamp = glucosePacket.getTimestamp();
+                if (bgTimestamp == 0) {
+                    bgTimestamp = glucosePacket.getReceivedAt();
+                    if (bgTimestamp == 0L) {
+                        bgTimestamp = System.currentTimeMillis();
+                    }
+                }
+                Trend trend = glucosePacket.getTrend();
+
+                BgData bgData = new BgData(bgValue, bgTimestamp, 0, 0, trend);
+                NotificationService.updateBgValue(GWatchApplication.getAppContext(), bgData);
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "updateNotificationService: failed to update notification service", e);
         }
     }
 }

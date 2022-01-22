@@ -207,7 +207,7 @@ public class WidgetUpdateService extends JobService {
         views.setTextColor(R.id.widget_time_delta, getTimeDeltaColor(context, widgetData.getTimeDelta()));
 
         views.setTextViewText(R.id.widget_source, "LibreLink".equals(widgetData.getSource()) ? "Libre" : widgetData.getSource());
-        color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_source", ContextCompat.getColor(context, R.color.def_widget_graph_bkg));
+        color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_source", ContextCompat.getColor(context, R.color.def_widget_text));
         views.setTextColor(R.id.widget_source, color);
 
 //        views.setViewVisibility(R.id.widget_offline_indicator, ((GWatchApplication)context).isConnected() ? View.GONE : View.VISIBLE);
@@ -259,15 +259,15 @@ public class WidgetUpdateService extends JobService {
     private static int getColorByGlucose(Context context, int glucose) {
         int color;
         if (glucose <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hypo", 70)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_critical", ContextCompat.getColor(context, R.color.def_red));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_hypo", ContextCompat.getColor(context, R.color.def_bg_hypo_color));
         } else if (glucose <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_low", 80)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_warn", ContextCompat.getColor(context, R.color.def_orange));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_low", ContextCompat.getColor(context, R.color.def_bg_low_color));
         } else if (glucose < PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_high", 170)) {
             color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_in_range", ContextCompat.getColor(context, R.color.def_widget_text));
         } else if (glucose < PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hyper", 270)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_warn", ContextCompat.getColor(context, R.color.def_orange));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_high", ContextCompat.getColor(context, R.color.def_bg_high_color));
         } else {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_critical", ContextCompat.getColor(context, R.color.def_red));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_hyper", ContextCompat.getColor(context, R.color.def_bg_hyper_color));
         }
         return color;
     }
@@ -477,15 +477,15 @@ public class WidgetUpdateService extends JobService {
     private static int getGraphPaintColor(Context context, int value) {
         int color;
         if (value <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hypo", 70)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_critical", ContextCompat.getColor(context, R.color.def_red));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_hypo", ContextCompat.getColor(context, R.color.def_bg_hypo_color));
         } else if (value <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_low", 80)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_warn", ContextCompat.getColor(context, R.color.def_orange));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_low", ContextCompat.getColor(context, R.color.def_bg_low_color));
         } else if (value < PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_high", 170)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_in_range", ContextCompat.getColor(context, R.color.def_green));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_in_range", ContextCompat.getColor(context, R.color.def_bg_in_range_color));
         } else if (value < PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hyper", 270)) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_warn", ContextCompat.getColor(context, R.color.def_orange));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_high", ContextCompat.getColor(context, R.color.def_bg_high_color));
         } else {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_critical", ContextCompat.getColor(context, R.color.def_red));
+            color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_hyper", ContextCompat.getColor(context, R.color.def_bg_hyper_color));
         }
         return color;
     }

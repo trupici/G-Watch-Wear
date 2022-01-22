@@ -39,6 +39,14 @@
     <color name="def_light_grey">#ff808080</color>
     <color name="def_dark_grey">#ff404040</color>
 
+    <color name="def_bg_hypo_color">#FFBC0007</color>
+    <color name="def_bg_low_color">#FFFC0709</color>
+    <color name="def_bg_in_range_color">#FF28EE09</color>
+    <color name="def_bg_high_color">#FFFFBB09</color>
+    <color name="def_bg_hyper_color">#FFFF6909</color>
+    <color name="def_bg_no_data_color">#FF008BE4</color>
+    <color name="def_bg_fast_drop_color">#FFFC0709</color>
+
     <color name="def_background">#ff181818</color>
 
     <color name="def_widget_bkg">#44000000</color>

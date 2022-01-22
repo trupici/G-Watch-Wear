@@ -151,12 +151,16 @@
 <!--    <string name="pref_glucose_panel_title">Glucose Panel</string>-->
 <!--    <string name="pref_glucose_panel_summary">Personalize panel with glucose values</string>-->
     <string name="pref_glucose_panel_colors">Text colors</string>
-    <string name="pref_glucose_panel_color_critical">Critical</string>
-    <string name="pref_glucose_panel_color_critical_summary">Text color for critical glucose values (hyper/hypo-glycemia)</string>
-    <string name="pref_glucose_panel_color_warn">Warning</string>
-    <string name="pref_glucose_panel_color_warn_summary">Text color for glucose values out of target range (high/low)</string>
+    <string name="pref_glucose_panel_color_hypo">Hypo</string>
+    <string name="pref_glucose_panel_color_hypo_summary">Color for very low (critical) glucose values</string>
+    <string name="pref_glucose_panel_color_low">Low</string>
+    <string name="pref_glucose_panel_color_low_summary">Color for low glucose values</string>
     <string name="pref_glucose_panel_color_in_range">In range</string>
-    <string name="pref_glucose_panel_color_in_range_summary">Text color for glucose values in target range</string>
+    <string name="pref_glucose_panel_color_in_range_summary">Color for glucose values in target range</string>
+    <string name="pref_glucose_panel_color_high">High</string>
+    <string name="pref_glucose_panel_color_high_summary">Color for high glucose values</string>
+    <string name="pref_glucose_panel_color_hyper">Hyper</string>
+    <string name="pref_glucose_panel_color_hyper_summary">Color for very high (critical) glucose values</string>
 
     <string name="pref_trend_panel_colors">Trend indicator colors</string>
     <string name="pref_trend_color_steep">Steep</string>

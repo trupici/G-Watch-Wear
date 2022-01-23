@@ -56,7 +56,7 @@ public class GlucosePacket extends GlucosePacketBase {
         long ts = Math.min(timestamp, receivedAt);
         idx += PacketUtils.encodeInt(data, idx, ts / 1000); // time in seconds
 
-        data[idx++] = (byte)trend.ordinal();
+        data[idx++] = (byte)(trend == null ? 0 : trend.ordinal());
         PacketUtils.encodeString(data, idx, getSource());
         return data;
     }

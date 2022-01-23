@@ -149,4 +149,25 @@ public class BgUtils {
             return Trend.UNKNOWN;
         }
     }
+
+    public static Trend calcTrend(int glucoseDelta, int sampleTimeDelta) {
+        if (sampleTimeDelta == 0) {
+            return Trend.UNKNOWN;
+        }
+        if (glucoseDelta < -3.5 * sampleTimeDelta) {
+            return Trend.DOWN_FAST;
+        } else if (glucoseDelta < -2 * sampleTimeDelta) {
+            return Trend.DOWN;
+        } else if (glucoseDelta < -sampleTimeDelta) {
+            return Trend.DOWN_SLOW;
+        } else if (glucoseDelta < sampleTimeDelta) {
+            return Trend.FLAT;
+        } else if (glucoseDelta < 2 * sampleTimeDelta) {
+            return Trend.UP_SLOW;
+        } else if (glucoseDelta < 3.5 * sampleTimeDelta) {
+            return Trend.UP;
+        } else {
+            return Trend.UP_FAST;
+        }
+    }
 }

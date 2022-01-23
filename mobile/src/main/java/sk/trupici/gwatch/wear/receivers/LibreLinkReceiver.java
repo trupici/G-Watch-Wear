@@ -108,7 +108,7 @@ public class LibreLinkReceiver extends BGReceiver {
     private final static String ACTION = "com.librelink.app.ThirdPartyIntegration.GLUCOSE_READING";
     private final static String EXTRA_GLUCOSE = "glucose";
     private final static String EXTRA_TIMESTAMP = "timestamp";
-    private final static String SRC_LABEL = "LibreLink";
+    private final static String SRC_LABEL = "Libre";
     private final static String PREFERENCE_KEY = "pref_data_source_libre";
 
     @Override

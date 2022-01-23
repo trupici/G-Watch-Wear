@@ -27,7 +27,8 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.util.DexcomUtils;
 
 /**
  * Intent extras contains array of bundles
@@ -81,7 +82,7 @@ public class DexComReceiver extends BGReceiver {
                 // get only the latest values
                 long maxTimestamp = 0L;
                 int glucoseValue = 0;
-                String trend = null;
+                String trendStr = null;
 
                 for (int i = 0; i < glucoseValues.size(); i++) {
                     Bundle glucoseValueBundle = glucoseValues.getBundle(String.valueOf(i));
@@ -91,18 +92,18 @@ public class DexComReceiver extends BGReceiver {
                         if (timestamp > maxTimestamp && value > 0) {
                             maxTimestamp = timestamp;
                             glucoseValue = value;
-                            trend = glucoseValueBundle.getString(EXTRA_TREND);
+                            trendStr = glucoseValueBundle.getString(EXTRA_TREND);
                         }
                     }
                 }
                 if (BuildConfig.DEBUG) {
-                    Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
-                    Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + maxTimestamp);
-                    Log.w(GWatchApplication.LOG_TAG, "Trend: " + trend);
+                    Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+                    Log.w(GWatchApplication.LOG_TAG, "Timestamp: " + maxTimestamp);
+                    Log.w(GWatchApplication.LOG_TAG, "Trend: " + trendStr);
                 }
 
                 if (maxTimestamp != 0 && glucoseValue > 0) {
-                    return new GlucosePacket((short)glucoseValue, maxTimestamp * 1000, (byte) 0, null, trend, getSourceLabel());
+                    return new GlucosePacket((short)glucoseValue, maxTimestamp * 1000, (byte) 0, DexcomUtils.toTrend(trendStr), trendStr, getSourceLabel());
                 }
             }
         }

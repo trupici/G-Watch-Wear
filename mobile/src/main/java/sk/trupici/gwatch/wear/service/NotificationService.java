@@ -56,6 +56,8 @@ public class NotificationService extends Service {
     private static final String ACTION_BG_VALUE = "NotificationService.BG_VALUE";
     private static final String ACTION_TEXT = "NotificationService.TEXT";
 
+    private static final String NO_DATA = "--";
+
     private static Notification currentNotification;
 
     public static void startService(Context context) {
@@ -98,7 +100,7 @@ public class NotificationService extends Service {
         if (ACTION_START.equals(intent.getAction())) {
             startForeground(NOTIFICATION_ID, getOrCreateNotification(context));
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, StringUtils.NO_DATA_STR));
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
         } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
             BgData bgData = BgData.fromBundle(intent.getBundleExtra("bgValue"));
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -106,7 +108,7 @@ public class NotificationService extends Service {
         } else if (ACTION_TEXT.equals(intent.getAction())) {
             String text = intent.getStringExtra("text");
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? StringUtils.NO_DATA_STR : text));
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
         } else if (ACTION_CONNECTION_STATUS.equals(intent.getAction())) {
             Boolean connStatus = intent.getBooleanExtra("status", false);
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -190,8 +192,8 @@ public class NotificationService extends Service {
     }
 
     public static Notification createUpdateNotification(Context context, BgData bgData) {
-        String text = StringUtils.NO_DATA_STR;
-        if (bgData != null) {
+        String text = NO_DATA;
+        if (bgData != null && bgData.getValue() > 0) {
             boolean isUnitConversion = PreferenceUtils.isConfigured(context, CommonConstants.PREF_IS_UNIT_CONVERSION, false);
             text = BgUtils.formatBgValueString(bgData.getValue(), bgData.getTrend(), isUnitConversion)
 //                    + BgUtils.formatBgDeltaForComplication(

@@ -16,12 +16,18 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import android.util.Log;
+
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
+import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.data.Trend;
 
 public class BgUtils {
+
+    private static final String LOG_TAG = BgUtils.class.getSimpleName();
 
     public static final Double GLUCOSE_CONV_FACTOR = 18.018018;
     public static final String GLUCOSE_UNITS_MGDL = "mg/dl";
@@ -112,5 +118,35 @@ public class BgUtils {
             str.append(valueDiff);
         }
         return str.toString();
+    }
+
+    public static Trend slopeArrowToTrend(String slopeArrow) {
+        if (slopeArrow == null) {
+            return null;
+        }
+        slopeArrow = slopeArrow.trim();
+        if ("".equals(slopeArrow)) {
+            return Trend.UNKNOWN;
+        } else if ("⇈".equals(slopeArrow)) {
+            return Trend.UP_FAST;
+        } else if ("↑".equals(slopeArrow)) {
+            return Trend.UP;
+        } else if ("↗".equals(slopeArrow)) {
+            return Trend.UP_SLOW;
+        } else if ("→".equals(slopeArrow)) {
+            return Trend.FLAT;
+        } else if ("↘".equals(slopeArrow)) {
+            return Trend.DOWN_SLOW;
+        } else if ("↓".equals(slopeArrow)) {
+            return Trend.DOWN;
+        } else if ("⇊".equals(slopeArrow)) {
+            return Trend.DOWN_FAST;
+        } else {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "Unknown slope: " + slopeArrow
+                        + ": " + StringUtils.toHexString(slopeArrow.getBytes(StandardCharsets.UTF_8)));
+            }
+            return Trend.UNKNOWN;
+        }
     }
 }

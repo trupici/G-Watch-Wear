@@ -44,7 +44,7 @@ public class AAPSReceiver extends BGReceiver {
     private final static String BG_VALUE = "glucoseMgdl";           // double
     private final static String BG_TIMESTAMP = "glucoseTimeStamp";  // long (ms)
     private final static String BG_UNITS = "units";                 // string: "mg/dl" or "mmol"
-    private final static String BG_TREND = "slopeArrow";            // string: direction arrow as string
+    private final static String BG_SLOPE = "slopeArrow";            // string: direction arrow as string
     private final static String BG_DELTA = "deltaMgdl";             // double
     private final static String BG_AVG_DELTA = "avgDeltaMgdl";      // double
     private final static String BG_LOW_LINE = "high";               // double
@@ -133,6 +133,7 @@ public class AAPSReceiver extends BGReceiver {
             packet.setPumpBattery(bundle.getInt(PUMP_BATTERY));
             packet.setPumpReservoir(bundle.getDouble(PUMP_RESERVOIR));
             packet.setPumpStatus(StringUtils.normalize(bundle.getString(PUMP_STATUS)));
+            packet.setSlopeArrow(bundle.getString(BG_SLOPE, null));
         } catch (Exception e) {
             Log.e(GWatchApplication.LOG_TAG, e.getLocalizedMessage(), e);
         }

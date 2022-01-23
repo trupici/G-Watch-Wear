@@ -36,6 +36,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
@@ -161,7 +162,7 @@ public class NightScoutFollowerService extends FollowerService {
         String trend = parts[3];
 
         if (BuildConfig.DEBUG) {
-            Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+            Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
             Log.w(GWatchApplication.LOG_TAG, "Trend: " + trend);
             Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + new Date(timestamp));
         }

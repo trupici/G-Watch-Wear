@@ -41,8 +41,10 @@ import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
 import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.service.NotificationService;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
@@ -69,7 +71,7 @@ public class WatchDispatcher implements Dispatcher {
 
             String messagePath = getMessagePath(packet);
             if (messagePath == null) {
-                Log.d(LOG_TAG, "dispatch: unsupported packet");
+                Log.w(LOG_TAG, "dispatch: unsupported packet");
                 return false;
             }
 
@@ -157,7 +159,7 @@ public class WatchDispatcher implements Dispatcher {
     private void notifyPacketSent(Context context) {
         try {
             if (context != null) {
-                String status = GWatchApplication.getAppContext().getString(R.string.packet_sent, UiUtils.formatTime(new Date()));
+                String status = GWatchApplication.getAppContext().getString(R.string.packet_sent, StringUtils.formatTime(new Date()));
                 GWatchApplication.getPacketConsole().showPacketStatus(status);
             }
         } catch (Throwable e) {
@@ -187,8 +189,8 @@ public class WatchDispatcher implements Dispatcher {
                             aapsPacket.getGlucoseValue(),
                             aapsPacket.getTimestamp(),
                             (byte) 0,
-                            null,
-                            null,
+                            BgUtils.slopeArrowToTrend(aapsPacket.getSlopeArrow()),
+                            aapsPacket.getSlopeArrow(),
                             aapsPacket.getSource());
                 }
             }

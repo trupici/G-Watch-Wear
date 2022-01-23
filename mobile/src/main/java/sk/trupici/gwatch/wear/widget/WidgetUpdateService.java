@@ -44,6 +44,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.ConfigPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacketBase;
 import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
@@ -224,7 +225,7 @@ public class WidgetUpdateService extends JobService {
             views.setTextViewText(R.id.widget_glucose_delta, glDeltaStr);
             views.setTextColor(R.id.widget_glucose_delta, colorByGlucose);
 
-            views.setTextViewText(R.id.widget_units, UiUtils.getGlucoseUnitsStr(isUnitConv));
+            views.setTextViewText(R.id.widget_units, BgUtils.getGlucoseUnitsStr(isUnitConv));
             views.setTextColor(R.id.widget_units, colorByGlucose);
 
             views.setImageViewResource(R.id.widget_trend, getTrendIconId(widgetData.getGlucoseDelta(), widgetData.getSampleTimeDelta()));
@@ -238,7 +239,7 @@ public class WidgetUpdateService extends JobService {
     }
 
     private static String getValueStrInUnits(int value, boolean isUnitConv) {
-        return isUnitConv ? UiUtils.convertGlucoseToMmolLStr(value) : String.valueOf(value);
+        return isUnitConv ? BgUtils.convertGlucoseToMmolLStr(value) : String.valueOf(value);
     }
 
     private static String getDeltaStrInUnits(int value, boolean isUnitConv, boolean highDensity) {
@@ -246,9 +247,9 @@ public class WidgetUpdateService extends JobService {
         builder.append(value < 0 ? StringUtils.EMPTY_STRING : "+");
         if (isUnitConv) {
             if (highDensity) {
-                builder.append(UiUtils.convertGlucoseToMmolL2Str(value));
+                builder.append(BgUtils.convertGlucoseToMmolL2Str(value));
             } else {
-                builder.append(UiUtils.convertGlucoseToMmolLStr(value));
+                builder.append(BgUtils.convertGlucoseToMmolLStr(value));
             }
         } else {
             builder.append(value);

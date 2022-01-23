@@ -34,6 +34,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.Packet;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static android.content.Context.POWER_SERVICE;
@@ -77,7 +78,7 @@ public abstract class BGReceiver extends BroadcastReceiver {
                         Log.w(GWatchApplication.LOG_TAG, getSourceLabel() + " packet not processed due to configuration");
                     }
                 } else {
-                    UiUtils.showMessage(appContext, appContext.getString(R.string.glucose_packet_received, getSourceLabel(), UiUtils.formatTime(new Date())));
+                    UiUtils.showMessage(appContext, appContext.getString(R.string.glucose_packet_received, getSourceLabel(), StringUtils.formatTime(new Date())));
                     Packet packet = processIntent(appContext, intent);
                     if (packet != null) {
                         GWatchApplication.getDispatcher().dispatch(packet);

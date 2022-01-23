@@ -23,7 +23,8 @@ import android.content.Context;
 import java.util.Date;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 public abstract class GlucosePacketBase extends PacketBase {
 
@@ -50,10 +51,10 @@ public abstract class GlucosePacketBase extends PacketBase {
         }
         text.append(context.getString(R.string.packet_type, getType().name())).append("\n");
         text.append(context.getString(R.string.packet_source, getSource())).append("\n");
-        text.append(context.getString(R.string.packet_received_at, UiUtils.formatTime(new Date(receivedAt)))).append("\n");
-        text.append(context.getString(R.string.packet_timestamp, UiUtils.formatTimeOrNoData(timestamp))).append("\n");
+        text.append(context.getString(R.string.packet_received_at, StringUtils.formatTime(new Date(receivedAt)))).append("\n");
+        text.append(context.getString(R.string.packet_timestamp, StringUtils.formatTimeOrNoData(timestamp))).append("\n");
 
-        text.append(context.getString(R.string.packet_bg_value, Math.round(glucoseValue), UiUtils.convertGlucoseToMmolL(glucoseValue))).append("\n");
+        text.append(context.getString(R.string.packet_bg_value, Math.round(glucoseValue), BgUtils.convertGlucoseToMmolL(glucoseValue))).append("\n");
         return text.toString();
     }
 

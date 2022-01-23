@@ -51,6 +51,8 @@ public class AAPSPacket extends GlucosePacketBase {
     private Double pumpReservoir;
     private String pumpStatus;
 
+    private String slopeArrow;
+
     public AAPSPacket(short bgValue, long bgTimestamp) {
         super(PacketType.AAPS, SOURCE_NAME, bgValue, bgTimestamp);
     }
@@ -85,6 +87,7 @@ public class AAPSPacket extends GlucosePacketBase {
      * [45+N1] N2 bytes of basalProfile string
      * [45+N1+N2] 8-bit pumpStatus len (N3)
      * [46+N1+N2] N3 bytes of pumpStatus string
+     * [46+N1+N2+N3] N4 bytes of slopeArrow string
      */
     @Override
     public byte[] getData() {
@@ -118,6 +121,7 @@ public class AAPSPacket extends GlucosePacketBase {
         idx += PacketUtils.encodeString(data, idx, basalProfile);
         idx += PacketUtils.encodeString(data, idx, tempBasalString);
         idx += PacketUtils.encodeString(data, idx, pumpStatus);
+        idx += PacketUtils.encodeString(data, idx, slopeArrow);
 
         return data;
     }
@@ -174,6 +178,7 @@ public class AAPSPacket extends GlucosePacketBase {
         idx += 1 + packet.tempBasalString.length();
         packet.pumpStatus = PacketUtils.decodeString(data, idx);
         idx += 1 + packet.pumpStatus.length();
+        packet.slopeArrow = PacketUtils.decodeString(data, idx);
 
         return packet;
     }
@@ -226,5 +231,13 @@ public class AAPSPacket extends GlucosePacketBase {
 
     public void setPumpStatus(String pumpStatus) {
         this.pumpStatus = pumpStatus;
+    }
+
+    public void setSlopeArrow(String slopeArrow) {
+        this.slopeArrow = slopeArrow;
+    }
+
+    public String getSlopeArrow() {
+        return slopeArrow;
     }
 }

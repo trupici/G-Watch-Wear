@@ -27,7 +27,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.BgUtils;
 
 /**
  * Modify method sendIntent in ThirdPartyIntegration.smali to send data to any app:
@@ -134,8 +134,8 @@ public class LibreLinkReceiver extends BGReceiver {
             long timestamp = extras.getLong(EXTRA_TIMESTAMP);
             double glucoseValue = extras.getDouble(EXTRA_GLUCOSE);
             if (BuildConfig.DEBUG) {
-                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
-                Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + timestamp);
+                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+                Log.w(GWatchApplication.LOG_TAG, "Timestamp: " + timestamp);
             }
             short glucose = (short)Math.round(glucoseValue);
             if (glucose > 0) {

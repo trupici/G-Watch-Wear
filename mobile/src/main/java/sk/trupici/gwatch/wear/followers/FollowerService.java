@@ -50,6 +50,7 @@ import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
@@ -125,7 +126,7 @@ public abstract class FollowerService extends Service {
                                         R.string.follower_entries_received,
                                         packets.size(),
                                         entries,
-                                        UiUtils.formatTime(new Date())));
+                                        StringUtils.formatTime(new Date())));
 
                         if (lastPacket != null) {
                             if (lastPacket.getTimestamp() != 0) {

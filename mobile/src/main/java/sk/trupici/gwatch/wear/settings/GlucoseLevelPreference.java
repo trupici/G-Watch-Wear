@@ -28,6 +28,7 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class GlucoseLevelPreference extends EditTextPreference {
@@ -142,7 +143,7 @@ public class GlucoseLevelPreference extends EditTextPreference {
 
         if (isUnitConversionSelected()) {
             Double doubleValue = Double.parseDouble(value);
-            value = String.valueOf(UiUtils.convertGlucoseToMmolL(doubleValue));
+            value = String.valueOf(BgUtils.convertGlucoseToMmolL(doubleValue));
         }
         return value;
     }
@@ -152,7 +153,7 @@ public class GlucoseLevelPreference extends EditTextPreference {
             value = getDefaultValue();
         } else if (isUnitConversionSelected()) {
             Double doubleValue = Double.parseDouble(value);
-            value = String.valueOf(UiUtils.convertGlucoseToMgDl(doubleValue).intValue());
+            value = String.valueOf(BgUtils.convertGlucoseToMgDl(doubleValue).intValue());
         }
         super.setText(value);
         return value;
@@ -170,7 +171,7 @@ public class GlucoseLevelPreference extends EditTextPreference {
         try {
             Double value = Double.parseDouble(text);
             if (isUnitConversionSelected()) {
-                value = UiUtils.convertGlucoseToMgDl(value);
+                value = BgUtils.convertGlucoseToMgDl(value);
             } else if (value.intValue() != value / 10d * 10d) {
                 throw new ValidationException(R.string.gl_validation_err_no_decimals);
             }
@@ -249,10 +250,10 @@ public class GlucoseLevelPreference extends EditTextPreference {
         // fix the mis-conversion
         if (doubleValue > MAX_THRESHOLD_MGDL_VALUE) {
             Log.e(GWatchApplication.LOG_TAG, "Invalid glucose threshold value: " + getKey() + ", performing downscale: " + strValue);
-            return String.valueOf(UiUtils.convertGlucoseToMmolL(doubleValue).intValue());
+            return String.valueOf(BgUtils.convertGlucoseToMmolL(doubleValue).intValue());
         } else if (!isDeltaValue && doubleValue < MIN_THRESHOLD_MGDL_VALUE) {
             Log.e(GWatchApplication.LOG_TAG, "Invalid glucose threshold value: " + getKey() + ", performing upscale: " + strValue);
-            return String.valueOf(UiUtils.convertGlucoseToMgDl(doubleValue).intValue());
+            return String.valueOf(BgUtils.convertGlucoseToMgDl(doubleValue).intValue());
         }
         return strValue;
     }

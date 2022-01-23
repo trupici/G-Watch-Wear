@@ -23,7 +23,7 @@ import android.util.Log;
 
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.PacketUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.StringUtils;
 
 /**
  * Packet from AndroidAPS app containing
@@ -50,6 +50,8 @@ public class AAPSPacket extends GlucosePacketBase {
     private Integer pumpBattery;
     private Double pumpReservoir;
     private String pumpStatus;
+
+    private String slopeArrow;
 
     public AAPSPacket(short bgValue, long bgTimestamp) {
         super(PacketType.AAPS, SOURCE_NAME, bgValue, bgTimestamp);
@@ -85,6 +87,7 @@ public class AAPSPacket extends GlucosePacketBase {
      * [45+N1] N2 bytes of basalProfile string
      * [45+N1+N2] 8-bit pumpStatus len (N3)
      * [46+N1+N2] N3 bytes of pumpStatus string
+     * [46+N1+N2+N3] N4 bytes of slopeArrow string
      */
     @Override
     public byte[] getData() {
@@ -118,6 +121,7 @@ public class AAPSPacket extends GlucosePacketBase {
         idx += PacketUtils.encodeString(data, idx, basalProfile);
         idx += PacketUtils.encodeString(data, idx, tempBasalString);
         idx += PacketUtils.encodeString(data, idx, pumpStatus);
+        idx += PacketUtils.encodeString(data, idx, slopeArrow);
 
         return data;
     }
@@ -126,11 +130,11 @@ public class AAPSPacket extends GlucosePacketBase {
     public String toText(Context context, String header) {
         StringBuffer text = new StringBuffer(super.toText(context, header));
 
-        text.append(context.getString(R.string.aaps_packet_cob, UiUtils.formatDoubleOrNoData(cob))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_iob, UiUtils.formatDoubleOrNoData(iob))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_profile, UiUtils.getStringOrNoData(basalProfile))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_tbr, UiUtils.getStringOrNoData(tempBasalString))).append("\n");
-        text.append(context.getString(R.string.aaps_packet_pump, UiUtils.getStringOrNoData(pumpStatus))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_cob, StringUtils.formatDoubleOrNoData(cob))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_iob, StringUtils.formatDoubleOrNoData(iob))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_profile, StringUtils.getStringOrNoData(basalProfile))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_tbr, StringUtils.getStringOrNoData(tempBasalString))).append("\n");
+        text.append(context.getString(R.string.aaps_packet_pump, StringUtils.getStringOrNoData(pumpStatus))).append("\n");
         return text.toString();
     }
 
@@ -174,6 +178,7 @@ public class AAPSPacket extends GlucosePacketBase {
         idx += 1 + packet.tempBasalString.length();
         packet.pumpStatus = PacketUtils.decodeString(data, idx);
         idx += 1 + packet.pumpStatus.length();
+        packet.slopeArrow = PacketUtils.decodeString(data, idx);
 
         return packet;
     }
@@ -226,5 +231,13 @@ public class AAPSPacket extends GlucosePacketBase {
 
     public void setPumpStatus(String pumpStatus) {
         this.pumpStatus = pumpStatus;
+    }
+
+    public void setSlopeArrow(String slopeArrow) {
+        this.slopeArrow = slopeArrow;
+    }
+
+    public String getSlopeArrow() {
+        return slopeArrow;
     }
 }

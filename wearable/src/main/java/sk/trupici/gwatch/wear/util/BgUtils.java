@@ -113,4 +113,30 @@ public class BgUtils {
         }
         return str.toString();
     }
+
+    public static Trend slopeArrowToTrend(String slopeArrow) {
+        if (slopeArrow == null) {
+            return null;
+        }
+        slopeArrow = slopeArrow.trim();
+        if ("".equals(slopeArrow)) {
+            return Trend.UNKNOWN;
+        } else if ("⇈".equals(slopeArrow)) {
+            return Trend.UP_FAST;
+        } else if ("↑".equals(slopeArrow)) {
+            return Trend.UP;
+        } else if ("↗".equals(slopeArrow)) {
+            return Trend.UP_SLOW;
+        } else if ("→".equals(slopeArrow)) {
+            return Trend.FLAT;
+        } else if ("↘".equals(slopeArrow)) {
+            return Trend.DOWN_SLOW;
+        } else if ("↓".equals(slopeArrow)) {
+            return Trend.DOWN;
+        } else if ("⇊".equals(slopeArrow)) {
+            return Trend.DOWN_FAST;
+        } else {
+            return Trend.UNKNOWN;
+        }
+    }
 }

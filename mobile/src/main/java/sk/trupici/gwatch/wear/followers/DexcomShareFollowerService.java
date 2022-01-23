@@ -42,6 +42,8 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -321,26 +323,33 @@ public class DexcomShareFollowerService extends FollowerService {
             double glucoseValue = json.optDouble("Value", 0);
             String wt = json.optString("WT").replaceAll("[^0-9]", StringUtils.EMPTY_STRING);
             long timestamp = Long.valueOf(wt);
-            Integer trend = null;
+
+            Trend trend = null;
+            Integer trendInt = null;
             try {
-                // FIXME - new String trend
-                trend = json.optInt("Trend");
+                trendInt = json.optInt("Trend");
+                trend = toTrend(trendInt);
             } catch (Exception e) {
                 Log.e(LOG_TAG, "parseDexcomValue: " + e.getLocalizedMessage());
             }
 
+            String trendStr = null;
+            if (trendInt == null) {
+                trendStr = json.optString("Trend", null);
+                trend = DexcomUtils.toTrend(trendStr);
+            }
+
             if (BuildConfig.DEBUG) {
-                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
-                Log.w(GWatchApplication.LOG_TAG, "Trend: " + trend);
+                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+                Log.w(GWatchApplication.LOG_TAG, "Trend: " + (trendInt != null ? trendInt : trendStr) + " -> " + trend);
                 Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + new Date(timestamp));
             }
 
             short glucose = (short) Math.round(glucoseValue);
-            packets.add(new GlucosePacket(glucose, timestamp, (byte) 0, toTrend(trend), trend.toString(), SRC_LABEL_SHORT));
+            packets.add(new GlucosePacket(glucose, timestamp, (byte) 0, trend, (trendInt != null ? trendInt.toString() : trendStr), SRC_LABEL_SHORT));
         }
         return packets;
     }
-
 
 
     /**
@@ -351,6 +360,8 @@ public class DexcomShareFollowerService extends FollowerService {
             return null;
         }
         switch (value) {
+            case 0:
+                return null; // from optString() if not found
             case 1:
                 return Trend.UP_FAST;
             case 2:

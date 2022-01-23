@@ -30,7 +30,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.BgUtils;
 
 /**
  * description from LibreHack:
@@ -100,8 +100,8 @@ public class DiaboxReceiver extends BGReceiver {
                             long timestamp = realtimeObj.optLong(DATA_TIMESTAMP, 0L);
                             int glucoseValue = realtimeObj.optInt(DATA_GLUCOSE, 0);
                             if (BuildConfig.DEBUG) {
-                                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
-                                Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + timestamp + " -> " + now);
+                                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+                                Log.w(GWatchApplication.LOG_TAG, "Timestamp: " + timestamp + " -> " + now);
                             }
                             short glucose = (short)Math.round(glucoseValue);
                             if (glucose > 0) {

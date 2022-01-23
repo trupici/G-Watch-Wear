@@ -33,6 +33,7 @@ import sk.trupici.gwatch.wear.data.AAPSPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.PacketBase;
 import sk.trupici.gwatch.wear.data.PacketType;
+import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.DumpUtils;
 import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
@@ -85,8 +86,8 @@ public class AapsDataListenerService extends WearableListenerService {
                     packet.getGlucoseValue(),
                     packet.getTimestamp(),
                     (byte) 0,
-                    null,
-                    null,
+                    BgUtils.slopeArrowToTrend(packet.getSlopeArrow()),
+                    packet.getSlopeArrow(),
                     packet.getSource());
 
             // schedule delivery to bg processor

@@ -26,6 +26,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.data.Trend;
 
 public class DexcomUtils {
     public static final String DEXCOM_PERMISSION = "com.dexcom.cgm.EXTERNAL_PERMISSION";
@@ -70,4 +71,31 @@ public class DexcomUtils {
         //no inspection
         return PackageManager.GET_DISABLED_COMPONENTS;
     }
+
+
+    /**
+     * Translates DexCom trend value to G-Watch internal trend representation
+     */
+    public static Trend toTrend(String value) {
+        if (value == null) {
+            return null;
+        } else if ("DoubleUp".equals(value)) {
+            return Trend.UP_FAST;
+        } else if ("SingleUp".equals(value)) {
+            return Trend.UP;
+        } else if ("FortyFiveUp".equals(value)) {
+            return Trend.UP_SLOW;
+        } else if ("Flat".equals(value)) {
+            return Trend.FLAT;
+        } else if ("FortyFiveDown".equals(value)) {
+            return Trend.DOWN_SLOW;
+        } else if ("SingleDown".equals(value)) {
+            return Trend.DOWN;
+        } else if ("DoubleDown".equals(value)) {
+            return Trend.DOWN_FAST;
+        } else {
+            return Trend.UNKNOWN;
+        }
+    }
+
 }

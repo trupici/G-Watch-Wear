@@ -28,7 +28,6 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.Packet;
 import sk.trupici.gwatch.wear.util.StringUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class ConsoleBuffer implements PacketConsole {
 
@@ -50,7 +49,7 @@ public class ConsoleBuffer implements PacketConsole {
 
     public void init() {
         buffer.clear();
-        appendText(GWatchApplication.getAppContext().getString(R.string.created_at, UiUtils.formatDateTime(creationDate)));
+        appendText(GWatchApplication.getAppContext().getString(R.string.created_at, StringUtils.formatDateTime(creationDate)));
         appendText(StringUtils.EMPTY_STRING);
         appendText(GWatchApplication.getAppContext().getString(R.string.waiting_for_packet));
     }

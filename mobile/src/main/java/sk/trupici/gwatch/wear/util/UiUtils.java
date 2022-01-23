@@ -21,18 +21,12 @@ package sk.trupici.gwatch.wear.util;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.Locale;
-
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -41,12 +35,6 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.console.PacketConsole;
 
 public class UiUtils {
-
-    public static final Double GLUCOSE_CONV_FACTOR = 18.018018;
-    public static final String GLUCOSE_UNITS_MGDL = "mg/dl";
-    public static final String GLUCOSE_UNITS_MMOLL = "mmol/l";
-
-    public static final String NO_DATA_STR = "-";
 
     public static void showToast(final Context context, final int msgId) {
         Toast.makeText(context, msgId, Toast.LENGTH_SHORT).show();
@@ -64,53 +52,6 @@ public class UiUtils {
             // Permission has already been granted
             return true;
         }
-    }
-
-    public static String formatDateTime(Date date) {
-        return java.text.DateFormat.getDateTimeInstance().format(date);
-    }
-
-    public static String formatTime(Date date) {
-        return java.text.DateFormat.getTimeInstance().format(date);
-    }
-
-    public static String formatTimeOrNoData(long timestamp) {
-        return timestamp == 0 ? NO_DATA_STR : java.text.DateFormat.getTimeInstance().format(new Date(timestamp));
-    }
-
-    public static String formatDoubleOrNoData(Double value) {
-        return (value == null || value == -1) ? UiUtils.NO_DATA_STR : String.format("%.2f", value);
-    }
-
-    public static String getStringOrNoData(String str) {
-        return (str == null) ? UiUtils.NO_DATA_STR : str;
-    }
-
-    public static Double convertGlucoseToMmolL(double glucoseValue) {
-        return Math.round(glucoseValue / GLUCOSE_CONV_FACTOR * 10d) / 10d;
-    }
-
-    public static Double convertGlucoseToMmolL2(double glucoseValue) {
-        return Math.round(glucoseValue / GLUCOSE_CONV_FACTOR * 100d) / 100d;
-    }
-
-    public static Double convertGlucoseToMgDl(double glucoseValue) {
-        return (double) Math.round(glucoseValue * GLUCOSE_CONV_FACTOR);
-    }
-
-    private static char getDefaultDecimalSeparator() {
-        return ((DecimalFormat)DecimalFormat.getInstance(Locale.getDefault())).getDecimalFormatSymbols().getDecimalSeparator();
-    }
-
-    public static String convertGlucoseToMmolLStr(double glucoseValue) {
-        char decimalSeparator = getDefaultDecimalSeparator();
-        return String.valueOf(convertGlucoseToMmolL(glucoseValue)).replace('.', decimalSeparator);
-    }
-
-    public static String convertGlucoseToMmolL2Str(double glucoseValue) {
-        char decimalSeparator = getDefaultDecimalSeparator();
-        double value = convertGlucoseToMmolL2(glucoseValue);
-        return String.valueOf(value).replace('.', decimalSeparator);
     }
 
     public static void runOnUiThread(Runnable runnable) {
@@ -146,10 +87,10 @@ public class UiUtils {
             return false;
         }
     }
-
-    public static String getGlucoseUnitsStr(boolean isUnitConv) {
-        return isUnitConv ? GLUCOSE_UNITS_MMOLL : GLUCOSE_UNITS_MGDL;
-    }
+//
+//    public static String getGlucoseUnitsStr(boolean isUnitConv) {
+//        return isUnitConv ? GLUCOSE_UNITS_MMOLL : GLUCOSE_UNITS_MGDL;
+//    }
 
     public static boolean isHighDensityDisplay(Context context) {
         return context.getResources().getDisplayMetrics().density > 2f;

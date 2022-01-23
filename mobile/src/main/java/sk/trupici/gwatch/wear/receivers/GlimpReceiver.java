@@ -30,7 +30,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
 import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.util.BgUtils;
 
 
 /**
@@ -87,9 +87,9 @@ public class GlimpReceiver extends BGReceiver {
             }
             /* for debug only END */
             if (BuildConfig.DEBUG) {
-                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + UiUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
+                Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
                 Log.w(GWatchApplication.LOG_TAG, "Trend: " + trend);
-                Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + new Date(timestamp));
+                Log.w(GWatchApplication.LOG_TAG, "Timestamp: " + new Date(timestamp));
                 Log.w(GWatchApplication.LOG_TAG, "Battery: " + battery + "%");
             }
             short glucose = (short) Math.round(glucoseValue);

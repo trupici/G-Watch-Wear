@@ -43,7 +43,8 @@ public class GlucosePacket extends GlucosePacketBase {
 
     @Override
     public byte[] getData() {
-        Integer dataSize = PACKET_MIN_DATA_SIZE;
+        Integer dataSize = PACKET_MIN_DATA_SIZE
+                + 1 + PacketUtils.getNullableStrLen(getSource());
         byte[] data = new byte[PACKET_HEADER_SIZE + dataSize];
         int idx = 0;
 
@@ -52,10 +53,11 @@ public class GlucosePacket extends GlucosePacketBase {
 
         idx += PacketUtils.encodeShort(data, idx, glucoseValue);
 
-        long ts = (timestamp < receivedAt) ? timestamp : receivedAt;
+        long ts = Math.min(timestamp, receivedAt);
         idx += PacketUtils.encodeInt(data, idx, ts / 1000); // time in seconds
 
-        data[idx] = (byte)trend.ordinal();
+        data[idx++] = (byte)trend.ordinal();
+        PacketUtils.encodeString(data, idx, getSource());
         return data;
     }
 
@@ -76,15 +78,16 @@ public class GlucosePacket extends GlucosePacketBase {
         byte type = data[idx++];
         byte size = data[idx++];
 
-        if (type != PacketType.GLUCOSE.getCodeAsByte() || size != PACKET_MIN_DATA_SIZE) {
+        if (type != PacketType.GLUCOSE.getCodeAsByte() || size < PACKET_MIN_DATA_SIZE) {
             return null;
         }
 
         short value = PacketUtils.decodeShort(data, idx);
         long timestamp = PacketUtils.decodeInt(data, idx+2) * 1000L;
         Trend trend = Trend.valueOf(data[idx+6]);
+        String source = size == PACKET_MIN_DATA_SIZE ? null :  PacketUtils.decodeString(data, idx+7);
 
-        return new GlucosePacket(value, timestamp, (byte)0, trend, trend.name(), null);
+        return new GlucosePacket(value, timestamp, (byte)0, trend, trend.name(), source);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -94,7 +94,8 @@ public class AAPSPacket extends GlucosePacketBase {
         Integer dataSize = PACKET_DATA_SIZE
                 + 1 + PacketUtils.getNullableStrLen(basalProfile)
                 + 1 + PacketUtils.getNullableStrLen(tempBasalString)
-                + 1 + PacketUtils.getNullableStrLen(pumpStatus);
+                + 1 + PacketUtils.getNullableStrLen(pumpStatus)
+                + 1 + PacketUtils.getNullableStrLen(slopeArrow);
         byte[] data = new byte[PACKET_HEADER_SIZE + dataSize];
         int idx = 0;
 

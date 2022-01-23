@@ -35,7 +35,7 @@ import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.BgData;
+import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
@@ -73,19 +73,19 @@ public class NotificationService extends Service {
         ContextCompat.startForegroundService(context, startIntent);
     }
 
-    public static void updateBgValue(Context context, BgData bgData) {
+    public static void updateBgData(Context context, GlucosePacket packet) {
         if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "updateBgValue: " + bgData);
+            Log.d(LOG_TAG, "updateBgPacket: " + packet.toText(context, null));
         }
         Intent startIntent = new Intent(context, NotificationService.class);
         startIntent.setAction(ACTION_BG_VALUE);
-        startIntent.putExtra("bgValue", bgData.toBundle());
+        startIntent.putExtra("data", packet.getData());
         ContextCompat.startForegroundService(context, startIntent);
     }
 
     public static void updateText(Context context, String text) {
         Intent startIntent = new Intent(context, NotificationService.class);
-        startIntent.setAction(ACTION_BG_VALUE);
+        startIntent.setAction(ACTION_TEXT);
         startIntent.putExtra("text", text);
         ContextCompat.startForegroundService(context, startIntent);
     }
@@ -102,9 +102,9 @@ public class NotificationService extends Service {
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
         } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
-            BgData bgData = BgData.fromBundle(intent.getBundleExtra("bgValue"));
+            GlucosePacket packet = GlucosePacket.of(intent.getByteArrayExtra("data"));
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, bgData));
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, packet));
         } else if (ACTION_TEXT.equals(intent.getAction())) {
             String text = intent.getStringExtra("text");
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -125,6 +125,9 @@ public class NotificationService extends Service {
     }
 
     private static Notification createNotification(Context context, String text) {
+        if (BuildConfig.DEBUG) {
+            Log.i(LOG_TAG, "createNotification: " + text);
+        }
 
         Intent showTaskIntent = new Intent(context, MainActivity.class);
         showTaskIntent.setAction(Intent.ACTION_MAIN);
@@ -168,7 +171,7 @@ public class NotificationService extends Service {
         synchronized (context) {
             if (currentNotification == null) {
                 createNotificationChannel(context);
-                currentNotification = createNotification(context, null);
+                currentNotification = createNotification(context, NO_DATA);
             }
             return currentNotification;
         }
@@ -191,17 +194,15 @@ public class NotificationService extends Service {
         }
     }
 
-    public static Notification createUpdateNotification(Context context, BgData bgData) {
+    public static Notification createUpdateNotification(Context context, GlucosePacket packet) {
         String text = NO_DATA;
-        if (bgData != null && bgData.getValue() > 0) {
+        if (packet != null && packet.getGlucoseValue() != 0) {
             boolean isUnitConversion = PreferenceUtils.isConfigured(context, CommonConstants.PREF_IS_UNIT_CONVERSION, false);
-            text = BgUtils.formatBgValueString(bgData.getValue(), bgData.getTrend(), isUnitConversion)
-//                    + BgUtils.formatBgDeltaForComplication(
-//                    bgData.getValueDiff(),
-//                    System.currentTimeMillis() - bgData.getTimestamp(),
-//                    isUnitConversion,
-//                    PreferenceUtils.getIntValue(context, CommonConstants.PREF_NO_DATA_THRESHOLD, 0))
-            ;
+            String source = StringUtils.notNullString(packet.getSource()).trim();
+            text = (source.length() > 0 ? source + ": " : "")
+                + BgUtils.formatBgValueString(packet.getGlucoseValue(), packet.getTrend(), isUnitConversion);
+        } else {
+            Log.w(LOG_TAG, "Invalid packet: " + (packet == null ? null : packet.toText(context, null)));
         }
         synchronized (context) {
             currentNotification = createNotification(context, text);

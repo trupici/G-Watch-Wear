@@ -35,11 +35,9 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.data.AAPSPacket;
-import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.data.ConfigPacket;
 import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.DumpUtils;
@@ -57,7 +55,7 @@ public class WatchDispatcher implements Dispatcher {
 
     @Override
     public boolean dispatch(Packet packet) {
-        Log.d(LOG_TAG, "dispatch: " + packet);
+        Log.d(LOG_TAG, "dispatch: " + packet.toText(GWatchApplication.getAppContext(), null));
         WidgetUpdateService.updateWidget(packet);
         updateNotificationService(packet);
 
@@ -196,21 +194,7 @@ public class WatchDispatcher implements Dispatcher {
             }
 
             if (packet instanceof GlucosePacket) {
-                GlucosePacket glucosePacket = (GlucosePacket) packet;
-
-                // evaluate received values
-                int bgValue = glucosePacket.getGlucoseValue();
-                long bgTimestamp = glucosePacket.getTimestamp();
-                if (bgTimestamp == 0) {
-                    bgTimestamp = glucosePacket.getReceivedAt();
-                    if (bgTimestamp == 0L) {
-                        bgTimestamp = System.currentTimeMillis();
-                    }
-                }
-                Trend trend = glucosePacket.getTrend();
-
-                BgData bgData = new BgData(bgValue, bgTimestamp, 0, 0, trend);
-                NotificationService.updateBgValue(GWatchApplication.getAppContext(), bgData);
+                NotificationService.updateBgData(GWatchApplication.getAppContext(), (GlucosePacket) packet);
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "updateNotificationService: failed to update notification service", e);

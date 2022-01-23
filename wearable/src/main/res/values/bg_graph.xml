@@ -28,8 +28,8 @@
 
     <bool name="def_graph_enable_dynamic_range">true</bool>
 
-    <bool name="def_graph_type_draw_line">false</bool>
-    <bool name="def_graph_type_draw_dots">true</bool>
+    <bool name="def_graph_type_draw_line">true</bool>
+    <bool name="def_graph_type_draw_dots">false</bool>
 
     <integer name="def_graph_refresh_rate">5</integer>
 

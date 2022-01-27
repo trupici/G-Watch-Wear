@@ -78,8 +78,8 @@
     <dimen name="digital_layout_time_panel_right">362px</dimen>
     <dimen name="digital_layout_time_panel_bottom">161px</dimen>
 
-    <integer name="digital_compl_progressbar_angle">72</integer>
+    <integer name="digital_compl_progressbar_angle">67</integer>
     <integer name="digital_compl_progressbar_padding">12</integer>
-    <integer name="digital_compl_progressbar_width">12</integer>
+    <integer name="digital_compl_progressbar_width">13</integer>
     <color name="digital_compl_progressbar_bkg_color">#88888888</color>
 </resources>

@@ -24,6 +24,8 @@ import android.os.PersistableBundle;
 
 import java.io.Serializable;
 
+import sk.trupici.gwatch.wear.data.Trend;
+
 public class WidgetData implements Serializable {
 
     /** glucose sample source app */
@@ -38,6 +40,8 @@ public class WidgetData implements Serializable {
     public static final String KEY_TIME_DELTA = "timeDelta";
     /** time delta from the previous glucose sample in minutes */
     public static final String KEY_SAMPLE_TIME_DELTA = "sampleTimeDelta";
+    /** trend received from data source packet */
+    public static final String KEY_TREND = "trend";
 
     private String source;
     private int glucose;
@@ -45,7 +49,7 @@ public class WidgetData implements Serializable {
     private int glucoseDelta;
     private int timeDelta;
     private int sampleTimeDelta;
-
+    private Trend trend;
 
     public static WidgetData fromBundle(BaseBundle bundle) {
         WidgetData data = new WidgetData();
@@ -55,6 +59,7 @@ public class WidgetData implements Serializable {
         data.setGlucoseDelta(bundle.getInt(KEY_GLUCOSE_DELTA, 0));
         data.setTimeDelta(bundle.getInt(KEY_TIME_DELTA, 0));
         data.setSampleTimeDelta(bundle.getInt(KEY_SAMPLE_TIME_DELTA, 0));
+        data.setTrend(Trend.valueOf(bundle.getInt(KEY_TREND)));
         return data;
     }
 
@@ -68,6 +73,7 @@ public class WidgetData implements Serializable {
         this.glucoseDelta = widgetData.getGlucoseDelta();
         this.timeDelta = widgetData.getTimeDelta();
         this.sampleTimeDelta = widgetData.getSampleTimeDelta();
+        this.trend = widgetData.getTrend();
     }
 
     public PersistableBundle toPersistableBundle(String action) {
@@ -78,6 +84,7 @@ public class WidgetData implements Serializable {
         bundle.putInt(KEY_GLUCOSE_DELTA, glucoseDelta);
         bundle.putInt(KEY_TIME_DELTA, timeDelta);
         bundle.putInt(KEY_SAMPLE_TIME_DELTA, sampleTimeDelta);
+        bundle.putInt(KEY_TREND, (trend == null ? 0 : trend.ordinal()));
         bundle.putString("action", action);
         return bundle;
     }
@@ -93,6 +100,7 @@ public class WidgetData implements Serializable {
         this.glucoseDelta = 0;
         this.timeDelta = 0;
         this.sampleTimeDelta = 0;
+        this.trend = null;
     }
 
     @Override
@@ -103,7 +111,8 @@ public class WidgetData implements Serializable {
                 .append("val: ").append(glucose).append(",")
                 .append("dVal: ").append(glucoseDelta).append(",")
                 .append("dTime: ").append(timeDelta).append(",")
-                .append("dSample: ").append(sampleTimeDelta).append("}")
+                .append("dSample: ").append(sampleTimeDelta).append(",")
+                .append("trend: ").append(trend).append("}")
                 .toString();
     }
 
@@ -153,5 +162,13 @@ public class WidgetData implements Serializable {
 
     public void setSampleTimeDelta(int sampleTimeDelta) {
         this.sampleTimeDelta = sampleTimeDelta;
+    }
+
+    public Trend getTrend() {
+        return trend;
+    }
+
+    public void setTrend(Trend trend) {
+        this.trend = trend;
     }
 }

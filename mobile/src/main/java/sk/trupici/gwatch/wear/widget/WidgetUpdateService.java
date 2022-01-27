@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.PersistableBundle;
 import android.util.DisplayMetrics;
@@ -41,19 +42,23 @@ import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.data.AAPSPacket;
 import sk.trupici.gwatch.wear.data.ConfigPacket;
+import sk.trupici.gwatch.wear.data.GlucosePacket;
 import sk.trupici.gwatch.wear.data.GlucosePacketBase;
 import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.StringUtils;
-import sk.trupici.gwatch.wear.util.UiUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
 import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 public class WidgetUpdateService extends JobService {
+
+    private static final String LOG_TAG = WidgetUpdateService.class.getSimpleName();
 
     public static final int WIDGET_JOB_ID = 8182;
 
@@ -128,7 +133,6 @@ public class WidgetUpdateService extends JobService {
             updateGraphData(widgetData, false);
         }
 
-        boolean makeFontsSmaller = !UiUtils.isHighDensityDisplay(context);
         String sourcePackage = getSourceAppPackageToLaunch(context);
 
         for (int appWidgetId : appWidgetIds) {
@@ -141,11 +145,6 @@ public class WidgetUpdateService extends JobService {
 
             // set on click handler
             views.setOnClickPendingIntent(R.id.widget_main, createLaunchPendingIntent(context, sourcePackage));
-
-            // adjust fonts size
-            if (makeFontsSmaller) {
-                decreaseWidgetFontSizes(views);
-            }
 
             // tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -207,11 +206,9 @@ public class WidgetUpdateService extends JobService {
         views.setTextViewText(R.id.widget_time_delta, timeDeltaStr);
         views.setTextColor(R.id.widget_time_delta, getTimeDeltaColor(context, widgetData.getTimeDelta()));
 
-        views.setTextViewText(R.id.widget_source, "LibreLink".equals(widgetData.getSource()) ? "Libre" : widgetData.getSource());
+        views.setTextViewText(R.id.widget_source, widgetData.getSource());
         color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_source", ContextCompat.getColor(context, R.color.def_widget_text));
         views.setTextColor(R.id.widget_source, color);
-
-//        views.setViewVisibility(R.id.widget_offline_indicator, ((GWatchApplication)context).isConnected() ? View.GONE : View.VISIBLE);
 
         if (widgetData.getGlucose() != 0) {
 
@@ -221,15 +218,25 @@ public class WidgetUpdateService extends JobService {
             views.setTextViewText(R.id.widget_glucose, getValueStrInUnits(widgetData.getGlucose(), isUnitConv));
             views.setTextColor(R.id.widget_glucose, colorByGlucose);
 
-            String glDeltaStr = getDeltaStrInUnits(widgetData.getGlucoseDelta(), isUnitConv, UiUtils.isHighDensityDisplay(context));
+            String glDeltaStr = getDeltaStrInUnits(widgetData.getGlucoseDelta(), isUnitConv);
             views.setTextViewText(R.id.widget_glucose_delta, glDeltaStr);
             views.setTextColor(R.id.widget_glucose_delta, colorByGlucose);
 
             views.setTextViewText(R.id.widget_units, BgUtils.getGlucoseUnitsStr(isUnitConv));
             views.setTextColor(R.id.widget_units, colorByGlucose);
 
-            views.setImageViewResource(R.id.widget_trend, getTrendIconId(widgetData.getGlucoseDelta(), widgetData.getSampleTimeDelta()));
-            views.setInt(R.id.widget_trend,"setColorFilter", getTrendColorId(context, widgetData.getGlucoseDelta(), widgetData.getSampleTimeDelta()));
+            Trend trend = widgetData.getTrend();
+            if (trend == Trend.UNKNOWN) {
+                trend = BgUtils.calcTrend(widgetData.getGlucoseDelta(), widgetData.getSampleTimeDelta());
+                if (BuildConfig.DEBUG) {
+                    Log.i(LOG_TAG, "getTrendArrow: calculated trend: (bgd: "
+                            + widgetData.getGlucoseDelta() + ", std: " + widgetData.getSampleTimeDelta() + ") "
+                            + trend);
+                }
+            }
+            char arrow = BgUtils.getTrendChar(trend);
+            views.setTextViewText(R.id.widget_trend, ""+arrow);
+            views.setTextColor(R.id.widget_trend, getTrendColorId(context, trend));
 
             views.setImageViewBitmap(R.id.widget_background, drawChart(context, appWidgetManager, widgetId));
         }
@@ -242,15 +249,11 @@ public class WidgetUpdateService extends JobService {
         return isUnitConv ? BgUtils.convertGlucoseToMmolLStr(value) : String.valueOf(value);
     }
 
-    private static String getDeltaStrInUnits(int value, boolean isUnitConv, boolean highDensity) {
+    private static String getDeltaStrInUnits(int value, boolean isUnitConv) {
         StringBuilder builder = new StringBuilder();
         builder.append(value < 0 ? StringUtils.EMPTY_STRING : "+");
         if (isUnitConv) {
-            if (highDensity) {
-                builder.append(BgUtils.convertGlucoseToMmolL2Str(value));
-            } else {
-                builder.append(BgUtils.convertGlucoseToMmolLStr(value));
-            }
+            builder.append(BgUtils.convertGlucoseToMmolL2Str(value));
         } else {
             builder.append(value);
         }
@@ -284,34 +287,24 @@ public class WidgetUpdateService extends JobService {
         return color;
     }
 
-    private static int getTrendIconId(int glucoseDelta, int sampleTimeDelta) {
-        if (glucoseDelta < -2 * sampleTimeDelta) {
-            return R.drawable.arrow_down;
-        } else if (glucoseDelta < -sampleTimeDelta) {
-            return R.drawable.arrow_down_skew;
-        } else if (glucoseDelta < sampleTimeDelta) {
-            return R.drawable.arrow_right;
-        } else if (glucoseDelta < 2 * sampleTimeDelta) {
-            return R.drawable.arrow_up_skew;
-        } else {
-            return R.drawable.arrow_up;
+    private static int getTrendColorId(Context context, Trend trend) {
+        switch (trend) {
+            case UP_FAST:
+            case UP:
+            case DOWN:
+            case DOWN_FAST:
+                return PreferenceUtils.getIntValue(context, "pref_widget_trend_color_steep", ContextCompat.getColor(context, R.color.def_red));
+            case UP_SLOW:
+            case DOWN_SLOW:
+                return PreferenceUtils.getIntValue(context, "pref_widget_trend_color_moderate", ContextCompat.getColor(context, R.color.def_orange));
+            case FLAT:
+                return PreferenceUtils.getIntValue(context, "pref_widget_trend_color_flat", ContextCompat.getColor(context, R.color.def_green));
+            default:
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "getTrendColorId: returning NO COLOR");
+                }
+                return Color.TRANSPARENT;
         }
-    }
-
-    private static int getTrendColorId(Context context, int glucoseDelta, int sampleTimeDelta) {
-        int color;
-        if (glucoseDelta < -2 * sampleTimeDelta) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_trend_color_steep", ContextCompat.getColor(context, R.color.def_red));
-        } else if (glucoseDelta < -sampleTimeDelta) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_trend_color_moderate", ContextCompat.getColor(context, R.color.def_orange));
-        } else if (glucoseDelta < sampleTimeDelta) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_trend_color_flat", ContextCompat.getColor(context, R.color.def_green));
-        } else if (glucoseDelta < 2 * sampleTimeDelta) {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_trend_color_moderate", ContextCompat.getColor(context, R.color.def_orange));
-        } else {
-            color = PreferenceUtils.getIntValue(context, "pref_widget_trend_color_steep", ContextCompat.getColor(context, R.color.def_red));
-        }
-        return color;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -345,14 +338,6 @@ public class WidgetUpdateService extends JobService {
             return DexcomUtils.getInstalledDexcomAppPackage();
         }
         return null;
-    }
-
-    private void decreaseWidgetFontSizes(RemoteViews views) {
-        views.setTextViewTextSize(R.id.widget_time_delta, COMPLEX_UNIT_SP, 10);
-        views.setTextViewTextSize(R.id.widget_source, COMPLEX_UNIT_SP, 10);
-        views.setTextViewTextSize(R.id.widget_glucose, COMPLEX_UNIT_SP, 40);
-        views.setTextViewTextSize(R.id.widget_glucose_delta, COMPLEX_UNIT_SP, 10);
-        views.setTextViewTextSize(R.id.widget_units, COMPLEX_UNIT_SP, 10);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -513,6 +498,9 @@ public class WidgetUpdateService extends JobService {
             widgetData.setTimestamp(gp.getTimestamp());
             widgetData.setGlucose(gp.getGlucoseValue());
             widgetData.setTimeDelta(0);
+            widgetData.setTrend(packet instanceof AAPSPacket
+                    ? BgUtils.slopeArrowToTrend(((AAPSPacket)packet).getSlopeArrow())
+                    : ((GlucosePacket)packet).getTrend());
 
             if (lastWidgetData.getTimestamp() != 0 && lastWidgetData.getTimestamp() > widgetData.getTimestamp()) {
                 // in case of old value, do not update current status, just update graph data

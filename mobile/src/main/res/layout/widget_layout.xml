@@ -36,140 +36,142 @@
     android:padding="0dp"
     />
 
-<LinearLayout
-    android:id="@+id/widget_ll1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_centerInParent="true"
-    android:orientation="vertical"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="1dp"
-    >
-
     <LinearLayout
+        android:id="@+id/widget_ll1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
-        >
-        <TextView
-            android:id="@+id/widget_time_delta"
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="6"
-            android:gravity="center"
-            android:hint="0 min"
-            android:textAlignment="gravity"
-            android:textColor="@color/def_widget_time"
-            android:textSize="12sp" />
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal|bottom"
-            android:orientation="vertical"
-            android:visibility="visible"
-            >
-<!--            <ImageView-->
-<!--                android:id="@+id/widget_offline_indicator"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/ic_watch"-->
-<!--                android:tint="@color/def_widget_disconnected"-->
-<!--                tools:ignore="UseAppTint" />-->
-        </LinearLayout>
-        <TextView
-            android:id="@+id/widget_source"
-            android:layout_height="match_parent"
-            android:layout_width="0dp"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:hint="--"
-            android:text="G-Watch"
-            android:textAlignment="gravity"
-            android:textColor="@color/def_widget_source"
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/widget_ll2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:layout_gravity="center">
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="1dp"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:id="@+id/widget_time_delta"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="6"
+                android:gravity="center"
+                android:hint="0 min"
+                android:textAlignment="gravity"
+                android:textColor="@color/def_widget_time"
+                android:textSize="12sp" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:id="@+id/widget_source"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:gravity="center"
+                android:hint="--"
+                android:text="G-Watch"
+                android:textAlignment="gravity"
+                android:textColor="@color/def_widget_source"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:id="@+id/widget_ll2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:orientation="vertical"
             android:layout_gravity="center">
 
-            <TextView
-                android:id="@+id/widget_glucose"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="left|center_vertical"
-                android:hint="--"
-                android:text="--"
-                android:textAlignment="gravity"
-                android:textColor="@color/def_widget_text"
-                android:textSize="52sp"
-                android:fontFamily="sans-serif"
-                />
-
             <LinearLayout
-                android:id="@+id/widget_ll3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_gravity="center_vertical|left">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="4"
-                    android:padding="4dp"
-                    android:gravity="center_horizontal|bottom"
-                    android:orientation="vertical"
-                    >
-                <ImageView
-                    android:id="@+id/widget_trend"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/arrow_right"
-                    android:tint="@color/disabled_gray"
-                    />
-                </LinearLayout>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
                 <TextView
-                    android:id="@+id/widget_glucose_delta"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
+                    android:id="@+id/widget_glucose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_vertical"
                     android:hint="--"
+                    android:text="--"
                     android:textAlignment="gravity"
-                    android:textSize="13sp"
                     android:textColor="@color/def_widget_text"
-                    android:textStyle="bold"
-                    android:gravity="center_horizontal|bottom"
-                />
-                <TextView
-                    android:id="@+id/widget_units"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:hint=""
-                    android:textAlignment="gravity"
-                    android:textSize="12sp"
-                    android:textColor="@color/def_widget_text"
-                    android:gravity="center_horizontal|top"
+                    android:textSize="52sp"
+                    android:fontFamily="sans-serif"
                     />
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        >
+                        <TextView
+                            android:id="@+id/widget_trend"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:tint="@color/def_widget_text"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textAlignment="center"
+                            />
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/widget_ll3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_gravity="center_vertical|left">
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="4"
+                        />
+                        <TextView
+                            android:id="@+id/widget_glucose_delta"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:hint="--"
+                            android:textAlignment="gravity"
+                            android:textSize="13sp"
+                            android:textColor="@color/def_widget_text"
+                            android:textStyle="bold"
+                            android:gravity="center_horizontal|bottom"
+                        />
+                        <TextView
+                            android:id="@+id/widget_units"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:hint=""
+                            android:textAlignment="gravity"
+                            android:textSize="12sp"
+                            android:textColor="@color/def_widget_text"
+                            android:gravity="center_horizontal|top"
+                            />
+                    </LinearLayout>
+                </FrameLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
 </RelativeLayout>

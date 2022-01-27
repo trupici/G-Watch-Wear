@@ -87,14 +87,6 @@ public class UiUtils {
             return false;
         }
     }
-//
-//    public static String getGlucoseUnitsStr(boolean isUnitConv) {
-//        return isUnitConv ? GLUCOSE_UNITS_MMOLL : GLUCOSE_UNITS_MGDL;
-//    }
-
-    public static boolean isHighDensityDisplay(Context context) {
-        return context.getResources().getDisplayMetrics().density > 2f;
-    }
 
     public static void showMessage(Context context, String message) {
         PacketConsole packetConsole = GWatchApplication.getPacketConsole();

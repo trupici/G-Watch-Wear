@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -44,6 +45,10 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
     public static final String EXTRA_ITEM_ID = "itemId";
     public static final String EXTRA_ITEM_TYPE = "itemType";
     public static final String EXTRA_COLOR = "color";
+
+    private static final String LOG_TAG = ColorPickerActivity.class.getSimpleName();
+
+    private static final int MAX_HEX_DIGITS = 8;
 
     private ColorPicker picker;
     private SVBar svBar;
@@ -106,7 +111,7 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
         onColorChanged(picker.getColor());
         picker.requestFocus();
 
-        text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(8)});
+        text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_HEX_DIGITS)});
         text.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -119,12 +124,13 @@ public class ColorPickerActivity extends Activity implements ColorPicker.OnColor
             @Override
             public void afterTextChanged(Editable s) {
                 try {
-                    int color = Integer.valueOf(s.toString().toLowerCase(Locale.ROOT), 16);
+                    String strColor = s.toString().toLowerCase(Locale.ROOT);
+                    long color = Long.valueOf(strColor, 16);
                     picker.setOnColorChangedListener(null);
-                    picker.setColor(color);
+                    picker.setColor((int)color);
                     picker.setOnColorChangedListener(ColorPickerActivity.this);
                 } catch (Exception e) {
-                    // swallow any exception
+                    Log.e(LOG_TAG, "afterTextChanged: Failed to apply new color value: " + s.toString(), e);
                 }
             }
         });

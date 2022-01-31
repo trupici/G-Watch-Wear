@@ -62,6 +62,10 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
                     R.drawable.hours_default, R.drawable.hours_shadow_default,
                     R.drawable.minutes_default, R.drawable.minutes_shadow_default,
                     R.drawable.seconds_1, R.drawable.seconds_shadow_default),
+            new HandsConfigData(2, "", R.drawable.hands_classic_preview,
+                    R.drawable.hours_classic, R.drawable.hours_classic_shadow,
+                    R.drawable.minutes_classic, R.drawable.minutes_classic_shadow,
+                    R.drawable.seconds_classic, R.drawable.seconds_classic_shadow),
     };
 
     private final static ConfigPageData[] CONFIG = {

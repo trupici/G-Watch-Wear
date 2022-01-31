@@ -20,6 +20,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -65,6 +67,8 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
         private Paint clearPaint;
         private int backgroundPathColor;
 
+        Paint ambientPaint;
+
         private int pbPadding;
         private int pbMaxAngle;
 
@@ -101,6 +105,13 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             clearPaint.setColor(Color.TRANSPARENT);
 
+            ambientPaint = new Paint();
+            ColorMatrix colorMatrix = new ColorMatrix();
+            colorMatrix.setSaturation(0);
+            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
+            ambientPaint.setColorFilter(filter);
+            ambientPaint.setAlpha(0x80);
+
             backgroundPathColor = context.getColor(R.color.digital_compl_progressbar_bkg_color);
 
             pbPadding = context.getResources().getInteger(R.integer.digital_compl_progressbar_padding);
@@ -134,25 +145,18 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
             float angleOffset = (90 - pbMaxAngle) / 2f;
             ProgressBarAttrs topLeftProgressBarAttrs = new ProgressBarAttrs(
-                    180 + angleOffset,
+                    90 + angleOffset,
                     pbMaxAngle,
-                    new RectF(0, 0, refScreenWidth /2f, refScreenHeight /2f)
+                    new RectF(0, refScreenHeight /2f, refScreenWidth /2f, refScreenHeight)
             );
             ProgressBarAttrs topRightProgressBarAttrs = new ProgressBarAttrs(
                     270 + angleOffset,
                     pbMaxAngle,
                     new RectF(refScreenWidth /2f, 0, refScreenWidth, refScreenHeight /2f)
             );
-            ProgressBarAttrs bottomLeftProgressBarAttrs = new ProgressBarAttrs(
-                    90 + angleOffset,
-                    pbMaxAngle,
-                    new RectF(0, refScreenHeight /2f, refScreenWidth /2f, refScreenHeight)
-            );
-            ProgressBarAttrs bottomRightProgressBarAttrs = new ProgressBarAttrs(
-                    angleOffset,
-                    pbMaxAngle,
-                    new RectF(refScreenWidth /2f, refScreenHeight /2f, refScreenWidth, refScreenHeight)
-            );
+            // no progress bar for bottom complications
+            ProgressBarAttrs bottomLeftProgressBarAttrs = null;
+            ProgressBarAttrs bottomRightProgressBarAttrs = null;
 
             complSettingsMap = new HashMap<>(4);
             complSettingsMap.put(ComplicationId.TOP_LEFT, new ComplicationSettings(
@@ -295,16 +299,10 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
             // update progress bars bounds
             complSettingsMap.get(ComplicationId.TOP_LEFT).getProgressAttrs().setBounds(
-                    new RectF(0, 0, width/2f, height/2f)
+                    new RectF(0, height/2f, width/2f, height)
             );
             complSettingsMap.get(ComplicationId.TOP_RIGHT).getProgressAttrs().setBounds(
                     new RectF(width/2f, 0, width, height/2f)
-            );
-            complSettingsMap.get(ComplicationId.BOTTOM_LEFT).getProgressAttrs().setBounds(
-                    new RectF(0, height/2f, width/2f, height)
-            );
-            complSettingsMap.get(ComplicationId.BOTTOM_RIGHT).getProgressAttrs().setBounds(
-                    new RectF(width/2f, height/2f, width, height)
             );
 
             for (ComplicationId complicationId : complSettingsMap.keySet()) {
@@ -345,16 +343,21 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
         protected void drawComplications(Canvas canvas, boolean isAmbientMode) {
             super.drawComplications(canvas, isAmbientMode);
 
-            if (!isAmbientMode && bitmap != null) {
-                canvas.drawBitmap(bitmap, null, getSurfaceHolder().getSurfaceFrame(), null);
+            if (bitmap != null) {
+                canvas.drawBitmap(bitmap, null, getSurfaceHolder().getSurfaceFrame(), isAmbientMode ? ambientPaint : null);
             }
         }
 
         private void drawComplicationProgressBar(ComplicationId complicationId) {
             ComplicationSettings settings = complSettingsMap.get(complicationId);
             ProgressBarAttrs progressBarAttrs = settings.getProgressAttrs();
+            if (progressBarAttrs == null) {
+                return;
+            }
+
             ComplicationAttrs complicationAttrs = settings.getAttrs();
             ComplicationData complicationData = settings.getComplicationData();
+
 
             // clear complication bitmap portion
             canvas.drawRect(progressBarAttrs.getBounds(), clearPaint);

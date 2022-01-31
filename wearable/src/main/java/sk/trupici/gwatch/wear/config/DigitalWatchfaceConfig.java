@@ -90,13 +90,11 @@ public class DigitalWatchfaceConfig implements WatchfaceConfig {
             new ComplicationConfig(
                     ComplicationId.BOTTOM_LEFT,
                     new int[] {
-                            ComplicationData.TYPE_RANGED_VALUE,
                             ComplicationData.TYPE_SHORT_TEXT,
                             ComplicationData.TYPE_LONG_TEXT,
                     }),
             new ComplicationConfig(ComplicationId.BOTTOM_RIGHT,
                     new int[] {
-                            ComplicationData.TYPE_RANGED_VALUE,
                             ComplicationData.TYPE_SHORT_TEXT,
                             ComplicationData.TYPE_LONG_TEXT,
                     })

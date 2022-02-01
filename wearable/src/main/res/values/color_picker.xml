@@ -25,6 +25,8 @@
     <dimen name="color_pointer_halo_radius">18dp</dimen>
     <dimen name="color_pointer_radius">14dp</dimen>
 
+    <color name="color_pointer_halo_color">#33ffffff</color>
+
     <!--
         Standard dimensions for color bars
      -->

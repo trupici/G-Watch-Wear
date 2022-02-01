@@ -15,12 +15,12 @@
  limitations under the License.
 -->
 <resources>
-    <string name="app_name">G-Watch Wear App</string>
+    <string name="app_name" translatable="false">G-Watch Wear App</string>
 
 
     <!-- MAIN SCREEN -->
 
-    <string name="app_desc_title" translatable="false">G-Watch App</string>
+    <string name="app_desc_title" translatable="false">G-Watch Wear App</string>
     <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!</string>
     <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
 
@@ -55,14 +55,6 @@
 
     <string name="action_navigation_up">Navigate up</string>
 
-    <!-- Watchface connection status -->
-
-    <string name="conn_status_connected">CONNECTED</string>
-    <string name="conn_status_disconnected">DISCONNECTED</string>
-    <string name="conn_status_unknown">UNKNOWN</string>
-    <string name="conn_notification_status_label">Status: %1$s</string>
-
-
     <!-- ABOUT dialog -->
 
     <string name="about_app_name" translatable="false">G-Watch Wear App 0.9</string>
@@ -77,7 +69,6 @@
     <string name="about_fb" translatable="false">facebook: fb.me/gwatchapp</string>
     <string name="about_source_code_title">Source code:</string>
     <string name="about_source_code" translatable="false">https://github.com/trupici/G-Watch-Wear</string>
-
 
     <string name="about_disclaimer_title">DISCLAIMER</string>
     <string name="about_license">By using this application, you agree to the following terms and conditions:</string>
@@ -118,7 +109,7 @@
 
     <string name="pref_language_title">Language</string>
 
-    <string name="edit_preference_validation_error">Invalid value</string>
+    <string name="edit_preference_validation_error">Invalid value</string> <!-- -->
     <string name="text_preference_validation_error">Invalid character</string>
 
     <string name="settings_save_changes_message">Settings changed. Do you want to send these changes to the watch?</string>
@@ -143,10 +134,10 @@
     <string name="pref_glucose_level_units_mmoll">mmol/l</string>
     <string name="pref_glucose_level_units_mgdl">mg/dl</string>
 
-    <string name="pref_watch_appearance_title">Watch Appearance</string>
-    <string name="pref_watch_appearance_summary">Personalize watch appearance</string>
+<!--    <string name="pref_watch_appearance_title">Watch Appearance</string>-->
+<!--    <string name="pref_watch_appearance_summary">Personalize watch appearance</string>-->
 
-    <string name="selected_file_title">Custom background file:</string>
+<!--    <string name="selected_file_title">Custom background file:</string>-->
 
 <!--    <string name="pref_glucose_panel_title">Glucose Panel</string>-->
 <!--    <string name="pref_glucose_panel_summary">Personalize panel with glucose values</string>-->
@@ -172,8 +163,8 @@
 
     <string name="pref_data_source_aaps_ignore_bg_title">Ignore glucose values from AAPS</string>
 
-    <string name="pref_on_click_action">OnClick Action</string>
-    <string name="pref_on_click_title">Enable OnClick Action</string>
+<!--    <string name="pref_on_click_action">OnClick Action</string>-->
+<!--    <string name="pref_on_click_title">Enable OnClick Action</string>-->
 
     <string name="pref_widget_title">App Widget</string>
     <string name="pref_widget_summary">Personalize app widget look and behavior</string>

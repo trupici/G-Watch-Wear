@@ -44,7 +44,7 @@ import sk.trupici.gwatch.wear.view.MainActivity;
 
 public class NotificationService extends Service {
 
-    private static String LOG_TAG = NotificationService.class.getSimpleName();
+    private static final String LOG_TAG = NotificationService.class.getSimpleName();
 
     public static final int NOTIFICATION_ID = 801415;
 
@@ -52,7 +52,6 @@ public class NotificationService extends Service {
     private static final int REQUEST_CODE = 2022;
 
     private static final String ACTION_START = "NotificationService.START";
-    private static final String ACTION_CONNECTION_STATUS = "NotificationService.CONNECTION_STATUS";
     private static final String ACTION_BG_VALUE = "NotificationService.BG_VALUE";
     private static final String ACTION_TEXT = "NotificationService.TEXT";
 
@@ -63,13 +62,6 @@ public class NotificationService extends Service {
     public static void startService(Context context) {
         Intent startIntent = new Intent(context, NotificationService.class);
         startIntent.setAction(ACTION_START);
-        ContextCompat.startForegroundService(context, startIntent);
-    }
-
-    public static void updateConnectionStatus(Context context, boolean isConnected) {
-        Intent startIntent = new Intent(context, NotificationService.class);
-        startIntent.setAction(ACTION_CONNECTION_STATUS);
-        startIntent.putExtra("status", isConnected);
         ContextCompat.startForegroundService(context, startIntent);
     }
 
@@ -109,10 +101,6 @@ public class NotificationService extends Service {
             String text = intent.getStringExtra("text");
             NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
-        } else if (ACTION_CONNECTION_STATUS.equals(intent.getAction())) {
-            Boolean connStatus = intent.getBooleanExtra("status", false);
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, connStatus));
         }
 
         return START_NOT_STICKY;
@@ -173,23 +161,6 @@ public class NotificationService extends Service {
                 createNotificationChannel(context);
                 currentNotification = createNotification(context, NO_DATA);
             }
-            return currentNotification;
-        }
-    }
-
-    public static Notification createUpdateNotification(Context context, Boolean isConnected) {
-        int connStatusId;
-        if (isConnected == null) {
-            connStatusId = R.string.conn_status_unknown;
-        } else if (Boolean.TRUE.equals(isConnected)) {
-            connStatusId = R.string.conn_status_connected;
-        } else {
-            connStatusId = R.string.conn_status_disconnected;
-        }
-        String text = context.getString(R.string.conn_notification_status_label, context.getText(connStatusId));
-
-        synchronized (context) {
-            currentNotification = createNotification(context, text);
             return currentNotification;
         }
     }

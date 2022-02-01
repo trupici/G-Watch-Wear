@@ -19,29 +19,13 @@
 <resources>
     <string-array name="languages">
         <item>System</item>
-        <item>Čeština</item>
-        <item>Dansk</item>
-        <item>Deutsch</item>
         <item>English</item>
-        <item>Français</item>
-        <item>Italiano</item>
-        <item>Nederlands</item>
-        <item>Norsk Bokmål</item>
         <item>Slovenčina</item>
-        <item>Svenska</item>
     </string-array>
 
     <string-array name="language_codes">
         <item>system</item>
-        <item>cs</item>
-        <item>da</item>
-        <item>de</item>
         <item>en</item>
-        <item>fr</item>
-        <item>it</item>
-        <item>nl</item>
-        <item>nb</item>
         <item>sk</item>
-        <item>sv</item>
     </string-array>
 </resources>

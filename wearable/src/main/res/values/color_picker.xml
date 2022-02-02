@@ -15,28 +15,49 @@
  limitations under the License.
 -->
 <resources>
+
     <!--
-    Standard dimensions for the color wheel
- -->
-    <dimen name="color_wheel_radius">130dp</dimen>
-    <dimen name="color_wheel_thickness">9dp</dimen>
-    <dimen name="color_center_halo_radius">50dp</dimen>
+        Color picker attributes.
+        See also layout_color_picker.xml, the wheel size depends on the screen size
+    -->
+
+    <!-- color ring size -->
+    <dimen name="color_wheel_radius">140dp</dimen>
+    <dimen name="color_wheel_thickness">10dp</dimen>
+
+    <!-- original and current color central indicator size -->
     <dimen name="color_center_radius">40dp</dimen>
-    <dimen name="color_pointer_halo_radius">18dp</dimen>
-    <dimen name="color_pointer_radius">14dp</dimen>
+    <dimen name="color_center_halo_radius">42dp</dimen>
 
-    <color name="color_pointer_halo_color">#33ffffff</color>
+    <!-- color wheel pointer size -->
+    <dimen name="color_pointer_radius">10dp</dimen>
+    <dimen name="color_pointer_halo_radius">13dp</dimen>
+
+    <!-- color wheel pointer appearance -->
+    <color name="color_pointer_halo_color">#000000</color>
+    <color name="color_pointer_default_color">#ffffff</color>
+    <bool name="color_pointer_fixed_color">true</bool>
 
     <!--
-        Standard dimensions for color bars
+        Color bars attributes.
+        See also layout_color_picker.xml, e.g. the bar length is overridden by layout.
      -->
-    <dimen name="bar_thickness">4dp</dimen>
     <dimen name="bar_length">240dp</dimen>
-    <dimen name="bar_pointer_radius">6dp</dimen>
-    <dimen name="bar_pointer_halo_radius">10dp</dimen>
-    <dimen name="bar_transparency_square_size">4dp</dimen>
+    <dimen name="bar_thickness">10dp</dimen>
 
-    <color name="bar_pointer_halo_color">#33ffffff</color>
-    <color name="bar_pointer_default_color">#ff81ff00</color>
+    <!-- bars pointer size -->
+    <dimen name="bar_pointer_radius">5dp</dimen>
+    <dimen name="bar_pointer_halo_radius">7dp</dimen>
+
+    <!-- opacity bar pattern grid size -->
+    <dimen name="bar_transparency_square_size">1dp</dimen>
+
+    <!-- bars pointer appearance -->
+    <color name="bar_pointer_halo_color">#000000</color>
+    <color name="bar_pointer_default_color">#ffffff</color>
+    <bool name="bar_pointer_fixed_color">true</bool>
+
+    <!-- bar corners radius. set 0 for rectangular shape -->
+    <integer name="bar_corner_radius">15</integer>
 
 </resources>

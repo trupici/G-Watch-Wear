@@ -68,14 +68,31 @@
             app:layout_constraintBottom_toBottomOf="parent" />
             />
 
+        <FrameLayout
+            android:id="@+id/pad1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.03"
+            app:layout_constraintTop_toBottomOf="@id/center_anchor"
+            app:layout_constraintBottom_toTopOf="@id/svbar"
+            />
+
         <com.larswerkman.holocolorpicker.SVBar
             android:id="@+id/svbar"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            app:layout_constraintWidth_percent="0.6"
+            app:layout_constraintWidth_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/center_anchor"
+            app:layout_constraintTop_toBottomOf="@id/pad1"
+            app:layout_constraintBottom_toTopOf="@id/pad2"
+            />
+        <FrameLayout
+            android:id="@+id/pad2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.03"
+            app:layout_constraintTop_toBottomOf="@id/svbar"
             app:layout_constraintBottom_toTopOf="@id/opacitybar"
             />
 
@@ -83,10 +100,10 @@
             android:id="@+id/opacitybar"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            app:layout_constraintWidth_percent="0.45"
+            app:layout_constraintWidth_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/svbar"
+            app:layout_constraintTop_toBottomOf="@id/pad2"
             />
         </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

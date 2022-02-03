@@ -41,6 +41,7 @@ import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -160,8 +161,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         paint.setTextAlign(Paint.Align.CENTER);
 
 
-        indicatorPaint = new Paint();
-        indicatorPaint.setAntiAlias(true);
+        indicatorPaint = UiUtils.createPaint();
         indicatorPaint.setStyle(Paint.Style.FILL);
 
         showBgIndicator = watchfaceConfig.showBgPanelIndicator(context);

@@ -20,8 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -43,6 +41,7 @@ import sk.trupici.gwatch.wear.components.DigitalTimePanel;
 import sk.trupici.gwatch.wear.config.DigitalWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 /**
  * Analog watch face with a ticking second hand.
@@ -94,8 +93,7 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             bitmap = Bitmap.createBitmap((int) refScreenWidth, (int) refScreenHeight, Bitmap.Config.ARGB_8888);
             canvas = new Canvas(bitmap);
 
-            paint = new Paint();
-            paint.setAntiAlias(true);
+            paint = UiUtils.createPaint();
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeWidth(context.getResources().getInteger(R.integer.digital_compl_progressbar_width));
@@ -105,11 +103,7 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             clearPaint.setColor(Color.TRANSPARENT);
 
-            ambientPaint = new Paint();
-            ColorMatrix colorMatrix = new ColorMatrix();
-            colorMatrix.setSaturation(0);
-            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-            ambientPaint.setColorFilter(filter);
+            ambientPaint = UiUtils.createAmbientPaint();
             ambientPaint.setAlpha(0x80);
 
             backgroundPathColor = context.getColor(R.color.digital_compl_progressbar_bkg_color);

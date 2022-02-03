@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -39,6 +37,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     final private static String LOG_TAG = BgGraph.class.getSimpleName();
@@ -158,16 +157,10 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         rightPadding = padding.right;
         bottomPadding = padding.bottom;
 
-        paint = new Paint();
+        paint = UiUtils.createPaint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setAntiAlias(true);
 
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        ambientPaint = new Paint();
-        ambientPaint.setAntiAlias(false);
-        ambientPaint.setColorFilter(filter);
+        ambientPaint = UiUtils.createAmbientPaint();
 
         restoreChartData(sharedPrefs);
         onConfigChanged(context, sharedPrefs);

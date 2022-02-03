@@ -30,6 +30,7 @@ import java.util.Calendar;
 import sk.trupici.gwatch.wear.config.AnalogWatchfaceConfig;
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.HandsConfigData;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class WatchHands implements ComponentPanel {
     public static final String LOG_TAG = WatchHands.class.getSimpleName();
@@ -60,8 +61,7 @@ public class WatchHands implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        paint = new Paint();
-        paint.setAntiAlias(true);
+        paint = UiUtils.createPaint();
 
         onConfigChanged(context, sharedPrefs);
     }

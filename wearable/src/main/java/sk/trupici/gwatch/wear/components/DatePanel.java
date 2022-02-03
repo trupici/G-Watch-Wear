@@ -23,8 +23,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -46,7 +44,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.util.BorderUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -132,12 +130,7 @@ public class DatePanel implements ComponentPanel {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextScaleX(0.9f);
 
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        ambientPaint = new TextPaint();
-        ambientPaint.setAntiAlias(false);
-        ambientPaint.setColorFilter(filter);
+        ambientPaint = UiUtils.createAmbientTextPaint();
         ambientPaint.setTextAlign(Paint.Align.CENTER);
         ambientPaint.setTextScaleX(0.9f);
 
@@ -242,8 +235,7 @@ public class DatePanel implements ComponentPanel {
         bkgBitmap.eraseColor(Color.TRANSPARENT);
 
         Canvas canvas = new Canvas(bkgBitmap);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
+        Paint paint = UiUtils.createPaint();
 
         // draw background
         if (backgroundColor != Color.TRANSPARENT) {

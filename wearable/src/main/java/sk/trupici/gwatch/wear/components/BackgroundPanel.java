@@ -21,14 +21,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.wearable.watchface.WatchFaceService;
 
 import sk.trupici.gwatch.wear.config.ConfigPageData;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 public class BackgroundPanel implements ComponentPanel {
 
@@ -42,7 +41,7 @@ public class BackgroundPanel implements ComponentPanel {
     final private WatchfaceConfig watchfaceConfig;
 
     private Paint paint;
-    private Paint grayPaint;
+    private Paint ambientPaint;
 
     private Bitmap bitmap;
 
@@ -57,14 +56,9 @@ public class BackgroundPanel implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        paint = new Paint();
-        paint.setAntiAlias(true);
+        paint = UiUtils.createPaint();
 
-        grayPaint = new Paint();
-        ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(0);
-        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-        grayPaint.setColorFilter(filter);
+        ambientPaint = UiUtils.createAmbientPaint();
 
         onConfigChanged(context, sharedPrefs);
     }
@@ -87,7 +81,7 @@ public class BackgroundPanel implements ComponentPanel {
             if (lowBitAmbient || burnInProtection) {
                 canvas.drawColor(Color.BLACK);
             } else {
-                canvas.drawBitmap(bitmap, null, canvas.getClipBounds(), grayPaint);
+                canvas.drawBitmap(bitmap, null, canvas.getClipBounds(), ambientPaint);
             }
         } else {
             canvas.drawBitmap(bitmap, null, canvas.getClipBounds(), paint);

@@ -47,6 +47,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.util.BorderUtils;
+import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
@@ -229,8 +230,7 @@ public class DigitalTimePanel implements ComponentPanel {
         bkgBitmap.eraseColor(Color.TRANSPARENT);
 
         Canvas canvas = new Canvas(bkgBitmap);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
+        Paint paint = UiUtils.createPaint();
 
         // draw background
         if (backgroundColor != Color.TRANSPARENT) {

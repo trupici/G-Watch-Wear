@@ -392,7 +392,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
             editTextPref.setTitle(applyValue(editTextPref.getTitle().toString(), value, null));
         } else if (pref instanceof ListPreference) {
             ListPreference listPref = (ListPreference) pref;
-            String value = listPref.getEntry().toString();
+            String value = listPref.getEntry() != null ? listPref.getEntry().toString() : StringUtils.EMPTY_STRING;
             listPref.setSummary(value);
         }
     }

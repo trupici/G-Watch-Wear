@@ -105,6 +105,7 @@ public class DatePanel implements ComponentPanel {
     private TextPaint paint;
     private TextPaint ambientPaint;
     private Paint erasePaint;
+    private Paint bkgPaint;
 
     private boolean timeZoneRegistered = false;
     private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
@@ -132,10 +133,11 @@ public class DatePanel implements ComponentPanel {
         paint.setTextScaleX(0.9f);
 
         ambientPaint = UiUtils.createAmbientTextPaint();
-        ambientPaint.setTextAlign(Paint.Align.CENTER);
-        ambientPaint.setTextScaleX(0.9f);
+        ambientPaint.setTextAlign(paint.getTextAlign());
+        ambientPaint.setTextScaleX(paint.getTextScaleX());
 
         erasePaint = UiUtils.createErasePaint();
+        bkgPaint = UiUtils.createPaint();
 
         sizeFactors = new RectF(
                 context.getResources().getDimension(R.dimen.analog_layout_date_panel_left) / refScreenWidth,
@@ -156,7 +158,7 @@ public class DatePanel implements ComponentPanel {
         bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
         bkgBitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
 
-        paint.setTextSize(bounds.height() / 2.2f);
+        paint.setTextSize(bounds.height() / 2.3f);
         ambientPaint.setTextSize(paint.getTextSize());
 
         drawDate();
@@ -208,11 +210,11 @@ public class DatePanel implements ComponentPanel {
         final float centerX = bounds.width() / 2f;
 
         // upper text
-        canvas.drawText(line1, centerX, bounds.height() / 2f - 5, paint);
+        canvas.drawText(line1, centerX, bounds.height() / 2f - 2, paint);
 
         // Day of Month
         paint.setColor(dayOfMonthColor);
-        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 5, paint);
+        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 7, paint);
     }
 
     private String formatDayMonth(DateFormat format, DateFormat fullNameFormat, Date date) {
@@ -245,39 +247,39 @@ public class DatePanel implements ComponentPanel {
 
         // draw background
         if (backgroundColor != Color.TRANSPARENT) {
-            paint.setColor(backgroundColor);
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            bkgPaint.setColor(backgroundColor);
+            bkgPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             if (BorderUtils.isBorderRounded(borderType)) {
                 canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
-                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
+                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bkgPaint);
             } else if (BorderUtils.isBorderRing(borderType)) {
                 canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
-                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
+                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, bkgPaint);
             } else {
-                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, paint);
+                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, bkgPaint);
             }
         }
 
         // draw border
         if (borderType != BorderType.NONE) {
-            paint.setColor(borderColor);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(BORDER_WIDTH);
+            bkgPaint.setColor(borderColor);
+            bkgPaint.setStyle(Paint.Style.STROKE);
+            bkgPaint.setStrokeWidth(BORDER_WIDTH);
             if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
                 if (BorderUtils.isBorderDotted(borderType)) {
-                    paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
+                    bkgPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
                 } else {
-                    paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
+                    bkgPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
                 }
             }
             if (BorderUtils.isBorderRounded(borderType)) {
                 canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
-                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
+                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bkgPaint);
             } else if (BorderUtils.isBorderRing(borderType)) {
                 canvas.drawRoundRect(0, 0, bounds.width() - 1, bounds.height() - 1,
-                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
+                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, bkgPaint);
             } else {
-                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, paint);
+                canvas.drawRect(0, 0, bounds.width() - 1, bounds.height() - 1, bkgPaint);
             }
         }
     }

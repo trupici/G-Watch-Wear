@@ -43,7 +43,7 @@
 
     <!-- xDrip+ integration -->
     <uses-permission android:name="com.eveningoutpost.dexdrip.permissions.RECEIVE_BG_ESTIMATE" />
-    <!-- Dexcom app integration -->
+    <!-- BYOD app integration -->
     <uses-permission android:name="com.dexcom.cgm.EXTERNAL_PERMISSION" />
 
     <queries>
@@ -109,7 +109,7 @@
                 <action android:name="com.eveningoutpost.dexdrip.FROM_LIBRE_ALARM"/>
                 <!-- Broadcast from DiaBox -->
                 <action android:name="com.outshineiot.diabox.BgEstimate"/>
-                <!-- Broadcast from patched Dexcom App -->
+                <!-- Broadcast from BYOD App -->
                 <action android:name="com.dexcom.cgm.EXTERNAL_BROADCAST"/>
             </intent-filter>
         </receiver>

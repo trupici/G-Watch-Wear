@@ -125,9 +125,6 @@ public class GWatchApplication extends Application {
         bgReceivers.add(receiver);
     }
     public void processIntent(Context context, Intent intent) {
-//        if (packetView != null) {
-//            packetView.showText("Intent: " + intent.toString());
-//        }
 
         for (BGReceiver receiver : bgReceivers) {
             if (receiver != null) {

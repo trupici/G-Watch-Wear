@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (C) 2021 Juraj Antal
+ Copyright (C) 2022 Juraj Antal
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@array/android_wear_capabilities">
+<resources>
     <string-array name="android_wear_capabilities">
-        <item>verify_remote_gwatch_wear_app</item>
+        <item>verify_remote_gwatch_phone_app</item>
     </string-array>
 </resources>

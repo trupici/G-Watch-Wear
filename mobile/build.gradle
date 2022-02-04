@@ -7,22 +7,33 @@ buildProperties.load(new FileInputStream(rootProject.file("local.properties")))
 
 android {
 
+    signingConfigs {
+        release {
+            release {
+                keyAlias buildProperties['signKeyAlias']
+                keyPassword buildProperties['signKeyPassword']
+                storeFile file(buildProperties['signStorePath'])
+                storePassword buildProperties['signStorePassword']
+            }
+        }
+    }
     compileSdk 30
 
     defaultConfig {
         applicationId "sk.trupici.gwatch.wear"
         minSdk 25
         targetSdk 30
-        versionCode 1
+        versionCode 1000001 // use 1xxxxxx codes for mobile app
         versionName "0.9"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     lintOptions {

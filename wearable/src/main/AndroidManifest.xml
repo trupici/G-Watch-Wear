@@ -47,7 +47,7 @@
         >
         <meta-data
             android:name="com.google.android.wearable.standalone"
-            android:value="true" />
+            android:value="false" />
 
         <service
             android:name=".watchface.AnalogWatchfaceService"
@@ -138,10 +138,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-<!--        <meta-data-->
-<!--            android:name="com.google.android.gms.version"-->
-<!--            android:value="@integer/google_play_services_version" />-->
 
         <service android:name=".services.BgDataListenerService" android:exported="true">
             <intent-filter>

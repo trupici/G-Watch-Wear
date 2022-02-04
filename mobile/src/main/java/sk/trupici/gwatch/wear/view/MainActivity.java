@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
 import java.lang.reflect.Method;
@@ -43,6 +42,7 @@ import sk.trupici.gwatch.wear.util.UiUtils;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 
 public class MainActivity extends LocalizedActivityBase implements HorizontalSwipeDetector.SwipeListener, ActivityCompat.OnRequestPermissionsResultCallback {
+
     private static MainActivity activity;
 
     public static final int REQUEST_CODE_BATTERY_OPTIMIZATIONS = 1;
@@ -71,10 +71,10 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
 
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                result -> {} // ignore result from permission request explanation
+                result -> {
+                } // ignore result from permission request explanation
         );
         checkAndRequestBatteryOptimization();
-
     }
 
 
@@ -82,7 +82,6 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
     protected void onResume() {
         super.onResume();
         GWatchApplication app = (GWatchApplication) getApplication();
-//        setConectionStatus(app.isSapInitialized() ? app.isConnected() : null);
     }
 
     @Override
@@ -204,6 +203,4 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
             }
         }
     }
-
-
 }

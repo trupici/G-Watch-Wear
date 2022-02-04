@@ -2,28 +2,39 @@ plugins {
     id 'com.android.application'
 }
 
+def buildProperties = new Properties()
+buildProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
 android {
+    signingConfigs {
+        release {
+            keyAlias buildProperties['signKeyAlias']
+            keyPassword buildProperties['signKeyPassword']
+            storeFile file(buildProperties['signStorePath'])
+            storePassword buildProperties['signStorePassword']
+        }
+    }
     compileSdk 31
 
     defaultConfig {
         applicationId "sk.trupici.gwatch.wear"
         minSdk 30
         targetSdk 30
-        versionCode 1
+        versionCode 2000001 // use 2xxxxxx codes for watch app
         versionName "0.9"
 
         multiDexEnabled true
     }
 
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
         }
     }
 }
 
 dependencies {
-    wearApp project(':wearable')
-
     implementation 'com.google.android.gms:play-services-wearable:17.1.0'
     implementation 'com.google.android.gms:play-services-base:18.0.1'
 

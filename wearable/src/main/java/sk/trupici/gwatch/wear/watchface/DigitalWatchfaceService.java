@@ -19,11 +19,8 @@ package sk.trupici.gwatch.wear.watchface;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -98,10 +95,7 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             paint.setStrokeCap(Paint.Cap.ROUND);
             paint.setStrokeWidth(context.getResources().getInteger(R.integer.digital_compl_progressbar_width));
 
-            clearPaint = new Paint();
-            clearPaint.setStyle(Paint.Style.FILL);
-            clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            clearPaint.setColor(Color.TRANSPARENT);
+            clearPaint = UiUtils.createErasePaint();
 
             ambientPaint = UiUtils.createAmbientPaint();
             ambientPaint.setAlpha(0x80);

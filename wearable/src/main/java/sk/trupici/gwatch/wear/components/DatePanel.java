@@ -25,6 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
@@ -103,6 +104,7 @@ public class DatePanel implements ComponentPanel {
 
     private TextPaint paint;
     private TextPaint ambientPaint;
+    private Paint erasePaint;
 
     private boolean timeZoneRegistered = false;
     private final BroadcastReceiver timeZoneReceiver = new BroadcastReceiver() {
@@ -125,14 +127,15 @@ public class DatePanel implements ComponentPanel {
 
         calendar = Calendar.getInstance();
 
-        paint = new TextPaint();
-        paint.setAntiAlias(true);
+        paint = UiUtils.createTextPaint();
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextScaleX(0.9f);
 
         ambientPaint = UiUtils.createAmbientTextPaint();
         ambientPaint.setTextAlign(Paint.Align.CENTER);
         ambientPaint.setTextScaleX(0.9f);
+
+        erasePaint = UiUtils.createErasePaint();
 
         sizeFactors = new RectF(
                 context.getResources().getDimension(R.dimen.analog_layout_date_panel_left) / refScreenWidth,
@@ -190,6 +193,8 @@ public class DatePanel implements ComponentPanel {
         final Date date = calendar.getTime();
 
         Canvas canvas = new Canvas(bitmap);
+        // erase bitmap
+        canvas.drawRect(new Rect(0, 0, bitmap.getWidth(), bitmap.getWidth()), erasePaint);
 
         String line1;
         if (showMonth) { // Month
@@ -235,7 +240,8 @@ public class DatePanel implements ComponentPanel {
         bkgBitmap.eraseColor(Color.TRANSPARENT);
 
         Canvas canvas = new Canvas(bkgBitmap);
-        Paint paint = UiUtils.createPaint();
+        // erase bitmap
+        canvas.drawRect(new Rect(0, 0, bkgBitmap.getWidth(), bkgBitmap.getWidth()), erasePaint);
 
         // draw background
         if (backgroundColor != Color.TRANSPARENT) {
@@ -293,11 +299,17 @@ public class DatePanel implements ComponentPanel {
         // border
         borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_date_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_date_border_type)));
+
+        drawDate();
+        drawBackgroundAndBorder();
     }
 
     @Override
     public void onPropertiesChanged(Context context, Bundle properties) {
         configureFormats();
+
+        drawDate();
+        drawBackgroundAndBorder();
     }
 
     private void configureFormats() {

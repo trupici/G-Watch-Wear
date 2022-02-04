@@ -19,6 +19,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -82,7 +83,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private float bottomOffset;
 
     private Rect bounds;
-    private TextPaint paint;
+    private Paint bkgPaint;
+    private TextPaint textPaint;
     private String bgLine1;
     private String bgLine2;
 
@@ -98,8 +100,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private int hypoColor;
     private int inRangeColor;
     private int noDataColor;
-
-
 
     private int hyperThreshold;
     private int highThreshold;
@@ -119,6 +119,11 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private RectF lowIndicatorSizeFactors;
     private RectF inRangeIndicatorSizeFactors;
     private RectF highIndicatorSizeFactors;
+
+    private Paint paint;
+    private Paint erasePaint;
+    private Paint ambientPaint;
+    private Bitmap bkgBitmap;
 
     public BgPanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
@@ -156,13 +161,17 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
             Log.d(LOG_TAG, "Rect: " + sizeFactors + ", offset: " + topOffset + ", " + bottomOffset);
         }
 
-        paint = new TextPaint();
-        paint.setAntiAlias(true);
-        paint.setTextAlign(Paint.Align.CENTER);
+        textPaint = UiUtils.createTextPaint();
+        textPaint.setTextAlign(Paint.Align.CENTER);
 
+        bkgPaint = UiUtils.createPaint();
 
         indicatorPaint = UiUtils.createPaint();
         indicatorPaint.setStyle(Paint.Style.FILL);
+
+        paint = UiUtils.createPaint();
+        erasePaint = UiUtils.createErasePaint();
+        ambientPaint = UiUtils.createAmbientPaint();
 
         showBgIndicator = watchfaceConfig.showBgPanelIndicator(context);
         if (showBgIndicator) {
@@ -197,6 +206,9 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
                 (int) (sizeFactors.top * height),
                 (int) (sizeFactors.right * width),
                 (int) (sizeFactors.bottom * height));
+
+        bkgBitmap = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+        drawBackgroundAndBorder();
 
         if (showBgIndicator) {
             lowIndicatorBounds = new RectF(
@@ -246,6 +258,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         borderColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_COLOR, context.getColor(R.color.def_bg_border_color));
         borderType = BorderType.getByNameOrDefault(sharedPrefs.getString(watchfaceConfig.getPrefsPrefix() + PREF_BORDER_TYPE, context.getString(R.string.def_bg_border_type)));
 
+        drawBackgroundAndBorder();
         onDataUpdate(lastBgData);
     }
 
@@ -256,89 +269,90 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onDraw(Canvas canvas, boolean isAmbientMode) {
-        // FIXME use bitmap backed drawing
-
-        boolean isNoData = isNoData();
-
-        if (!isAmbientMode) {
+         if (isAmbientMode) {
+             textPaint.setColor(getAmbientRangedColor(isNoData()));
+        } else {
             if (lastBgData.getValue() > 0 && System.currentTimeMillis() - lastBgUpdate > CommonConstants.MINUTE_IN_MILLIS) {
                 onDataUpdate(lastBgData);
             }
-
-            // draw background
-            paint.setColor(backgroundColor);
-            paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            if (BorderUtils.isBorderRounded(borderType)) {
-                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-            } else if (BorderUtils.isBorderRing(borderType)) {
-                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-            } else {
-                canvas.drawRect(bounds, paint);
-            }
-
-            // draw border
-            if (borderType != BorderType.NONE) {
-                paint.setColor(borderColor);
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(BORDER_WIDTH);
-                if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
-                    if (BorderUtils.isBorderDotted(borderType)) {
-                        paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
-                    } else {
-                        paint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
-                    }
-                }
-                if (BorderUtils.isBorderRounded(borderType)) {
-                    canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                            BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, paint);
-                } else if (BorderUtils.isBorderRing(borderType)) {
-                    canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
-                            BORDER_RING_RADIUS, BORDER_RING_RADIUS, paint);
-                } else {
-                    canvas.drawRect(bounds, paint);
-                }
-            }
-
-            if (showBgIndicator) {
-                drawIndicatorBar(canvas, indicatorPaint, lowIndicatorBounds, getLowIndicatorColor(isNoData));
-                drawIndicatorBar(canvas, indicatorPaint, inRangeIndicatorBounds, getInRangeIndicatorColor(isNoData));
-                drawIndicatorBar(canvas, indicatorPaint, highIndicatorBounds, getHighIndicatorColor(isNoData));
-            }
+            canvas.drawBitmap(bkgBitmap, bounds.left, bounds.top, paint);
+            textPaint.setColor(getRangedColor(isNoData()));
         }
 
-        // draw bg value
 
         // line 1
         float x = bounds.left + bounds.width() / 2f; // text will be centered around
         float top = bounds.top + topOffset;
         float height = bounds.height() - topOffset - bottomOffset;
-        long bgTimeDiff = System.currentTimeMillis() - lastBgData.getTimestamp();
-        if (isAmbientMode) {
-            paint.setColor(getAmbientRangedColor(isNoData));
-//            paint.setAntiAlias(false);
-        } else {
-            paint.setColor(getRangedColor(isNoData));
-//            paint.setAntiAlias(true);
-        }
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(height / 2f);
-        paint.setFakeBoldText(true);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(height / 2f);
+        textPaint.setFakeBoldText(true);
         canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
-                x, top + height / 2f, paint);
+                x, top + height / 2f, textPaint);
 
         // line 2
-        paint.setTextSize(height / 3f);
-        paint.setFakeBoldText(false);
+        textPaint.setTextSize(height / 3f);
+        textPaint.setFakeBoldText(false);
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
-                x, bounds.bottom - bottomOffset - height / 10f, paint);
+                x, bounds.bottom - bottomOffset - height / 10f, textPaint);
+
+        if (showBgIndicator) {
+            Boolean isNoData = isNoData();
+            Paint paint = isAmbientMode ? ambientPaint : indicatorPaint;
+            drawIndicatorBar(canvas, paint, lowIndicatorBounds, getLowIndicatorColor(isNoData));
+            drawIndicatorBar(canvas, paint, inRangeIndicatorBounds, getInRangeIndicatorColor(isNoData));
+            drawIndicatorBar(canvas, paint, highIndicatorBounds, getHighIndicatorColor(isNoData));
+        }
+   }
+
+    private void drawBackgroundAndBorder() {
+        if (bkgBitmap == null || borderType == null) {
+            return; // not ready yet
+        }
+
+        Rect bounds = new Rect(0, 0, bkgBitmap.getWidth(), bkgBitmap.getHeight());
+
+        Canvas canvas = new Canvas(bkgBitmap);
+        canvas.drawRect(bounds, erasePaint);
+
+        // draw background
+        bkgPaint.setColor(backgroundColor);
+        bkgPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        if (BorderUtils.isBorderRounded(borderType)) {
+            canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                    BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bkgPaint);
+        } else if (BorderUtils.isBorderRing(borderType)) {
+            canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                    BORDER_RING_RADIUS, BORDER_RING_RADIUS, bkgPaint);
+        } else {
+            canvas.drawRect(bounds, bkgPaint);
+        }
+
+        // draw border
+        if (borderType != BorderType.NONE) {
+            bkgPaint.setColor(borderColor);
+            bkgPaint.setStyle(Paint.Style.STROKE);
+            bkgPaint.setStrokeWidth(BORDER_WIDTH);
+            if (BorderUtils.getBorderDrawableStyle(borderType) == ComplicationDrawable.BORDER_STYLE_DASHED) {
+                if (BorderUtils.isBorderDotted(borderType)) {
+                    bkgPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DOT_LEN, BORDER_GAP_LEN}, 0f));
+                } else {
+                    bkgPaint.setPathEffect(new DashPathEffect(new float[]{BORDER_DASH_LEN, BORDER_GAP_LEN}, 0f));
+                }
+            }
+            if (BorderUtils.isBorderRounded(borderType)) {
+                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                        BORDER_ROUND_RECT_RADIUS, BORDER_ROUND_RECT_RADIUS, bkgPaint);
+            } else if (BorderUtils.isBorderRing(borderType)) {
+                canvas.drawRoundRect(bounds.left, bounds.top, bounds.right, bounds.bottom,
+                        BORDER_RING_RADIUS, BORDER_RING_RADIUS, bkgPaint);
+            } else {
+                canvas.drawRect(bounds, bkgPaint);
+            }
+        }
     }
 
     private void drawIndicatorBar(Canvas canvas, Paint paint, RectF bounds, int fillColor) {
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "drawIndicatorBar: " + Integer.toHexString(fillColor) + ", " + bounds);
-        }
         paint.setColor(fillColor);
         canvas.drawRoundRect(
                 new RectF(

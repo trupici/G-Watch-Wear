@@ -309,6 +309,7 @@
     <string name="follower_data_request">"\nSending %1$s data request..."</string>
     <string name="follower_data_received">"%1$s data received at: %2$s"</string>
     <string name="follower_auth_request">"\nSending %1$s auth request..."</string>
+    <string name="follower_session_request">"\nSending %1$s session request..."</string>
     <string name="follower_entries_received">"%1$d %2$s received at: %3$s"</string>
     <plurals name="entries">
         <item quantity="one">entry</item>
@@ -320,7 +321,7 @@
     <string name="follower_rsp_err">FAILED</string>
     <string name="follower_rsp_err_message">FAILED: %1$s</string>
     <string name="follower_err_no_session">No session id</string>
-    <string name="follower_err_invalid_session">Invalid session id</string>
+    <string name="follower_err_no_account_id">No account id</string>
 
 
 

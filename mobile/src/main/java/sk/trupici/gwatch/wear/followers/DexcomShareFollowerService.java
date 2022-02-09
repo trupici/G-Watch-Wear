@@ -73,12 +73,13 @@ public class DexcomShareFollowerService extends FollowerService {
     public static final String DEXCOM_NON_US_URL = "https://shareous1.dexcom.com";
 
     public static final String DEXCOM_PATH_GET_VALUE = "/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues";
-    public static final String DEXCOM_PATH_GET_SESSION_ID = "/ShareWebServices/Services/General/LoginPublisherAccountByName";
+    public static final String DEXCOM_PATH_GET_SESSION_ID = "/ShareWebServices/Services/General/LoginPublisherAccountById";
+    public static final String DEXCOM_PATH_AUTHENTICATE = "/ShareWebServices/Services/General/AuthenticatePublisherAccount";
 
-    public static final String USER_AGENT = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0"; //xdrip: "CGM-Store-1.2/22 CFNetwork/711.5.6 Darwin/14.0.0"
+    public static final String USER_AGENT = "Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0";
 
 
-    private static final String INVALID_SESSION_ID = "00000000-0000-0000-0000-000000000000";
+    private static final String INVALID_ID = "00000000-0000-0000-0000-000000000000";
     private static final String[] DEXCOM_APP_IDS = new String[] {
             "d8665ade-9673-4e27-9ff6-92db4ce13d13",
             "d89443d2-327c-4a6f-89e5-496bbb0317db" // xdrip
@@ -121,7 +122,7 @@ public class DexcomShareFollowerService extends FollowerService {
         try {
             String url = getServerUrl(context) + DEXCOM_PATH_GET_VALUE;
             builder = builder.url(url);
-            String sessionId = getSessionId(context);
+            String sessionId = authenticate(context);
             if (sessionId == null) {
                 return null;
             }
@@ -146,7 +147,7 @@ public class DexcomShareFollowerService extends FollowerService {
                     .addHeader("Cache-Control",  "no-cache")
 //                    .addHeader("Connection", "close")
                     .url(httpUrl)
-                    .post(RequestBody.create(StringUtils.EMPTY_STRING, null))
+                    .post(RequestBody.create(StringUtils.EMPTY_STRING, MediaType.get("application/json")))
                     ;
         } catch (Exception e) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", e);
@@ -174,7 +175,65 @@ public class DexcomShareFollowerService extends FollowerService {
         return null;
     }
 
-    private String getSessionId(Context context) {
+    private String getSessionId(Context context, String accountId, String appId) {
+        String sessionId = getSessionData();
+        if (sessionId != null) {
+            return sessionId;
+        }
+
+        Log.e(LOG_TAG, "DSFService: getting session id...");
+        UiUtils.showMessage(context, context.getString(R.string.follower_session_request, SRC_LABEL));
+
+        Request.Builder builder = new Request.Builder();
+        try {
+            String url = getServerUrl(context) + DEXCOM_PATH_GET_SESSION_ID;
+            builder = builder.url(url);
+            JSONObject json = new JSONObject();
+            json.put("accountId", accountId);
+            json.put("password", getSecret(context));
+            json.put("applicationId", appId);
+
+            Request request = builder
+                    .addHeader("User-Agent", USER_AGENT)
+                    .addHeader("Accept", "application/json")
+                    .url(url)
+                    .post(RequestBody.create(json.toString(), MediaType.get("application/json")))
+                    .build();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, getClass().getSimpleName() + " failed", e);
+            UiUtils.showMessage(context, e.getLocalizedMessage());
+            return null;
+        }
+
+        try (Response response = getHttpClient(context).newCall(builder.build()).execute()) {
+            if (response.isSuccessful()) {
+                String receivedData = getResponseBodyAsString(response);
+                if (BuildConfig.DEBUG) {
+                    Log.d(GWatchApplication.LOG_TAG, "Dexcom Share session id received: " + receivedData);
+                }
+                if (receivedData == null || receivedData.length() == 0) {
+                    throw new CommunicationException(context.getString(R.string.follower_err_no_session));
+                }
+                sessionId = receivedData.replaceAll("\"", StringUtils.EMPTY_STRING);
+                if (INVALID_ID.equals(sessionId)) {
+                    Log.e(LOG_TAG, getClass().getSimpleName() + " failed: Invalid session id");
+                    UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, context.getString(R.string.follower_err_no_session)));
+                    return null;
+                }
+                setSessionData(sessionId);
+                UiUtils.showMessage(context, context.getString(R.string.follower_rsp_ok));
+                return sessionId;
+            } else {
+                handleErrorIgnoreInvalidSession(response, null);
+            }
+        } catch (Throwable t) {
+            Log.e(LOG_TAG, getClass().getSimpleName() + " failed", t);
+            UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));
+        }
+        return null;
+    }
+
+    private String authenticate(Context context) {
         String sessionId = getSessionData();
         if (sessionId != null) {
             return sessionId;
@@ -183,9 +242,10 @@ public class DexcomShareFollowerService extends FollowerService {
         Log.e(LOG_TAG, "DSFService: authenticating...");
         UiUtils.showMessage(context, context.getString(R.string.follower_auth_request, SRC_LABEL));
 
+        String appId = getApplicationId();
         Request.Builder builder = new Request.Builder();
         try {
-            String url = getServerUrl(context) + DEXCOM_PATH_GET_SESSION_ID;
+            String url = getServerUrl(context) + DEXCOM_PATH_AUTHENTICATE;
             builder = builder.url(url);
             String account = getAccount(context);
             if (account == null) {
@@ -194,12 +254,13 @@ public class DexcomShareFollowerService extends FollowerService {
             JSONObject json = new JSONObject();
             json.put("accountName", account);
             json.put("password", getSecret(context));
-            json.put("applicationId", getApplicationId());
+            json.put("applicationId", appId);
 
             Request request = builder
                     .addHeader("User-Agent", USER_AGENT)
+                    .addHeader("Accept", "application/json")
                     .url(url)
-                    .post(RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8")))
+                    .post(RequestBody.create(json.toString(), MediaType.get("application/json")))
                     .build();
         } catch (Exception e) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", e);
@@ -216,21 +277,17 @@ public class DexcomShareFollowerService extends FollowerService {
                 if (receivedData == null || receivedData.length() == 0) {
                     throw new CommunicationException(context.getString(R.string.follower_err_no_session));
                 }
-                sessionId = receivedData.replaceAll("\"", StringUtils.EMPTY_STRING);
-                if (INVALID_SESSION_ID.equals(sessionId)) {
-                    Log.e(LOG_TAG, getClass().getSimpleName() + " failed: Invalid session id");
-                    UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, context.getString(R.string.follower_err_no_session)));
+                String accountId = receivedData.replaceAll("\"", StringUtils.EMPTY_STRING);
+                if (INVALID_ID.equals(accountId)) {
+                    Log.e(LOG_TAG, getClass().getSimpleName() + " failed: Invalid account id");
+                    UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, context.getString(R.string.follower_err_no_account_id)));
                     return null;
                 }
-                setSessionData(sessionId);
                 UiUtils.showMessage(context, context.getString(R.string.follower_rsp_ok));
-                return sessionId;
+                return getSessionId(context, accountId, appId);
             } else {
                 handleErrorIgnoreInvalidSession(response, null);
             }
-//        } catch (CommunicationException e) {
-//            Log.e(LOG_TAG, getClass().getSimpleName() + " failed", e);
-//            UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, e.getLocalizedMessage()));
         } catch (Throwable t) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", t);
             UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));

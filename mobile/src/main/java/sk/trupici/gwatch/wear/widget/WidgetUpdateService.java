@@ -336,6 +336,8 @@ public class WidgetUpdateService extends JobService {
             return "com.outshineiot.diabox";
         } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_dexcom", false)) {
             return DexcomUtils.getInstalledDexcomAppPackage();
+        } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_dexcom_follow", false)) {
+            return DexcomUtils.getInstalledDexcomFollowAppPackage();
         }
         return null;
     }

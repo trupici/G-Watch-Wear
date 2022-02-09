@@ -32,7 +32,7 @@ public class DexcomUtils {
     public static final String DEXCOM_PERMISSION = "com.dexcom.cgm.EXTERNAL_PERMISSION";
 
     private static final String DEXCOM_PACKAGE_PREFIX = "com.dexcom.";
-    private static final String DEXCOM_FOLLOWER_PACKAGE_PREFIX = "com.dexcom.follow";
+    private static final String DEXCOM_FOLLOWER_PACKAGE_PREFIX = "com.dexcom.follow.";
 
     public static boolean checkAndRequestDexcomPermission(AppCompatActivity activity, int requestCode) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
@@ -57,6 +57,21 @@ public class DexcomUtils {
             int disabledFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? getDisabledComponentsOld() : PackageManager.MATCH_DISABLED_COMPONENTS;
             for (PackageInfo packageInfo : packageManager.getInstalledPackages(disabledFlag)) {
                 if (packageInfo.packageName.startsWith(DEXCOM_PACKAGE_PREFIX) && !packageInfo.packageName.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX)) {
+                    return packageInfo.packageName;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(GWatchApplication.LOG_TAG, e.toString(), e);
+        }
+        return null;
+    }
+
+    public static String getInstalledDexcomFollowAppPackage() {
+        try {
+            PackageManager packageManager = GWatchApplication.getAppContext().getPackageManager();
+            int disabledFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? getDisabledComponentsOld() : PackageManager.MATCH_DISABLED_COMPONENTS;
+            for (PackageInfo packageInfo : packageManager.getInstalledPackages(disabledFlag)) {
+                if (packageInfo.packageName.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX)) {
                     return packageInfo.packageName;
                 }
             }

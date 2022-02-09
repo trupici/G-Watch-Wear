@@ -69,6 +69,20 @@
         <package android:name="com.dexcom.g6.region5.mgdl" />
         <package android:name="com.dexcom.g6.region6.mgdl" />
         <package android:name="com.dexcom.g6.region7.mgdl" />
+        <package android:name="com.dexcom.follow.region1.mmol" />
+        <package android:name="com.dexcom.follow.region2.mmol" />
+        <package android:name="com.dexcom.follow.region3.mmol" />
+        <package android:name="com.dexcom.follow.region4.mmol" />
+        <package android:name="com.dexcom.follow.region5.mmol" />
+        <package android:name="com.dexcom.follow.region6.mmol" />
+        <package android:name="com.dexcom.follow.region7.mmol" />
+        <package android:name="com.dexcom.follow.region1.mgdl" />
+        <package android:name="com.dexcom.follow.region2.mgdl" />
+        <package android:name="com.dexcom.follow.region3.mgdl" />
+        <package android:name="com.dexcom.follow.region4.mgdl" />
+        <package android:name="com.dexcom.follow.region5.mgdl" />
+        <package android:name="com.dexcom.follow.region6.mgdl" />
+        <package android:name="com.dexcom.follow.region7.mgdl" />
     </queries>
 
 

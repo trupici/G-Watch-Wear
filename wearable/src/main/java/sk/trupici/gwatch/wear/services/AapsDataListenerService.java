@@ -81,7 +81,7 @@ public class AapsDataListenerService extends WearableListenerService {
 
             Log.d(LOG_TAG, packet.toText(getApplicationContext(), ""));
 
-//        if (!ignoreAapsBg) {
+        if (packet.getGlucoseValue() > 0 /*&& !ignoreAapsBg*/) {
             GlucosePacket glucosePacket = new GlucosePacket(
                     packet.getGlucoseValue(),
                     packet.getTimestamp(),
@@ -103,7 +103,7 @@ public class AapsDataListenerService extends WearableListenerService {
 
             WorkManager workManager = WorkManager.getInstance(getApplicationContext());
             workManager.enqueue(workRequest);
-//        }
+        }
 
             // TODO send AAPS data
 

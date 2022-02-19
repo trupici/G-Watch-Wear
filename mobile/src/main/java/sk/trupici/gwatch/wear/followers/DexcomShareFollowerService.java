@@ -380,30 +380,26 @@ public class DexcomShareFollowerService extends FollowerService {
             double glucoseValue = json.optDouble("Value", 0);
             String wt = json.optString("WT").replaceAll("[^0-9]", StringUtils.EMPTY_STRING);
             long timestamp = Long.valueOf(wt);
-
-            Trend trend = null;
-            Integer trendInt = null;
-            try {
-                trendInt = json.optInt("Trend");
-                trend = toTrend(trendInt);
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "parseDexcomValue: " + e.getLocalizedMessage());
-            }
+            int trendInt = json.optInt("Trend");
 
             String trendStr = null;
-            if (trendInt == null) {
+            Trend trend = null;
+            if (trendInt == 0) {
                 trendStr = json.optString("Trend", null);
                 trend = DexcomUtils.toTrend(trendStr);
+            } else {
+                trendStr = Integer.toString(trendInt);
+                trend = toTrend(trendInt);
             }
 
             if (BuildConfig.DEBUG) {
                 Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
-                Log.w(GWatchApplication.LOG_TAG, "Trend: " + (trendInt != null ? trendInt : trendStr) + " -> " + trend);
+                Log.w(GWatchApplication.LOG_TAG, "Trend: " + trendStr + " -> " + trend);
                 Log.w(GWatchApplication.LOG_TAG, "Timestanp: " + new Date(timestamp));
             }
 
             short glucose = (short) Math.round(glucoseValue);
-            packets.add(new GlucosePacket(glucose, timestamp, (byte) 0, trend, (trendInt != null ? trendInt.toString() : trendStr), SRC_LABEL_SHORT));
+            packets.add(new GlucosePacket(glucose, timestamp, (byte) 0, trend, trendStr, SRC_LABEL_SHORT));
         }
         return packets;
     }
@@ -412,10 +408,7 @@ public class DexcomShareFollowerService extends FollowerService {
     /**
      * Translates DexCom trend value to G-Watch internal trend representation
      */
-    private static Trend toTrend(Integer value) {
-        if (value == null) {
-            return null;
-        }
+    private static Trend toTrend(int value) {
         switch (value) {
             case 0:
                 return null; // from optString() if not found

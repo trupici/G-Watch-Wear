@@ -25,6 +25,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.SystemProviders;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.util.Log;
 
@@ -171,6 +172,18 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                     new ComplicationAttrs(),
                     bottomRightProgressBarAttrs,
                     bottomRightComplCoefs));
+
+
+            // set default complication providers
+            setDefaultSystemComplicationProvider (ComplicationId.TOP_LEFT.ordinal(),
+                    SystemProviders.WATCH_BATTERY, ComplicationData.TYPE_RANGED_VALUE);
+            setDefaultSystemComplicationProvider (ComplicationId.TOP_RIGHT.ordinal(),
+                    SystemProviders.STEP_COUNT, ComplicationData.TYPE_RANGED_VALUE);
+            setDefaultSystemComplicationProvider (ComplicationId.BOTTOM_LEFT.ordinal(),
+                    SystemProviders.SUNRISE_SUNSET, ComplicationData.TYPE_SHORT_TEXT);
+            setDefaultSystemComplicationProvider (ComplicationId.BOTTOM_RIGHT.ordinal(),
+                    SystemProviders.DAY_OF_WEEK, ComplicationData.TYPE_SHORT_TEXT);
+
 
             for (ComplicationSettings settings : complSettingsMap.values()) {
                 settings.getAttrs().load(context, sharedPrefs, settings.getPrefix());

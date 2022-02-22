@@ -21,6 +21,8 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.SystemProviders;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.util.Log;
 
@@ -91,6 +93,12 @@ public class AnalogWatchfaceService extends WatchfaceServiceBase {
             );
             rightComplicationAttrs = new ComplicationAttrs();
             rightComplicationAttrs.load(context, sharedPrefs, watchfaceConfig.getPrefsPrefix() + ComplicationConfig.RIGHT_PREFIX);
+
+            // set default complication providers
+            setDefaultSystemComplicationProvider (ComplicationId.LEFT.ordinal(),
+                    SystemProviders.WATCH_BATTERY, ComplicationData.TYPE_RANGED_VALUE);
+            setDefaultSystemComplicationProvider (ComplicationId.RIGHT.ordinal(),
+                    SystemProviders.STEP_COUNT, ComplicationData.TYPE_RANGED_VALUE);
 
             // Creates a ComplicationDrawable for each location where the user can render a
             // complication on the watch face.

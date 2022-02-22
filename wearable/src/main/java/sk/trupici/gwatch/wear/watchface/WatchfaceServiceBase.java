@@ -17,7 +17,9 @@
 package sk.trupici.gwatch.wear.watchface;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -29,6 +31,7 @@ import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.wearable.complications.ComplicationData;
+import android.support.wearable.complications.ComplicationHelperActivity;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
@@ -39,6 +42,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
@@ -320,8 +325,10 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
-                // Preferences might have changed since last time watch face was visible.
                 Context context = getApplicationContext();
+                checkAndRequestComplicationPermission(context);
+
+                // Preferences might have changed since last time watch face was visible.
                 bkgPanel.onConfigChanged(context, sharedPrefs);
                 bgPanel.onConfigChanged(context, sharedPrefs);
                 bgGraph.onConfigChanged(context, sharedPrefs);
@@ -378,6 +385,17 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             }
             LocalBroadcastManager.getInstance(context).registerReceiver(receiver, intentFilter);
             receivers.add(receiver);
+        }
+
+        protected void checkAndRequestComplicationPermission(Context context) {
+
+            if (ContextCompat.checkSelfPermission(context,"com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA"
+                ) != PermissionChecker.PERMISSION_GRANTED) {
+
+                Intent permissionRequestIntent = ComplicationHelperActivity.createPermissionRequestHelperIntent(context, new ComponentName(context, this.getClass()));
+                permissionRequestIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(permissionRequestIntent);
+            }
         }
     }
 }

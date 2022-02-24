@@ -261,7 +261,7 @@ public class DatePanel implements ComponentPanel {
         }
 
         // draw border
-        if (borderType != BorderType.NONE) {
+        if (borderType != BorderType.NONE && borderType != null) {
             bkgPaint.setColor(borderColor);
             bkgPaint.setStyle(Paint.Style.STROKE);
             bkgPaint.setStrokeWidth(BORDER_WIDTH);

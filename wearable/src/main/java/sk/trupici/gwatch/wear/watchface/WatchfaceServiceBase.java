@@ -120,6 +120,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
 
         private long lastMinute = 0L;
 
+        private boolean permissionChecked = false;
+
         abstract void initializeCustomPanels(Context context, int screenWidth, int screenHeight);
         abstract void drawCustomPanels(Canvas canvas, boolean isAmbientMode);
         abstract void initializeComplications(Context context);
@@ -388,13 +390,15 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         }
 
         protected void checkAndRequestComplicationPermission(Context context) {
-
-            if (ContextCompat.checkSelfPermission(context,"com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA"
-                ) != PermissionChecker.PERMISSION_GRANTED) {
-
-                Intent permissionRequestIntent = ComplicationHelperActivity.createPermissionRequestHelperIntent(context, new ComponentName(context, this.getClass()));
-                permissionRequestIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(permissionRequestIntent);
+            if (!permissionChecked) {
+                permissionChecked = true;
+                int status = ContextCompat.checkSelfPermission(context,"com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA");
+                Log.d(LOG_TAG, "checkAndRequestComplicationPermission: " + status);
+                if (status == PermissionChecker.PERMISSION_DENIED) {
+                    Intent permissionRequestIntent = ComplicationHelperActivity.createPermissionRequestHelperIntent(context, new ComponentName(context, this.getClass()));
+                    permissionRequestIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(permissionRequestIntent);
+                }
             }
         }
     }

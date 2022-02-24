@@ -34,8 +34,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.util.concurrent.Executors;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,6 +45,7 @@ import sk.trupici.gwatch.wear.config.BorderPickerActivity;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.ColorPickerActivity;
 import sk.trupici.gwatch.wear.config.PickerViewHolder;
+import sk.trupici.gwatch.wear.config.ProviderInfoRetrieverActivity;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
@@ -71,9 +70,6 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
     final private WatchfaceConfig watchfaceConfig;
 
     final private SharedPreferences prefs;
-
-    // Required to retrieve complication data from watch face for preview.
-    final private ProviderInfoRetriever providerInfoRetriever;
 
     private ComplicationId selectedComplicationId;
 
@@ -101,20 +97,7 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
             defaultComplicationDrawable = context.getDrawable(android.R.drawable.ic_menu_report_image);
         } catch (Exception e) { }
 
-        // Initialization of code to retrieve active complication data for the watch face.
-        this.providerInfoRetriever = new ProviderInfoRetriever(context, Executors.newCachedThreadPool());
-        providerInfoRetriever.init();
-
         selectedComplicationId = watchfaceConfig.getDefaultComplicationId();
-    }
-
-
-    public void destroy() {
-        try {
-            providerInfoRetriever.release();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "destroy: " + e.getLocalizedMessage());
-        }
     }
 
     @NonNull
@@ -248,14 +231,6 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
             }
         }
         return false;
-    }
-
-
-    @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        // Required to release retriever for active complication data on detach.
-        providerInfoRetriever.release();
     }
 
     private boolean updatePreviewColors(ConfigItem.Type type, Integer id, Integer color) {
@@ -499,7 +474,7 @@ public class ComplicationsConfigAdapter extends RecyclerView.Adapter<RecyclerVie
                 complicationViewHolder.setBorder(complicationId, drawable);
             }
 
-            providerInfoRetriever.retrieveProviderInfo(
+            ((ProviderInfoRetrieverActivity)context).getProviderInfoRetriever().retrieveProviderInfo(
                     new ProviderInfoRetriever.OnProviderInfoReceivedCallback() {
                         @Override
                         public void onProviderInfoReceived(int watchFaceComplicationId, @Nullable ComplicationProviderInfo complicationProviderInfo) {

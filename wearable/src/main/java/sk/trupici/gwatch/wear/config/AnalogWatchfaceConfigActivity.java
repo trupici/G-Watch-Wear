@@ -22,8 +22,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.wearable.complications.ProviderInfoRetriever;
 import android.util.Log;
 import android.view.MotionEvent;
+
+import java.util.concurrent.Executors;
 
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -35,7 +38,7 @@ import sk.trupici.gwatch.wear.util.PreferenceUtils;
 /**
  * Main {@code Activity} for Analog watch face configuration
  */
-public class AnalogWatchfaceConfigActivity extends Activity {
+public class AnalogWatchfaceConfigActivity extends Activity implements ProviderInfoRetrieverActivity {
 
     public static final String LOG_TAG = AnalogWatchfaceConfigActivity.class.getSimpleName();
 
@@ -46,6 +49,14 @@ public class AnalogWatchfaceConfigActivity extends Activity {
 
     private SharedPreferences prefs;
 
+    // Required to retrieve complication data from watch face for preview.
+    private ProviderInfoRetriever providerInfoRetriever;
+
+    @Override
+    public ProviderInfoRetriever getProviderInfoRetriever() {
+        return providerInfoRetriever;
+    }
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         if (BuildConfig.DEBUG) {
@@ -53,7 +64,9 @@ public class AnalogWatchfaceConfigActivity extends Activity {
                 super.onRestoreInstanceState(savedInstanceState);
             } catch (Exception e) {
                 Log.e(LOG_TAG, ">>>>>>>>>>>>> onRestoreInstanceState: failed");
-                DumpUtils.dumpBundle(savedInstanceState, ">>>");
+                if (BuildConfig.DEBUG) {
+                    DumpUtils.dumpBundle(savedInstanceState, ">>>");
+                }
                 savedInstanceState = null;
             }
         } else {
@@ -76,10 +89,6 @@ public class AnalogWatchfaceConfigActivity extends Activity {
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         config = new AnalogWatchfaceConfig();
 
-        onCreatePageView(this);
-    }
-
-    private void onCreatePageView(Context context) {
         setContentView(R.layout.layout_config_main);
 
         ViewPager2 viewPager = findViewById(R.id.horizontal_pager);
@@ -91,21 +100,27 @@ public class AnalogWatchfaceConfigActivity extends Activity {
                 findViewById(R.id.page_indicator),
                 viewPager.getAdapter().getItemCount(),
                 viewPager);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        if (BuildConfig.DEBUG) {
-            PreferenceUtils.dumpPreferences(sharedPref);
-        }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+
+        // Initialization of code to retrieve active complication data for the watch face.
+        this.providerInfoRetriever = new ProviderInfoRetriever(this, Executors.newCachedThreadPool());
+        providerInfoRetriever.init();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
 
         configAdapter.destroy();
         if (pageIndicatorAdapter != null) {
             pageIndicatorAdapter.destroy();
         }
+
+        providerInfoRetriever.release();
     }
 
     @Override

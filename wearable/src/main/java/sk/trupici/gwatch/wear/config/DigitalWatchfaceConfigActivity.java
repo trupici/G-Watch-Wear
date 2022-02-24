@@ -17,25 +17,26 @@
 package sk.trupici.gwatch.wear.config;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.wearable.complications.ProviderInfoRetriever;
 import android.util.Log;
 import android.view.MotionEvent;
+
+import java.util.concurrent.Executors;
 
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.DumpUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
  * Main {@code Activity} for Digital watch face configuration
  */
-public class DigitalWatchfaceConfigActivity extends Activity {
+public class DigitalWatchfaceConfigActivity extends Activity implements ProviderInfoRetrieverActivity {
 
     public static final String LOG_TAG = DigitalWatchfaceConfigActivity.class.getSimpleName();
 
@@ -46,6 +47,14 @@ public class DigitalWatchfaceConfigActivity extends Activity {
 
     private SharedPreferences prefs;
 
+    // Required to retrieve complication data from watch face for preview.
+    private ProviderInfoRetriever providerInfoRetriever;
+
+    @Override
+    public ProviderInfoRetriever getProviderInfoRetriever() {
+        return providerInfoRetriever;
+    }
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         if (BuildConfig.DEBUG) {
@@ -53,7 +62,9 @@ public class DigitalWatchfaceConfigActivity extends Activity {
                 super.onRestoreInstanceState(savedInstanceState);
             } catch (Exception e) {
                 Log.e(LOG_TAG, ">>>>>>>>>>>>> onRestoreInstanceState: failed");
-                DumpUtils.dumpBundle(savedInstanceState, ">>>");
+                if (BuildConfig.DEBUG) {
+                    DumpUtils.dumpBundle(savedInstanceState, ">>>");
+                }
                 savedInstanceState = null;
             }
         } else {
@@ -76,10 +87,6 @@ public class DigitalWatchfaceConfigActivity extends Activity {
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         config = new DigitalWatchfaceConfig();
 
-        onCreatePageView(this);
-    }
-
-    private void onCreatePageView(Context context) {
         setContentView(R.layout.layout_config_main);
 
         ViewPager2 viewPager = findViewById(R.id.horizontal_pager);
@@ -91,21 +98,27 @@ public class DigitalWatchfaceConfigActivity extends Activity {
                 findViewById(R.id.page_indicator),
                 viewPager.getAdapter().getItemCount(),
                 viewPager);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        if (BuildConfig.DEBUG) {
-            PreferenceUtils.dumpPreferences(sharedPref);
-        }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+
+        // Initialization of code to retrieve active complication data for the watch face.
+        this.providerInfoRetriever = new ProviderInfoRetriever(this, Executors.newCachedThreadPool());
+        providerInfoRetriever.init();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
 
         configAdapter.destroy();
         if (pageIndicatorAdapter != null) {
             pageIndicatorAdapter.destroy();
         }
+
+        providerInfoRetriever.release();
     }
 
     @Override

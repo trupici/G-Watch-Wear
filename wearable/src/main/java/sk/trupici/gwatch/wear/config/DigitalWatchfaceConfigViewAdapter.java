@@ -326,9 +326,7 @@ public class DigitalWatchfaceConfigViewAdapter extends WearableRecyclerView.Adap
 
     @Override
     public void onViewDetachedFromWindow(@NonNull WearableRecyclerView.ViewHolder holder) {
-        if (holder instanceof ComplicationsConfigViewHolder) {
-            ((ComplicationsConfigAdapter)((ComplicationsConfigViewHolder) holder).getRecyclerView().getAdapter()).destroy();
-        } else if (holder instanceof ImageSetPageViewHolder) {
+        if (holder instanceof ImageSetPageViewHolder) {
             ((ConfigPageAdapter)((ImageSetPageViewHolder) holder).getVerticalPager().getAdapter()).destroy();
         }
         super.onViewDetachedFromWindow(holder);

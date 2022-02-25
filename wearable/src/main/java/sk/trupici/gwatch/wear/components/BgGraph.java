@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -471,11 +470,12 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         }
 
         // get max displayed value
+        float height = bounds.height() - topPadding - bottomPadding;
         int max = maxValue;
         if (max < highThreshold) {
             max = highThreshold;
         } else {
-            scale = bounds.width() / ((float) (max - min + 1));
+            scale = height / ((float) (max - min + 1));
             max += GRAPH_DYN_PADDING / scale; // increase upper boundary if scaled
         }
         max += GRAPH_DYN_PADDING;
@@ -484,7 +484,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         }
 
         // get dynamic horizontal scale
-        scale = bounds.height() / ((float) (max - min + 1));
+        scale = height / ((float) (max - min + 1));
 
         return new GraphRange(min, max, scale);
     }

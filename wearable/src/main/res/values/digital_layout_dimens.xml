@@ -63,15 +63,15 @@
     <dimen name="digital_layout_bg_panel_indicator_high_right">272px</dimen>
     <dimen name="digital_layout_bg_panel_indicator_high_bottom">378px</dimen>
 
-    <dimen name="digital_layout_bg_graph_panel_left">87px</dimen>
-    <dimen name="digital_layout_bg_graph_panel_top">171px</dimen>
-    <dimen name="digital_layout_bg_graph_panel_right">360px</dimen>
-    <dimen name="digital_layout_bg_graph_panel_bottom">283px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_left">91px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_top">172px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_right">359px</dimen>
+    <dimen name="digital_layout_bg_graph_panel_bottom">282px</dimen>
 
-    <dimen name="digital_layout_bg_graph_left_padding">2px</dimen>
-    <dimen name="digital_layout_bg_graph_right_padding">2px</dimen>
-    <dimen name="digital_layout_bg_graph_top_padding">2px</dimen>
-    <dimen name="digital_layout_bg_graph_bottom_padding">2px</dimen>
+    <dimen name="digital_layout_bg_graph_left_padding">3px</dimen>
+    <dimen name="digital_layout_bg_graph_right_padding">3px</dimen>
+    <dimen name="digital_layout_bg_graph_top_padding">3px</dimen>
+    <dimen name="digital_layout_bg_graph_bottom_padding">3px</dimen>
 
     <dimen name="digital_layout_time_panel_left">89px</dimen>
     <dimen name="digital_layout_time_panel_top">82px</dimen>

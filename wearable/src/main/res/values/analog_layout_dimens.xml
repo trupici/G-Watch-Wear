@@ -62,8 +62,8 @@
 
     <dimen name="analog_layout_bg_graph_panel_left">91px</dimen>
     <dimen name="analog_layout_bg_graph_panel_top">85px</dimen>
-    <dimen name="analog_layout_bg_graph_panel_right">360px</dimen>
-    <dimen name="analog_layout_bg_graph_panel_bottom">195px</dimen>
+    <dimen name="analog_layout_bg_graph_panel_right">359px</dimen>
+    <dimen name="analog_layout_bg_graph_panel_bottom">196px</dimen>
 
     <dimen name="analog_layout_bg_graph_left_padding">1px</dimen>
     <dimen name="analog_layout_bg_graph_right_padding">1px</dimen>

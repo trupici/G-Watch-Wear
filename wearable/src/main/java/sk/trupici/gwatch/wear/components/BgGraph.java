@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -357,6 +358,9 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         // draw lines
         paint.setStrokeWidth(1f);
 
+        float xMax = bounds.width() - 1 - rightPadding;
+        float yMax = bounds.height() - 1 - bottomPadding;
+
         // draw hour interval (vertical) lines
         if (enableVertLines) {
             paint.setColor(vertLineColor);
@@ -365,7 +369,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
                 if (lx < leftPadding) {
                     break;
                 }
-                canvas.drawLine(lx, topPadding, lx, height - bottomPadding, paint);
+                canvas.drawLine(lx, topPadding, lx, yMax, paint);
             }
         }
 
@@ -374,12 +378,12 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
             paint.setColor(criticalLineColor);
             if (graphRange.isInRange(hyperThreshold)) {
                 y = yOffset - (hyperThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
+                canvas.drawLine(leftPadding, y, xMax, y, paint);
             }
 
             if (graphRange.isInRange(hypoThreshold)) {
                 y = yOffset - (hypoThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
+                canvas.drawLine(leftPadding, y, xMax, y, paint);
             }
         }
 
@@ -387,14 +391,14 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         if (enableHighLine && graphRange.isInRange(highThreshold)) {
             paint.setColor(highLineColor);
             y = yOffset - (highThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
+            canvas.drawLine(leftPadding, y, xMax, y, paint);
         }
 
         // draw low boundary line (horizontal)
         if (enableLowLine && graphRange.isInRange(lowThreshold)) {
             paint.setColor(lowLineColor);
             y = yOffset - (lowThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, width - rightPadding, y, paint);
+            canvas.drawLine(leftPadding, y, xMax, y, paint);
         }
 
         // get offset of the left most value

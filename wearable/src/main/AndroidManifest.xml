@@ -26,11 +26,6 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
-    <compatible-screens>
-        <screen android:screenSize="small" android:screenDensity="xhdpi" />
-        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
-    </compatible-screens>
-
     <queries>
         <package android:name="info.nightscout.androidaps" />
         <package android:name="com.eveningoutpost.dexdrip" />

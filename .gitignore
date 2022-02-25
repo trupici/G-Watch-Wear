@@ -80,3 +80,4 @@ wearable/.localazy
 mobile/.localazy
 mobile/release/mobile-release.aab
 mobile/release/**
+wearable/release/

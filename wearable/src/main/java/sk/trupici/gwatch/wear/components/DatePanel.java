@@ -214,7 +214,8 @@ public class DatePanel implements ComponentPanel {
 
         // Day of Month
         paint.setColor(dayOfMonthColor);
-        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - 7, paint);
+        int lift = Math.min(7, (int)bounds.height()/6);
+        canvas.drawText(dayOfMonthFormat.format(date), centerX, bounds.height() - lift, paint);
     }
 
     private String formatDayMonth(DateFormat format, DateFormat fullNameFormat, Date date) {

@@ -125,6 +125,12 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private Paint ambientPaint;
     private Bitmap bkgBitmap;
 
+    // precalculated text coordinates
+    private float xLine;
+    private float yLine1;
+    private float yLine2;
+    private float paddedHeight;
+
     public BgPanel(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
         this.refScreenWidth = screenWidth;
         this.refScreenHeight = screenHeight;
@@ -160,6 +166,12 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "Rect: " + sizeFactors + ", offset: " + topOffset + ", " + bottomOffset);
         }
+
+        xLine = bounds.left + bounds.width() / 2f; // text will be centered around
+        paddedHeight = bounds.height() - topOffset - bottomOffset;
+        yLine1 = bounds.top + topOffset + paddedHeight / 2f;
+        yLine2 = bounds.bottom - bottomOffset - paddedHeight / 10f;
+
 
         textPaint = UiUtils.createTextPaint();
         textPaint.setTextAlign(Paint.Align.CENTER);
@@ -206,6 +218,16 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
                 (int) (sizeFactors.top * height),
                 (int) (sizeFactors.right * width),
                 (int) (sizeFactors.bottom * height));
+
+        float yScale = (float) height / refScreenHeight;
+        topOffset = watchfaceConfig.getBgPanelTopOffset(context) * yScale;
+        bottomOffset = watchfaceConfig.getBgPanelBottomOffset(context) * yScale;
+
+        xLine = bounds.left + bounds.width() / 2f; // text will be centered around
+        paddedHeight = bounds.height() - topOffset - bottomOffset;
+        yLine1 = bounds.top + topOffset + paddedHeight / 2f;
+        yLine2 = bounds.bottom - bottomOffset - paddedHeight / 10f;
+
 
         bkgBitmap = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
         drawBackgroundAndBorder();
@@ -279,22 +301,16 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
             textPaint.setColor(getRangedColor(isNoData()));
         }
 
-
         // line 1
-        float x = bounds.left + bounds.width() / 2f; // text will be centered around
-        float top = bounds.top + topOffset;
-        float height = bounds.height() - topOffset - bottomOffset;
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTextSize(height / 2f);
+        textPaint.setTextSize(paddedHeight / 2f);
         textPaint.setFakeBoldText(true);
-        canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT,
-                x, top + height / 2f, textPaint);
+        canvas.drawText(bgLine1 != null ? bgLine1 : ComplicationConfig.NO_DATA_TEXT, xLine, yLine1, textPaint);
 
         // line 2
-        textPaint.setTextSize(height / 3f);
+        textPaint.setTextSize(paddedHeight / 3f);
         textPaint.setFakeBoldText(false);
-        canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT,
-                x, bounds.bottom - bottomOffset - height / 10f, textPaint);
+        canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT, xLine, yLine2, textPaint);
 
         if (showBgIndicator) {
             Boolean isNoData = isNoData();

@@ -217,7 +217,7 @@ public class DigitalWatchfaceConfig implements WatchfaceConfig {
     @Override
     public RectF getBgPanelBounds(Context context) {
         return new RectF(
-                context.getResources().getDimension(R.dimen.digital_layout_bg_pnel_left),
+                context.getResources().getDimension(R.dimen.digital_layout_bg_panel_left),
                 context.getResources().getDimension(R.dimen.digital_layout_bg_panel_top),
                 context.getResources().getDimension(R.dimen.digital_layout_bg_panel_right),
                 context.getResources().getDimension(R.dimen.digital_layout_bg_panel_bottom)

@@ -18,17 +18,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="sk.trupici.gwatch.wear">
 
-    <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- Required for complications to receive complication data and open the provider chooser. -->
     <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
-
-    <!--  Required for alarms -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.type.watch" />
+
+    <compatible-screens>
+        <screen android:screenSize="small" android:screenDensity="xhdpi" />
+        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
+    </compatible-screens>
 
     <queries>
         <package android:name="info.nightscout.androidaps" />

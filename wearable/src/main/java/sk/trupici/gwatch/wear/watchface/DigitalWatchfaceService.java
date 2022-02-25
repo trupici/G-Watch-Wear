@@ -105,7 +105,8 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
             pbPadding = context.getResources().getInteger(R.integer.digital_compl_progressbar_padding);
             pbMaxAngle = context.getResources().getInteger(R.integer.digital_compl_progressbar_angle);
-            pbCircleBounds = new RectF(pbPadding, pbPadding, refScreenWidth -pbPadding, refScreenHeight -pbPadding);
+
+            pbCircleBounds = new RectF(pbPadding, pbPadding, refScreenWidth-pbPadding, refScreenHeight-pbPadding);
 
             RectF topLeftComplCoefs = new RectF(
                     getResources().getDimension(R.dimen.digital_layout_top_left_compl_left) / refScreenWidth,
@@ -136,12 +137,12 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             ProgressBarAttrs topLeftProgressBarAttrs = new ProgressBarAttrs(
                     90 + angleOffset,
                     pbMaxAngle,
-                    new RectF(0, refScreenHeight /2f, refScreenWidth /2f, refScreenHeight)
+                    new RectF(0, refScreenHeight/2f, refScreenWidth/2f, refScreenHeight)
             );
             ProgressBarAttrs topRightProgressBarAttrs = new ProgressBarAttrs(
                     270 + angleOffset,
                     pbMaxAngle,
-                    new RectF(refScreenWidth /2f, 0, refScreenWidth, refScreenHeight /2f)
+                    new RectF(refScreenWidth/2f, 0, refScreenWidth, refScreenHeight/2f)
             );
             // no progress bar for bottom complications
             ProgressBarAttrs bottomLeftProgressBarAttrs = null;
@@ -298,10 +299,17 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                         ));
             }
 
+            float xPadding = pbPadding * width / refScreenWidth;
+            float yPadding = pbPadding * height / refScreenHeight;
+            pbCircleBounds = new RectF(xPadding, yPadding, width-xPadding, height-yPadding);
+
+            paint.setStrokeWidth(paint.getStrokeWidth() * width / refScreenWidth);
+
             // update progress bars bounds
             complSettingsMap.get(ComplicationId.TOP_LEFT).getProgressAttrs().setBounds(
                     new RectF(0, height/2f, width/2f, height)
             );
+
             complSettingsMap.get(ComplicationId.TOP_RIGHT).getProgressAttrs().setBounds(
                     new RectF(width/2f, 0, width, height/2f)
             );

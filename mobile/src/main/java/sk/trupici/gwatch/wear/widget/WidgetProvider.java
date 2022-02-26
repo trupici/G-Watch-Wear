@@ -27,7 +27,7 @@ import java.util.Collections;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
-import sk.trupici.gwatch.wear.data.ConfigPacket;
+import sk.trupici.gwatch.wear.common.data.ConfigPacket;
 
 public class WidgetProvider extends AppWidgetProvider {
     @Override

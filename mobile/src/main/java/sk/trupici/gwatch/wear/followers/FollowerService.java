@@ -45,12 +45,12 @@ import okhttp3.ResponseBody;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;

@@ -35,11 +35,11 @@ import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
 public class NotificationService extends Service {

@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
 import android.content.Context;
 
 import java.util.Date;
 
-import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.BgUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.R;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public abstract class GlucosePacketBase extends PacketBase {
 

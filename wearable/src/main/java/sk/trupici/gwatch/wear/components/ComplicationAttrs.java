@@ -23,10 +23,10 @@ import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.util.BorderUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
 
 public class ComplicationAttrs {
 

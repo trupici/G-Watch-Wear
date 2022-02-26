@@ -20,7 +20,7 @@ package sk.trupici.gwatch.wear.console;
 
 import android.content.Context;
 
-import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.common.data.Packet;
 
 public interface PacketConsole {
 

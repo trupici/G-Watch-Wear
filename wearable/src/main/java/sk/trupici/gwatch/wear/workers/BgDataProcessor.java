@@ -26,12 +26,14 @@ import androidx.preference.PreferenceManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.data.PacketBase;
+import sk.trupici.gwatch.wear.common.data.PacketType;
+import sk.trupici.gwatch.wear.common.data.Trend;
 import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.data.PacketBase;
-import sk.trupici.gwatch.wear.data.PacketType;
-import sk.trupici.gwatch.wear.data.Trend;
 import sk.trupici.gwatch.wear.util.CommonConstants;
+
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.DAY_IN_MILLIS;
 
 public class BgDataProcessor extends Worker {
     private final static String LOG_TAG = BgDataProcessor.class.getSimpleName();
@@ -104,7 +106,7 @@ public class BgDataProcessor extends Worker {
         }
 
         // store received values - new values only
-        if (timestampDiff >= 0 || Math.abs(timestampDiff) > CommonConstants.DAY_IN_MILLIS) {
+        if (timestampDiff >= 0 || Math.abs(timestampDiff) > DAY_IN_MILLIS) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt(PREF_LAST_BG_VALUE, bgValue);
             editor.putLong(PREF_LAST_BG_TIMESTAMP, bgTimestamp);

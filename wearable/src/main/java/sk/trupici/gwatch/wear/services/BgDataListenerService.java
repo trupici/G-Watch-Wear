@@ -29,9 +29,9 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import sk.trupici.gwatch.wear.BuildConfig;
-import sk.trupici.gwatch.wear.data.PacketBase;
-import sk.trupici.gwatch.wear.data.PacketType;
-import sk.trupici.gwatch.wear.util.DumpUtils;
+import sk.trupici.gwatch.wear.common.data.PacketBase;
+import sk.trupici.gwatch.wear.common.data.PacketType;
+import sk.trupici.gwatch.wear.common.util.DumpUtils;
 import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
 public class BgDataListenerService extends WearableListenerService {

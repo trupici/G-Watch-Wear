@@ -18,7 +18,7 @@
 
 package sk.trupici.gwatch.wear.dispatch;
 
-import sk.trupici.gwatch.wear.data.Packet;
+import sk.trupici.gwatch.wear.common.data.Packet;
 
 public interface Dispatcher {
     /* dispatch packet to the watch */

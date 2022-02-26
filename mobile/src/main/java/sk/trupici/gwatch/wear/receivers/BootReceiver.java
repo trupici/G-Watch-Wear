@@ -24,10 +24,10 @@ import android.content.Intent;
 import android.util.Log;
 
 import sk.trupici.gwatch.wear.GWatchApplication;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 public class BootReceiver extends BroadcastReceiver {
     @Override

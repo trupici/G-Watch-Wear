@@ -29,8 +29,8 @@ import androidx.preference.TwoStatePreference;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.view.SettingsActivity;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;

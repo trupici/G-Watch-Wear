@@ -48,6 +48,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
 import sk.trupici.gwatch.wear.components.BgGraph;
@@ -56,7 +57,9 @@ import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
+
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.SECOND_IN_MILLIS;
 
 /**
  * Watch face parent base class with common functionality
@@ -69,7 +72,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
      * Updates rate in milliseconds for interactive mode. We update once a second to advance the
      * second hand.
      */
-    private static final long INTERACTIVE_UPDATE_RATE_MS = CommonConstants.SECOND_IN_MILLIS;
+    private static final long INTERACTIVE_UPDATE_RATE_MS = SECOND_IN_MILLIS;
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -307,7 +310,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             drawComplications(canvas, isAmbientMode);
             drawCustomPanels(canvas, isAmbientMode);
 
-            if (now - lastMinute > CommonConstants.MINUTE_IN_MILLIS) {
+            if (now - lastMinute > MINUTE_IN_MILLIS) {
                 bgAlarmController.handleNoDataAlarm(getApplicationContext());
                 lastMinute = now;
             }

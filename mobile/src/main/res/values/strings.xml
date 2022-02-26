@@ -324,29 +324,5 @@
     <string name="follower_err_no_account_id">No account id</string>
 
 
-
-    <!-- PACKETS -->
-
-    <string name="packet_type">Type: %1$s</string>
-    <string name="packet_source">Source: %1$s</string>
-    <string name="packet_received_at">Received at: %1$s</string>
-    <string name="packet_timestamp">Timestamp: %1$s</string>
-    <string name="packet_bg_value">Glucose: %1$d mg/dl (%2$.1f mmol/l)</string>
-    <string name="packet_trend">Trend: %1$s</string>
-    <string name="packet_battery">Battery: %1$d%%</string>
-    <string name="packet_length">Length: %1$d B</string>
-    <string name="packet_file_name">Name: %1$s</string>
-
-    <string name="aaps_packet_cob">COB: %1$sg</string>
-    <string name="aaps_packet_iob">IOB: %1$sU</string>
-    <string name="aaps_packet_tbr">TBR: %1$s</string>
-    <string name="aaps_packet_profile">Profile: %1$s</string>
-    <string name="aaps_packet_pump">Pump: %1$s</string>
-
-    <string name="tlv_packet_items">Items: %1$d</string>
-
-
     <string name="dexcom_app_not_installed">Dexcom App is not installed!</string>
-
-<!--    <string name="main_activity_status">Status:</string>-->
 </resources>

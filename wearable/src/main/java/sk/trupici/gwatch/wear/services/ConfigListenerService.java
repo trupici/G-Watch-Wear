@@ -30,13 +30,13 @@ import java.util.Map;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
+import sk.trupici.gwatch.wear.common.data.ConfigPacket;
+import sk.trupici.gwatch.wear.common.data.TLV;
+import sk.trupici.gwatch.wear.common.util.DumpUtils;
+import sk.trupici.gwatch.wear.common.util.PacketUtils;
 import sk.trupici.gwatch.wear.data.ConfigData;
-import sk.trupici.gwatch.wear.data.ConfigPacket;
 import sk.trupici.gwatch.wear.data.ConfigType;
-import sk.trupici.gwatch.wear.data.TLV;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.DumpUtils;
-import sk.trupici.gwatch.wear.util.PacketUtils;
 
 import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HIGH;
 import static sk.trupici.gwatch.wear.data.ConfigData.TAG_GL_THRESHOLD_HYPER;

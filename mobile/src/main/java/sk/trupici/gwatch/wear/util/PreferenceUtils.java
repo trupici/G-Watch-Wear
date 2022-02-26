@@ -18,7 +18,6 @@
 
 package sk.trupici.gwatch.wear.util;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
@@ -34,7 +33,6 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
-import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import sk.trupici.gwatch.wear.BuildConfig;
@@ -54,39 +52,6 @@ public class PreferenceUtils {
     public static final String DEF_VALUE_LOCALE = "system";
 
     public static final String DUMMY_KEY_PREFIX = "dummy";
-
-    public static void dumpPreferences(SharedPreferences prefs) {
-        prefs.getAll().forEach((key, value) -> Log.d(LOG_TAG, "PREFS -> " + key + ": " + value));
-    }
-
-    public static boolean isConfigured(Context context, String prefName, boolean defValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(prefName, defValue);
-    }
-
-    public static int getIntValue(Context context, String prefName, int defValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getInt(prefName, defValue);
-    }
-
-    public static int getStringValueAsInt(Context context, String prefName, int defValue) {
-        return getStringValueAsInt(PreferenceManager.getDefaultSharedPreferences(context), prefName, defValue);
-    }
-
-    public static String getStringValue(Context context, String prefName, String defValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(prefName, defValue);
-    }
-
-    public static void setStringValue(Context context, String prefName, String value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs.edit().putString(prefName, value).commit();
-    }
-
-    public static int getStringValueAsInt(SharedPreferences prefs, String prefName, int defValue) {
-        String strValue = prefs.getString(prefName, StringUtils.EMPTY_STRING);
-        return strValue.trim().isEmpty() ? defValue : Integer.valueOf(strValue);
-    }
 
     public static Object getDefaultValue(Preference pref) {
         try {

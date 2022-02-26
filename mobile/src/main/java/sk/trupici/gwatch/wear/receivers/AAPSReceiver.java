@@ -20,16 +20,15 @@ package sk.trupici.gwatch.wear.receivers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
-import sk.trupici.gwatch.wear.data.AAPSPacket;
-import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.data.AAPSPacket;
+import sk.trupici.gwatch.wear.common.data.Packet;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 /**
  */

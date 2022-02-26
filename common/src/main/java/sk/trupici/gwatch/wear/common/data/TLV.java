@@ -16,16 +16,32 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
-import android.content.Context;
+public class TLV {
+    private byte tag;
+    private byte len;
+    private byte[] value;
 
-public interface Packet {
-    int PACKET_HEADER_SIZE = 2;
+    public TLV(byte tag, byte len, byte[] value) {
+        this.tag = tag;
+        this.len = len;
+        this.value = value;
+    }
 
-    PacketType getType();
+    public int getTotalLen() {
+        return 2 + len;
+    }
 
-    byte[] getData();
+    public byte getTag() {
+        return tag;
+    }
 
-    String toText(Context context, String header);
+    public byte getLen() {
+        return len;
+    }
+
+    public byte[] getValue() {
+        return value;
+    }
 }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.console.ConsoleBuffer;
 import sk.trupici.gwatch.wear.console.PacketConsole;
 import sk.trupici.gwatch.wear.dispatch.Dispatcher;
@@ -44,7 +45,6 @@ import sk.trupici.gwatch.wear.receivers.LibreLinkReceiver;
 import sk.trupici.gwatch.wear.receivers.XDripReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.LangUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 public class GWatchApplication extends Application {
 

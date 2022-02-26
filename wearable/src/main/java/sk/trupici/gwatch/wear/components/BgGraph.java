@@ -39,6 +39,9 @@ import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MINUTES;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
+
 public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     final private static String LOG_TAG = BgGraph.class.getSimpleName();
 
@@ -230,7 +233,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
     }
 
     public void refresh(long timeMs, SharedPreferences sharedPrefs) {
-        long currentMinute = timeMs / CommonConstants.MINUTE_IN_MILLIS;
+        long currentMinute = timeMs / MINUTE_IN_MILLIS;
         if (lastGraphUpdateMin != currentMinute) {
             updateGraphData(null, timeMs, sharedPrefs);
         }
@@ -241,7 +244,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
             Log.d(LOG_TAG, "graph: updateGraphData: " + bgValue);
         }
 
-        final long now = System.currentTimeMillis() / CommonConstants.MINUTE_IN_MILLIS; // minutes
+        final long now = System.currentTimeMillis() / MINUTE_IN_MILLIS; // minutes
         if (now < 0) {
             Log.e(LOG_TAG, "graph: now is negative: " + now);
             return;
@@ -271,7 +274,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
         // set new data
         if (bgValue != null) {
-            long tsData = timestamp / CommonConstants.MINUTE_IN_MILLIS;
+            long tsData = timestamp / MINUTE_IN_MILLIS;
             int diff = (int) Math.round((now - tsData)/(double)refreshRateMin);
             if (0 <= diff && diff < GRAPH_DATA_LEN) {
                 int newValue = bgValue.intValue();
@@ -363,7 +366,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         // draw hour interval (vertical) lines
         if (enableVertLines) {
             paint.setColor(vertLineColor);
-            for (int mins = CommonConstants.HOUR_IN_MINUTES;; mins += CommonConstants.HOUR_IN_MINUTES) {
+            for (int mins = HOUR_IN_MINUTES;; mins += HOUR_IN_MINUTES) {
                 float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) refreshRateMin);
                 if (lx < leftPadding) {
                     break;

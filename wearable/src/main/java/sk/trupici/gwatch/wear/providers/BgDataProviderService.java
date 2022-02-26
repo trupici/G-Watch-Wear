@@ -29,8 +29,9 @@ import java.util.stream.Collectors;
 
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
-import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MILLIS;
 
 public class BgDataProviderService extends ComplicationProviderService {
 
@@ -101,11 +102,11 @@ public class BgDataProviderService extends ComplicationProviderService {
         int value = prefs.getInt(PREF_VALUE, 0);
         long lastUpdate = prefs.getLong(PREF_LAST_UPDATE, 0);
 
-        boolean isNoData = text == null || System.currentTimeMillis() - lastUpdate > CommonConstants.HOUR_IN_MILLIS;
+        boolean isNoData = text == null || System.currentTimeMillis() - lastUpdate > HOUR_IN_MILLIS;
 
         if (BuildConfig.DEBUG) {
             Log.i(LOG_TAG, "onComplicationUpdate: text=" + text + ", title=" + title + ", value=" + value + ", ts=" + new Date(lastUpdate));
-            Log.i(LOG_TAG, "onComplicationUpdate: ts diff=" + (System.currentTimeMillis() - lastUpdate) + " vs " + CommonConstants.HOUR_IN_MILLIS);
+            Log.i(LOG_TAG, "onComplicationUpdate: ts diff=" + (System.currentTimeMillis() - lastUpdate) + " vs " + HOUR_IN_MILLIS);
         }
 
         ComplicationData data;

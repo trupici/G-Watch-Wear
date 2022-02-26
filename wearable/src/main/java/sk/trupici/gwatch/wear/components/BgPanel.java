@@ -34,16 +34,19 @@ import android.util.Log;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.config.BorderType;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.BorderUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.DAY_IN_MILLIS;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.SECOND_IN_MILLIS;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DASH_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_DOT_LEN;
 import static sk.trupici.gwatch.wear.util.BorderUtils.BORDER_GAP_LEN;
@@ -294,7 +297,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
          if (isAmbientMode) {
              textPaint.setColor(getAmbientRangedColor(isNoData()));
         } else {
-            if (lastBgData.getValue() > 0 && System.currentTimeMillis() - lastBgUpdate > CommonConstants.MINUTE_IN_MILLIS) {
+            if (lastBgData.getValue() > 0 && System.currentTimeMillis() - lastBgUpdate > MINUTE_IN_MILLIS) {
                 onDataUpdate(lastBgData);
             }
             canvas.drawBitmap(bkgBitmap, bounds.left, bounds.top, paint);
@@ -384,7 +387,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     private boolean isNoData() {
         return lastBgData.getValue() == 0
-                || (System.currentTimeMillis() - lastBgData.getTimestamp()) > noDataThreshold * CommonConstants.SECOND_IN_MILLIS;
+                || (System.currentTimeMillis() - lastBgData.getTimestamp()) > noDataThreshold * SECOND_IN_MILLIS;
     }
 
     private int getRangedColor(boolean isNoData) {
@@ -456,7 +459,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
         long now = System.currentTimeMillis();
         long timeDiff = now - bgData.getTimestamp();
-        if (bgData.getValue() <= 0 || timeDiff > CommonConstants.DAY_IN_MILLIS) {
+        if (bgData.getValue() <= 0 || timeDiff > DAY_IN_MILLIS) {
             // too old sample or invalid data
             bgLine1 = "--";
             bgLine2 = "--";

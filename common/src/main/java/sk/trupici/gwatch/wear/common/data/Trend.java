@@ -15,17 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package sk.trupici.gwatch.wear.common.data;
 
-package sk.trupici.gwatch.wear.data;
+import java.util.Arrays;
 
-import android.content.Context;
+public enum Trend {
+    UNKNOWN,
+    UP_FAST,
+    UP,
+    UP_SLOW,
+    FLAT,
+    DOWN_SLOW,
+    DOWN,
+    DOWN_FAST;
 
-public interface Packet {
-    int PACKET_HEADER_SIZE = 2;
-
-    PacketType getType();
-
-    byte[] getData();
-
-    String toText(Context context, String header);
+    public static Trend valueOf(int ordinal) {
+        return Arrays.stream(values()).filter(x -> x.ordinal() == ordinal).findFirst().orElse(UNKNOWN);
+    }
 }

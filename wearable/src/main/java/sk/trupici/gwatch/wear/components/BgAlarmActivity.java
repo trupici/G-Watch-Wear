@@ -31,9 +31,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.util.CommonConstants;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public class BgAlarmActivity extends WearableDialogActivity {
 

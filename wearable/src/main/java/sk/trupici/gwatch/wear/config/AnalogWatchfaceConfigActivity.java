@@ -17,7 +17,6 @@
 package sk.trupici.gwatch.wear.config;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,8 +31,7 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.DumpUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.DumpUtils;
 
 /**
  * Main {@code Activity} for Analog watch face configuration

@@ -31,7 +31,7 @@ import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.DumpUtils;
+import sk.trupici.gwatch.wear.common.util.DumpUtils;
 
 /**
  * Main {@code Activity} for Digital watch face configuration

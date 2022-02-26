@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
 import android.content.Context;
 
-import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.PacketUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.R;
+import sk.trupici.gwatch.wear.common.util.PacketUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public class GlucosePacket extends GlucosePacketBase {
     public static final int PACKET_MIN_DATA_SIZE = (2 + 4 + 1);
@@ -56,7 +56,7 @@ public class GlucosePacket extends GlucosePacketBase {
         long ts = Math.min(timestamp, receivedAt);
         idx += PacketUtils.encodeInt(data, idx, ts / 1000); // time in seconds
 
-        data[idx++] = (byte)trend.ordinal();
+        data[idx++] = (byte)(trend == null ? 0 : trend.ordinal());
         PacketUtils.encodeString(data, idx, getSource());
         return data;
     }

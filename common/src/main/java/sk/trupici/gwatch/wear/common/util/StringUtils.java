@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.util;
+package sk.trupici.gwatch.wear.common.util;
 
 import java.text.Normalizer;
 import java.util.Date;

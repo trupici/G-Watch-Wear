@@ -17,15 +17,6 @@
 package sk.trupici.gwatch.wear.util;
 
 public interface CommonConstants {
-
-    long SECOND_IN_MILLIS = 1000L;
-    int MINUTE_IN_SECONDS = 60;
-    long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
-    int HOUR_IN_MINUTES = 60;
-    long HOUR_IN_MILLIS = 3600000L; // 60 * 60 * 1000
-    int DAY_IN_MINUTES = 1440; // 24 * 60
-    long DAY_IN_MILLIS = 86400000L; // 24 * 60 * 60 * 1000
-
     String PREF_IS_UNIT_CONVERSION = "cfg_glucose_units_conversion";
     String PREF_NO_DATA_THRESHOLD = "bg_threshold_no_data";
 }

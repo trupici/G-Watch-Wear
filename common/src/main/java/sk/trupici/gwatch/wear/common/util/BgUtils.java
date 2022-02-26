@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.util;
+package sk.trupici.gwatch.wear.common.util;
 
 import android.util.Log;
 
@@ -22,8 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-import sk.trupici.gwatch.wear.BuildConfig;
-import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.common.BuildConfig;
+import sk.trupici.gwatch.wear.common.data.Trend;
 
 public class BgUtils {
 

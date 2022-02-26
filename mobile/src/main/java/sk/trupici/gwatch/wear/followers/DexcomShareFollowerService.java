@@ -40,16 +40,16 @@ import okhttp3.Response;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
-import static sk.trupici.gwatch.wear.util.StringUtils.EMPTY_STRING;
+import static sk.trupici.gwatch.wear.common.util.StringUtils.EMPTY_STRING;
 
 /**
  * DexCom Cloud Follower Service

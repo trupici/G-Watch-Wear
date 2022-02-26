@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2019 Juraj Antal
- *
- * Originally created in G-Watch App
+ * Copyright (C) 2021 Juraj Antal
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +14,15 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.util;
 
-public class TLV {
-    private byte tag;
-    private byte len;
-    private byte[] value;
+public interface CommonConstants {
 
-    public TLV(byte tag, byte len, byte[] value) {
-        this.tag = tag;
-        this.len = len;
-        this.value = value;
-    }
-
-    public int getTotalLen() {
-        return 2 + len;
-    }
-
-    public byte getTag() {
-        return tag;
-    }
-
-    public byte getLen() {
-        return len;
-    }
-
-    public byte[] getValue() {
-        return value;
-    }
+    long SECOND_IN_MILLIS = 1000L;
+    int MINUTE_IN_SECONDS = 60;
+    long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
+    int HOUR_IN_MINUTES = 60;
+    long HOUR_IN_MILLIS = 3600000L; // 60 * 60 * 1000
+    int DAY_IN_MINUTES = 1440; // 24 * 60
+    long DAY_IN_MILLIS = 86400000L; // 24 * 60 * 60 * 1000
 }

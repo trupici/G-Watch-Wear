@@ -27,11 +27,11 @@ import android.util.Log;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static android.content.Context.POWER_SERVICE;

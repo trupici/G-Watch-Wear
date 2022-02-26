@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
 import android.content.Context;
 import android.util.Log;
 
-import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.PacketUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.R;
+import sk.trupici.gwatch.wear.common.util.PacketUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
+
 
 /**
  * Packet from AndroidAPS app containing

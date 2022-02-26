@@ -21,9 +21,10 @@ import android.os.Bundle;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
-import sk.trupici.gwatch.wear.util.BgUtils;
-import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.CommonConstants;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public class BgData {
     private final static String KEY_VALUE = "value";

@@ -26,7 +26,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.common.data.Trend;
 
 public class DexcomUtils {
     public static final String DEXCOM_PERMISSION = "com.dexcom.cgm.EXTERNAL_PERMISSION";

@@ -27,10 +27,10 @@ import java.util.Date;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.data.Packet;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
 
 public class XDripReceiver extends BGReceiver {
     private final static String ACTION = "com.eveningoutpost.dexdrip.BgEstimate";

@@ -26,12 +26,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.config.complications.AnalogComplicationViewHolder;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.config.complications.ComplicationViewHolder;
 import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigAdapter;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 
 /**
  * Configuration data for Analog watch face configuration

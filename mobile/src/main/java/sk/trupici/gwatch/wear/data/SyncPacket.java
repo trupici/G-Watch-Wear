@@ -21,6 +21,8 @@ package sk.trupici.gwatch.wear.data;
 import android.content.Context;
 
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.data.PacketBase;
+import sk.trupici.gwatch.wear.common.data.PacketType;
 
 public class SyncPacket extends PacketBase {
     private static final int PKT_LEN = 2;

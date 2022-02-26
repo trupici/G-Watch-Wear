@@ -42,19 +42,17 @@ import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.AAPSPacket;
-import sk.trupici.gwatch.wear.data.ConfigPacket;
-import sk.trupici.gwatch.wear.data.GlucosePacket;
-import sk.trupici.gwatch.wear.data.GlucosePacketBase;
-import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.data.Trend;
-import sk.trupici.gwatch.wear.util.BgUtils;
+import sk.trupici.gwatch.wear.common.data.AAPSPacket;
+import sk.trupici.gwatch.wear.common.data.ConfigPacket;
+import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.data.GlucosePacketBase;
+import sk.trupici.gwatch.wear.common.data.Packet;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
-import sk.trupici.gwatch.wear.util.StringUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
-
-import static android.util.TypedValue.COMPLEX_UNIT_SP;
 
 public class WidgetUpdateService extends JobService {
 

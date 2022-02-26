@@ -26,8 +26,8 @@ import java.util.LinkedList;
 
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.data.Packet;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.data.Packet;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public class ConsoleBuffer implements PacketConsole {
 

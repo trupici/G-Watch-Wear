@@ -29,10 +29,13 @@ import java.util.Date;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.DumpUtils;
 import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.DumpUtils;
+
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.DAY_IN_MILLIS;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MILLIS;
 
 
 public class ProviderDataUpdater extends BroadcastReceiver {
@@ -55,7 +58,7 @@ public class ProviderDataUpdater extends BroadcastReceiver {
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: last ts > bg ts. Back-filling?");
             }
-            if (lastBgTimestamp - bgData.getTimestamp() > CommonConstants.DAY_IN_MILLIS) {
+            if (lastBgTimestamp - bgData.getTimestamp() > DAY_IN_MILLIS) {
                 invalidTimestampDiff = true; // save the last timestamp, maybe the stored value is invalid
             } else { // back filling ?
                 return;
@@ -70,11 +73,11 @@ public class ProviderDataUpdater extends BroadcastReceiver {
         }
 
         long timeDiff = System.currentTimeMillis() - bgData.getTimestamp();
-        if (invalidTimestampDiff || timeDiff > CommonConstants.DAY_IN_MILLIS) {
+        if (invalidTimestampDiff || timeDiff > DAY_IN_MILLIS) {
             // signal no data
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onReceive: data is too old: " + new Date(bgData.getTimestamp()));
-                Log.i(LOG_TAG, "onReceive: ts diff=" + (System.currentTimeMillis() - bgData.getTimestamp()) + " vs " + CommonConstants.HOUR_IN_MILLIS);
+                Log.i(LOG_TAG, "onReceive: ts diff=" + (System.currentTimeMillis() - bgData.getTimestamp()) + " vs " + HOUR_IN_MILLIS);
             }
             edit.remove(BgDataProviderService.PREF_TEXT);
             edit.remove(BgDataProviderService.PREF_TITLE);

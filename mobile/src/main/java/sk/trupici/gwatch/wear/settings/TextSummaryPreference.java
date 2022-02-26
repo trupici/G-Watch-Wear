@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.StringUtils;
+import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 /**

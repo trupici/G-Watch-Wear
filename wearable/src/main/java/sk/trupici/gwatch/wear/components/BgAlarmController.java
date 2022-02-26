@@ -32,13 +32,14 @@ import java.util.Date;
 
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.util.BgUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.workers.BgDataProcessor;
 
 import static android.content.Context.POWER_SERVICE;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
 
 public class BgAlarmController extends BroadcastReceiver {
 
@@ -447,7 +448,7 @@ public class BgAlarmController extends BroadcastReceiver {
             }
 
             long lastBgTimestamp = PreferenceUtils.getLongValue(context, BgDataProcessor.PREF_LAST_BG_TIMESTAMP, 0L);
-            if (lastBgTimestamp == 0 || now - lastBgTimestamp < noDataConfig.threshold * CommonConstants.MINUTE_IN_MILLIS) {
+            if (lastBgTimestamp == 0 || now - lastBgTimestamp < noDataConfig.threshold * MINUTE_IN_MILLIS) {
                 if (BuildConfig.DEBUG) {
                     Log.d(LOG_TAG, "alarms: last bg timestamp is in range");
                 }
@@ -494,10 +495,10 @@ public class BgAlarmController extends BroadcastReceiver {
                     Log.d(LOG_TAG, "alarms: last alarm snoozed at: " + new Date(lastSnoozedAt));
                 }
                 long snoozeTime = now - lastSnoozedAt;
-                if (snoozeTime < alarmConfig.snoozeTime * CommonConstants.MINUTE_IN_MILLIS) {
+                if (snoozeTime < alarmConfig.snoozeTime * MINUTE_IN_MILLIS) {
                     if (BuildConfig.DEBUG) {
                         Log.i(LOG_TAG, "alarms: " + alarmConfig.type.name() + " alarm snooze time " + alarmConfig.snoozeTime
-                                + " has not elapsed yet: " + snoozeTime / CommonConstants.MINUTE_IN_MILLIS);
+                                + " has not elapsed yet: " + snoozeTime / MINUTE_IN_MILLIS);
                     }
                     return;
                 }
@@ -507,12 +508,12 @@ public class BgAlarmController extends BroadcastReceiver {
             if (lastTriggeredAt != 0) {
                 long elapsed = now - lastTriggeredAt;
                 if (BuildConfig.DEBUG) {
-                    Log.d(LOG_TAG, "alarms: elapsed from last alarm: " + elapsed / CommonConstants.MINUTE_IN_MILLIS);
+                    Log.d(LOG_TAG, "alarms: elapsed from last alarm: " + elapsed / MINUTE_IN_MILLIS);
                 }
-                if (elapsed < alarmConfig.period * CommonConstants.MINUTE_IN_MILLIS) {
+                if (elapsed < alarmConfig.period * MINUTE_IN_MILLIS) {
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "alarms: " + alarmConfig.type.name() + " alarm period " + alarmConfig.period
-                                + " has not elapsed yet: " + elapsed / CommonConstants.MINUTE_IN_MILLIS);
+                                + " has not elapsed yet: " + elapsed / MINUTE_IN_MILLIS);
                     }
                     return;
                 }

@@ -23,7 +23,7 @@ import android.widget.Switch;
 
 import androidx.recyclerview.widget.RecyclerView;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 
 /**
  * Simple 2-state switch view holder for bound {@code ConfigItem}

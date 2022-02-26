@@ -20,14 +20,6 @@ public interface CommonConstants {
     String BG_RECEIVER_ACTION = "sk.trupici.gwatch.wear.BG_RECEIVER_ACTION";
     String REMOTE_CONFIG_ACTION = "sk.trupici.gwatch.wear.REMOTE_CONFIG_ACTION";
 
-    long SECOND_IN_MILLIS = 1000L;
-    int MINUTE_IN_SECONDS = 60;
-    long MINUTE_IN_MILLIS = 60000L; // 60 * 1000
-    int HOUR_IN_MINUTES = 60;
-    long HOUR_IN_MILLIS = 3600000L; // 60 * 60 * 1000
-    int DAY_IN_MINUTES = 1440; // 24 * 60
-    long DAY_IN_MILLIS = 86400000L; // 24 * 60 * 60 * 1000
-
     String PREF_IS_UNIT_CONVERSION = "bg_is_unit_conversion";
 
     String PREF_HYPER_THRESHOLD = "bg_threshold_hyper";

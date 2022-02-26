@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
 import android.content.Context;
 import android.util.Log;
@@ -24,8 +24,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.PacketUtils;
+import sk.trupici.gwatch.wear.common.R;
+import sk.trupici.gwatch.wear.common.util.PacketUtils;
 
 public abstract class TLVPacket extends PacketBase {
     private static final String LOG_TAG = TLVPacket.class.getSimpleName();

@@ -16,28 +16,16 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
-public abstract class PacketBase implements Packet {
-    private static final String LOCAL_SOURCE = "G-Watch Service";
+import android.content.Context;
 
-    private final PacketType type;
-    private final String source;
+public interface Packet {
+    int PACKET_HEADER_SIZE = 2;
 
-    public PacketBase(PacketType type, String source) {
-        this.type = type;
-        this.source = source == null ? LOCAL_SOURCE : source;
-    }
+    PacketType getType();
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Packet implementation
+    byte[] getData();
 
-    @Override
-    public PacketType getType() {
-        return type;
-    }
-
-    public String getSource() {
-        return source;
-    }
+    String toText(Context context, String header);
 }

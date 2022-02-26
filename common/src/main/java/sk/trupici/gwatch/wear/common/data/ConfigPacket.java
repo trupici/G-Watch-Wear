@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package sk.trupici.gwatch.wear.data;
+package sk.trupici.gwatch.wear.common.data;
 
 import java.util.List;
 
-import sk.trupici.gwatch.wear.util.PacketUtils;
+import sk.trupici.gwatch.wear.common.util.PacketUtils;
 
 public class ConfigPacket extends TLVPacket {
     public ConfigPacket(List<TLV> tlvList, int totalLen) {

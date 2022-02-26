@@ -26,7 +26,7 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 
 public class AppWidgetGraphFragment extends sk.trupici.gwatch.wear.settings.fragment.SettingsFragment {
     @Override

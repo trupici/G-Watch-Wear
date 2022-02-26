@@ -24,7 +24,7 @@ import android.os.PersistableBundle;
 
 import java.io.Serializable;
 
-import sk.trupici.gwatch.wear.data.Trend;
+import sk.trupici.gwatch.wear.common.data.Trend;
 
 public class WidgetData implements Serializable {
 

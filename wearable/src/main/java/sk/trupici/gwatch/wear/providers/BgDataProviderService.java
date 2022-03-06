@@ -16,6 +16,7 @@
 package sk.trupici.gwatch.wear.providers;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.ComplicationManager;
 import android.support.wearable.complications.ComplicationProviderService;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
+import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 
 import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MILLIS;
@@ -109,23 +111,25 @@ public class BgDataProviderService extends ComplicationProviderService {
             Log.i(LOG_TAG, "onComplicationUpdate: ts diff=" + (System.currentTimeMillis() - lastUpdate) + " vs " + HOUR_IN_MILLIS);
         }
 
-        ComplicationData data;
+        ComplicationData.Builder builder;
         if (isNoData) {
             if (BuildConfig.DEBUG) {
                 Log.i(LOG_TAG, "onComplicationUpdate: no data for id=" + complicationId + ", type=" + type);
             }
-            data = new ComplicationData.Builder(ComplicationData.TYPE_NO_DATA).build();
+            builder = new ComplicationData.Builder(ComplicationData.TYPE_NO_DATA);
         } else if (type == ComplicationData.TYPE_SHORT_TEXT) {
-            data = new ComplicationData.Builder(type)
+            builder = new ComplicationData.Builder(type)
                     .setShortText(ComplicationText.plainText(text))
-                    .setShortTitle(ComplicationText.plainText(title))
-                    .build();
+                    .setShortTitle(ComplicationText.plainText(title));
+
         } else {//if (type == ComplicationData.TYPE_LONG_TEXT) {
-            data = new ComplicationData.Builder(type)
+            builder = new ComplicationData.Builder(type)
                     .setLongText(ComplicationText.plainText(text))
-                    .setLongTitle(ComplicationText.plainText(title))
-                    .build();
+                    .setLongTitle(ComplicationText.plainText(title));
         }
-        manager.updateComplicationData(complicationId, data);
+        builder
+                .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
+                .build();
+        manager.updateComplicationData(complicationId, builder.build());
     }
 }

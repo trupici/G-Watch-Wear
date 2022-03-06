@@ -249,6 +249,17 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             }
             // Updates correct ComplicationDrawable with updated data.
             ComplicationId id = ComplicationId.valueOf(complicationId);
+
+            // for top ranged complications show only icon if available
+            if (complicationData.getType() == ComplicationData.TYPE_RANGED_VALUE && (id == ComplicationId.TOP_LEFT || id == ComplicationId.TOP_RIGHT)) {
+                if (complicationData.getIcon() != null) {
+                    ComplicationData.Builder builder = new ComplicationData.Builder(complicationData);
+                    builder.setShortTitle(null);
+                    builder.setShortText(null);
+                    complicationData = builder.build();
+                }
+            }
+
             watchfaceConfig.getComplicationConfig(id).getComplicationDrawable().setComplicationData(complicationData);
             complSettingsMap.get(id).setComplicationData(complicationData);
             drawComplicationProgressBar(id);

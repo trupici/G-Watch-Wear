@@ -15,6 +15,7 @@
  limitations under the License.
 -->
 <resources>
+    <string name="app_name_short" translatable="false">G-Watch</string>
     <string name="app_name" translatable="false">G-Watch Wear App</string>
     <string name="provider_name" translatable="false">G-Watch BG Provider</string>
 

@@ -15,6 +15,10 @@
  */
 package sk.trupici.gwatch.wear.providers;
 
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.support.wearable.complications.ComplicationData;
@@ -90,7 +94,7 @@ public class BgDataProviderService extends ComplicationProviderService {
             Log.i(LOG_TAG, "onComplicationUpdate: id=" + complicationId + ", type=" + type);
         }
 
-        if (type != ComplicationData.TYPE_SHORT_TEXT && type != ComplicationData.TYPE_LONG_TEXT && type != ComplicationData.TYPE_RANGED_VALUE) {
+        if (type != ComplicationData.TYPE_SHORT_TEXT && type != ComplicationData.TYPE_LONG_TEXT) {
             manager.noUpdateRequired(complicationId);
             if (BuildConfig.DEBUG) {
                 Log.w(LOG_TAG, "onComplicationUpdate: unsupported type for id=" + complicationId + ", type=" + type);
@@ -103,6 +107,12 @@ public class BgDataProviderService extends ComplicationProviderService {
         String title = prefs.getString(PREF_TITLE, null);
         int value = prefs.getInt(PREF_VALUE, 0);
         long lastUpdate = prefs.getLong(PREF_LAST_UPDATE, 0);
+
+//        text = "TEST";
+//        title = "test";
+//        lastUpdate = System.currentTimeMillis();
+//        PreferenceUtils.setStringValue(this, PREF_TEXT, text);
+//        PreferenceUtils.setStringValue(this, PREF_TITLE, title);
 
         boolean isNoData = text == null || System.currentTimeMillis() - lastUpdate > HOUR_IN_MILLIS;
 
@@ -119,17 +129,23 @@ public class BgDataProviderService extends ComplicationProviderService {
             builder = new ComplicationData.Builder(ComplicationData.TYPE_NO_DATA);
         } else if (type == ComplicationData.TYPE_SHORT_TEXT) {
             builder = new ComplicationData.Builder(type)
+                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
+                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId))
                     .setShortText(ComplicationText.plainText(text))
                     .setShortTitle(ComplicationText.plainText(title));
 
         } else {//if (type == ComplicationData.TYPE_LONG_TEXT) {
             builder = new ComplicationData.Builder(type)
+                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
+                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId))
                     .setLongText(ComplicationText.plainText(text))
                     .setLongTitle(ComplicationText.plainText(title));
         }
-        builder
-                .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
-                .build();
         manager.updateComplicationData(complicationId, builder.build());
+    }
+
+    private PendingIntent createOnTapEvent(Context context, ComponentName provider, int complicationId) {
+        Intent intent = new Intent(context, ComplicationBgGraphActivity.class);
+        return PendingIntent.getActivity(context, complicationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

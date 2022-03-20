@@ -37,7 +37,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
-import sk.trupici.gwatch.wear.components.BgGraph;
+import sk.trupici.gwatch.wear.components.BgGraphPanel;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.DigitalTimePanel;
 import sk.trupici.gwatch.wear.config.complications.ComplicationsConfigAdapter;
@@ -174,7 +174,7 @@ public class DigitalWatchfaceConfigViewAdapter extends WearableRecyclerView.Adap
             case BG_GRAPH:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
                 view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
-                view.setId(BgGraph.CONFIG_ID);
+                view.setId(BgGraphPanel.CONFIG_ID);
                 return new ConfigItemListPageViewHolder(view);
             case ALARMS:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
@@ -203,7 +203,7 @@ public class DigitalWatchfaceConfigViewAdapter extends WearableRecyclerView.Adap
             ConfigItemListPageViewHolder listHolder = (ConfigItemListPageViewHolder) holder;
             if (BgPanel.CONFIG_ID == listHolder.getViewId()) {
                 onBindBgPanelConfigViewHolder(listHolder, position);
-            } else if (BgGraph.CONFIG_ID == listHolder.getViewId()) {
+            } else if (BgGraphPanel.CONFIG_ID == listHolder.getViewId()) {
                 onBindBgGraphConfigViewHolder(listHolder, position);
             } else if (BgAlarmController.CONFIG_ID == listHolder.getViewId()) {
                 onBindAlarmsConfigViewHolder(listHolder, position);
@@ -274,7 +274,7 @@ public class DigitalWatchfaceConfigViewAdapter extends WearableRecyclerView.Adap
         ConfigItemListAdapter adapter = new ConfigItemListAdapter(
                 context,
                 holder.getRecyclerView(),
-                BgGraph.CONFIG_ID,
+                BgGraphPanel.CONFIG_ID,
                 BgGraphMenuItems.items,
                 prefs,
                 watchfaceConfig);

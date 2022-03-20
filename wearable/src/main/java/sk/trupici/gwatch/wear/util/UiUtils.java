@@ -6,7 +6,9 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.text.TextPaint;
+import android.view.View;
 
 public class UiUtils {
 
@@ -45,5 +47,11 @@ public class UiUtils {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         paint.setColor(Color.TRANSPARENT);
         return paint;
+    }
+
+    public static Rect getViewBounds(View view) {
+        int[] pos = new int[2];
+        view.getLocationOnScreen(pos);
+        return new Rect(pos[0], pos[1], view.getWidth(), view.getHeight());
     }
 }

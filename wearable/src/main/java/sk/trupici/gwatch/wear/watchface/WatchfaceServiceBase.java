@@ -51,7 +51,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
-import sk.trupici.gwatch.wear.components.BgGraph;
+import sk.trupici.gwatch.wear.components.BgGraphPanel;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
@@ -115,7 +115,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         protected float refScreenHeight;
 
         private BackgroundPanel bkgPanel;
-        private BgGraph bgGraph;
+        private BgGraphPanel bgGraphPanel;
         private BgPanel bgPanel;
         private BgAlarmController bgAlarmController;
 
@@ -163,8 +163,8 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             bgPanel = new BgPanel((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
             bgPanel.onCreate(context, sharedPrefs);
 
-            bgGraph = new BgGraph((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
-            bgGraph.onCreate(context, sharedPrefs);
+            bgGraphPanel = new BgGraphPanel((int) refScreenWidth, (int) refScreenHeight, watchfaceConfig);
+            bgGraphPanel.onCreate(context, sharedPrefs);
 
             bgAlarmController = new BgAlarmController();
             bgAlarmController.onCreate(context, sharedPrefs);
@@ -173,7 +173,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             initializeCustomPanels(context, (int) refScreenWidth, (int) refScreenHeight);
 
             registerReceiver(context, bgPanel, CommonConstants.BG_RECEIVER_ACTION, CommonConstants.REMOTE_CONFIG_ACTION);
-            registerReceiver(context, bgGraph, CommonConstants.BG_RECEIVER_ACTION, CommonConstants.REMOTE_CONFIG_ACTION);
+            registerReceiver(context, bgGraphPanel, CommonConstants.BG_RECEIVER_ACTION, CommonConstants.REMOTE_CONFIG_ACTION);
             registerReceiver(context, bgAlarmController, CommonConstants.BG_RECEIVER_ACTION);
         }
 
@@ -216,7 +216,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             Context context = getApplicationContext();
             bkgPanel.onPropertiesChanged(context, properties);
             bgPanel.onPropertiesChanged(context, properties);
-            bgGraph.onPropertiesChanged(context, properties);
+            bgGraphPanel.onPropertiesChanged(context, properties);
         }
 
         @Override
@@ -272,7 +272,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         protected void adjustSize(int width, int height) {
             Context context = getApplicationContext();
             bkgPanel.onSizeChanged(context, width, height);
-            bgGraph.onSizeChanged(context, width, height);
+            bgGraphPanel.onSizeChanged(context, width, height);
             bgPanel.onSizeChanged(context, width, height);
         }
 
@@ -302,10 +302,10 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
             long now = System.currentTimeMillis();
             boolean isAmbientMode = isInAmbientMode();
 
-            bgGraph.refresh(now, sharedPrefs);
+            bgGraphPanel.refresh(now, sharedPrefs);
 
             bkgPanel.onDraw(canvas, isAmbientMode);
-            bgGraph.onDraw(canvas, isAmbientMode);
+            bgGraphPanel.onDraw(canvas, isAmbientMode);
             bgPanel.onDraw(canvas, isAmbientMode);
             drawComplications(canvas, isAmbientMode);
             drawCustomPanels(canvas, isAmbientMode);
@@ -336,7 +336,7 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
                 // Preferences might have changed since last time watch face was visible.
                 bkgPanel.onConfigChanged(context, sharedPrefs);
                 bgPanel.onConfigChanged(context, sharedPrefs);
-                bgGraph.onConfigChanged(context, sharedPrefs);
+                bgGraphPanel.onConfigChanged(context, sharedPrefs);
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
                 Rect surfaceRect = getSurfaceHolder().getSurfaceFrame();

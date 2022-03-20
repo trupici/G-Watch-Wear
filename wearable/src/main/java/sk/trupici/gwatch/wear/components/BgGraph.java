@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Juraj Antal
+ * Copyright (C) 2022 Juraj Antal
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,63 +16,27 @@
 
 package sk.trupici.gwatch.wear.components;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Bundle;
 import android.util.Log;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
-import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.config.WatchfaceConfig;
-import sk.trupici.gwatch.wear.data.BgData;
-import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MINUTES;
 import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
 
-public class BgGraph extends BroadcastReceiver implements ComponentPanel {
+public class BgGraph {
     final private static String LOG_TAG = BgGraph.class.getSimpleName();
-
-    public static final int CONFIG_ID = 12;
-
-    public static final String PREF_BKG_COLOR = "graph_color_background";
-    public static final String PREF_HYPO_COLOR = "graph_color_hypo";
-    public static final String PREF_LOW_COLOR = "graph_color_low";
-    public static final String PREF_IN_RANGE_COLOR = "graph_color_in_range";
-    public static final String PREF_HIGH_COLOR = "graph_high_low";
-    public static final String PREF_HYPER_COLOR = "graph_hyper_low";
-
-    public static final String PREF_VERT_LINE_COLOR = "graph_color_vert_line";
-    public static final String PREF_LOW_LINE_COLOR = "graph_color_low_line";
-    public static final String PREF_HIGH_LINE_COLOR = "graph_color_high_line";
-    public static final String PREF_CRITICAL_LINE_COLOR = "graph_color_critical_line";
-
-    public static final String PREF_ENABLE_VERT_LINES = "graph_enable_vert_lines";
-    public static final String PREF_ENABLE_CRITICAL_LINES = "graph_enable_critical_lines";
-    public static final String PREF_ENABLE_HIGH_LINE = "graph_enable_high_line";
-    public static final String PREF_ENABLE_LOW_LINE = "graph_enable_low_line";
-
-    public static final String PREF_ENABLE_DYNAMIC_RANGE = "graph_enable_dynamic_range";
-
-    public static final String PREF_TYPE_LINE = "graph_type_draw_line";
-    public static final String PREF_TYPE_DOTS = "graph_type_draw_dots";
 
     private static final String PREF_DATA = "graph_data";
     private static final String PREF_DATA_LAST_UPD_MIN = "graph_last_upd";
-
-    private static final String PREF_REFRESH_RATE = "graph_refresh_rate";
 
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
@@ -85,80 +49,26 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
     private static final int GRAPH_DYN_PADDING = 7;
 
-    private static final int GRAPH_DATA_LEN = 48;
-
-
-    final private int refScreenWidth;
-    final private int refScreenHeight;
-
-    final private WatchfaceConfig watchfaceConfig;
+    public static final int GRAPH_DATA_LEN = 48;
 
     private int[] graphData = new int[GRAPH_DATA_LEN];
     private long lastGraphUpdateMin = 0;
-    private int refreshRateMin;
 
     private int minValue = 0;
     private int maxValue = 0;
-
-    private int leftPadding;
-    private int rightPadding;
-    private int topPadding;
-    private int bottomPadding;
 
     private Bitmap bitmap;
     private Paint paint;
     private Paint ambientPaint;
 
-    private int backgroundColor;
-    private int hypoColor;
-    private int lowColor;
-    private int inRangeColor;
-    private int highColor;
-    private int hyperColor;
+    private BgGraphParams params;
 
-    private int vertLineColor;
-    private int lowLineColor;
-    private int highLineColor;
-    private int criticalLineColor;
-
-    private int hypoThreshold;
-    private int lowThreshold;
-    private int highThreshold;
-    private int hyperThreshold;
-
-    private boolean enableDynamicRange;
-    private boolean enableVertLines;
-    private boolean enableCriticalLines;
-    private boolean enableHighLine;
-    private boolean enableLowLine;
-
-    private boolean drawChartLine;
-    private boolean drawChartDots;
-
-    private RectF sizeFactors;
     private RectF bounds;
 
-    public BgGraph(int screenWidth, int screenHeight, WatchfaceConfig watchfaceConfig) {
-        this.refScreenWidth = screenWidth;
-        this.refScreenHeight = screenHeight;
-        this.watchfaceConfig = watchfaceConfig;
-    }
+    public void create(SharedPreferences sharedPrefs, BgGraphParams params, RectF bounds) {
+        this.params = params;
 
-    @Override
-    public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        RectF bounds = watchfaceConfig.getBgGraphBounds(context);
-        sizeFactors = new RectF(
-                bounds.left / refScreenWidth,
-                bounds.top / refScreenHeight,
-                bounds.right / refScreenWidth,
-                bounds.bottom / refScreenHeight
-        );
-
-        Rect padding = watchfaceConfig.getBgGraphPadding(context);
-        leftPadding = padding.left;
-        topPadding = padding.top;
-        rightPadding = padding.right;
-        bottomPadding = padding.bottom;
+        this.bounds = bounds;
 
         paint = UiUtils.createPaint();
         paint.setStyle(Paint.Style.FILL);
@@ -166,76 +76,31 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         ambientPaint = UiUtils.createAmbientPaint();
 
         restoreChartData(sharedPrefs);
-        onConfigChanged(context, sharedPrefs);
+        reconfigure(params);
     }
 
-    @Override
-    public void onSizeChanged(Context context, int width, int height) {
-        bounds = new RectF(
-                width * sizeFactors.left,
-                height * sizeFactors.top,
-                width * sizeFactors.right,
-                height * sizeFactors.bottom);
+    public void resize(RectF bounds) {
+        this.bounds = bounds;
 
         bitmap = Bitmap.createBitmap((int) bounds.width(), (int) bounds.height(), Bitmap.Config.ARGB_8888);
         drawChart();
     }
 
-    @Override
-    public void onConfigChanged(Context context, SharedPreferences sharedPrefs) {
-
-        // colors
-        backgroundColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_BKG_COLOR, context.getColor(R.color.def_bg_background_color));
-        hypoColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPO_COLOR, context.getColor(R.color.def_bg_hypo_color));
-        lowColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_COLOR, context.getColor(R.color.def_bg_low_color));
-        inRangeColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_IN_RANGE_COLOR, context.getColor(R.color.def_bg_in_range_color));
-        highColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_COLOR, context.getColor(R.color.def_bg_high_color));
-        hyperColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HYPER_COLOR, context.getColor(R.color.def_bg_hyper_color));
-
-        // lines
-        vertLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_VERT_LINE_COLOR, context.getColor(R.color.def_graph_color_vert_line));
-        lowLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_LOW_LINE_COLOR, context.getColor(R.color.def_graph_color_low_line));
-        highLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_HIGH_LINE_COLOR, context.getColor(R.color.def_graph_color_high_line));
-        criticalLineColor = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_CRITICAL_LINE_COLOR, context.getColor(R.color.def_graph_color_critical_line));
-
-        enableVertLines = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_VERT_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_vert_lines));
-        enableCriticalLines = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_CRITICAL_LINES, context.getResources().getBoolean(R.bool.def_graph_enable_critical_lines));
-        enableHighLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_HIGH_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_high_line));
-        enableLowLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_LOW_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_low_line));
-
-        enableDynamicRange = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_DYNAMIC_RANGE, context.getResources().getBoolean(R.bool.def_graph_enable_dynamic_range));
-
-        drawChartLine = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_LINE, context.getResources().getBoolean(R.bool.def_graph_type_draw_line));
-        drawChartDots = sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_DOTS, context.getResources().getBoolean(R.bool.def_graph_type_draw_dots));
-
-        refreshRateMin = sharedPrefs.getInt(watchfaceConfig.getPrefsPrefix() + PREF_REFRESH_RATE, context.getResources().getInteger(R.integer.def_graph_refresh_rate));
-
-        // levels - external BG panel settings dependency !
-        hypoThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPO_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hypo));
-        lowThreshold = sharedPrefs.getInt(CommonConstants.PREF_LOW_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_low));
-        highThreshold = sharedPrefs.getInt(CommonConstants.PREF_HIGH_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_high));
-        hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
+    public void reconfigure(BgGraphParams params) {
+        this.params = params;
 
         drawChart();
     }
 
-    @Override
-    public void onPropertiesChanged(Context context, Bundle properties) {
-    }
-
-    @Override
-    public void onDraw(Canvas canvas, boolean isAmbientMode) {
+    public void draw(Canvas canvas, boolean isAmbientMode) {
+        if (bitmap == null) {
+            Log.e(LOG_TAG, "Failed to draw graph, bitmap is not ready yet");
+            return;
+        }
         if (isAmbientMode) {
             canvas.drawBitmap(bitmap, bounds.left, bounds.top, ambientPaint);
         } else {
             canvas.drawBitmap(bitmap, bounds.left, bounds.top, paint);
-        }
-    }
-
-    public void refresh(long timeMs, SharedPreferences sharedPrefs) {
-        long currentMinute = timeMs / MINUTE_IN_MILLIS;
-        if (lastGraphUpdateMin != currentMinute) {
-            updateGraphData(null, timeMs, sharedPrefs);
         }
     }
 
@@ -254,7 +119,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
         if (lastGraphUpdateMin != 0) {
             // shift data left
-            int roll = (int) ((now - lastGraphUpdateMin) / refreshRateMin);
+            int roll = (int) ((now - lastGraphUpdateMin) / params.refreshRateMin);
             if (roll > 0) {
                 lastGraphUpdateMin = now;
                 if (BuildConfig.DEBUG) {
@@ -275,7 +140,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         // set new data
         if (bgValue != null) {
             long tsData = timestamp / MINUTE_IN_MILLIS;
-            int diff = (int) Math.round((now - tsData)/(double)refreshRateMin);
+            int diff = (int) Math.round((now - tsData)/(double)params.refreshRateMin);
             if (0 <= diff && diff < GRAPH_DATA_LEN) {
                 int newValue = bgValue.intValue();
                 int idx = GRAPH_DATA_LEN - 1 - diff;
@@ -325,18 +190,18 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "graph: Bitmap size: " + bitmap.getWidth() + " x " + bitmap.getHeight());
-            Log.d(LOG_TAG, "graph: Padding: " + leftPadding + ", " + topPadding + ", " + rightPadding + ", " + bottomPadding);
+            Log.d(LOG_TAG, "graph: Padding: " + params.leftPadding + ", " + params.topPadding + ", " + params.rightPadding + ", " + params.bottomPadding);
         }
 
-        bitmap.eraseColor(backgroundColor);
+        bitmap.eraseColor(params.backgroundColor);
         paint.reset();
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
 
         Canvas canvas = new Canvas(bitmap);
 
-        int width = (int)bounds.width() - leftPadding - rightPadding;
-        int height = (int)bounds.height() - topPadding - bottomPadding;
+        int width = (int)bounds.width() - params.leftPadding - params.rightPadding;
+        int height = (int)bounds.height() - params.topPadding - params.bottomPadding;
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "graph: Paint size: " + width + " x " + height);
         }
@@ -350,57 +215,57 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         float graphPaddingX = (width - count * (2*DOT_RADIUS + padding))/2.0f;
 
         float x, y;
-        float xOffset = leftPadding + graphPaddingX + padding / 2 + DOT_RADIUS;
-        float yOffset = topPadding + height;
+        float xOffset = params.leftPadding + graphPaddingX + padding / 2 + DOT_RADIUS;
+        float yOffset = params.topPadding + height;
 
-        GraphRange graphRange = enableDynamicRange ? getDynamicRange()
+        GraphRange graphRange = params.enableDynamicRange ? getDynamicRange()
                 : new GraphRange(GRAPH_MIN_VALUE, GRAPH_MAX_VALUE, height / GRAPH_VALUE_INT);
 
 
         // draw lines
         paint.setStrokeWidth(1f);
 
-        float xMax = bounds.width() - 1 - rightPadding;
-        float yMax = bounds.height() - 1 - bottomPadding;
+        float xMax = bounds.width() - 1 - params.rightPadding;
+        float yMax = bounds.height() - 1 - params.bottomPadding;
 
         // draw hour interval (vertical) lines
-        if (enableVertLines) {
-            paint.setColor(vertLineColor);
+        if (params.enableVertLines) {
+            paint.setColor(params.vertLineColor);
             for (int mins = HOUR_IN_MINUTES;; mins += HOUR_IN_MINUTES) {
-                float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) refreshRateMin);
-                if (lx < leftPadding) {
+                float lx = xOffset + (2 * DOT_RADIUS + padding) * (count - 1 - mins / (float) params.refreshRateMin);
+                if (lx < params.leftPadding) {
                     break;
                 }
-                canvas.drawLine(lx, topPadding, lx, yMax, paint);
+                canvas.drawLine(lx, params.topPadding, lx, yMax, paint);
             }
         }
 
         // draw critical boundaries (horizontal) lines
-        if (enableCriticalLines) {
-            paint.setColor(criticalLineColor);
-            if (graphRange.isInRange(hyperThreshold)) {
-                y = yOffset - (hyperThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, xMax, y, paint);
+        if (params.enableCriticalLines) {
+            paint.setColor(params.criticalLineColor);
+            if (graphRange.isInRange(params.hyperThreshold)) {
+                y = yOffset - (params.hyperThreshold - graphRange.min) * graphRange.scale;
+                canvas.drawLine(params.leftPadding, y, xMax, y, paint);
             }
 
-            if (graphRange.isInRange(hypoThreshold)) {
-                y = yOffset - (hypoThreshold - graphRange.min) * graphRange.scale;
-                canvas.drawLine(leftPadding, y, xMax, y, paint);
+            if (graphRange.isInRange(params.hypoThreshold)) {
+                y = yOffset - (params.hypoThreshold - graphRange.min) * graphRange.scale;
+                canvas.drawLine(params.leftPadding, y, xMax, y, paint);
             }
         }
 
         // draw high boundary line (horizontal)
-        if (enableHighLine && graphRange.isInRange(highThreshold)) {
-            paint.setColor(highLineColor);
-            y = yOffset - (highThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, xMax, y, paint);
+        if (params.enableHighLine && graphRange.isInRange(params.highThreshold)) {
+            paint.setColor(params.highLineColor);
+            y = yOffset - (params.highThreshold - graphRange.min) * graphRange.scale;
+            canvas.drawLine(params.leftPadding, y, xMax, y, paint);
         }
 
         // draw low boundary line (horizontal)
-        if (enableLowLine && graphRange.isInRange(lowThreshold)) {
-            paint.setColor(lowLineColor);
-            y = yOffset - (lowThreshold - graphRange.min) * graphRange.scale;
-            canvas.drawLine(leftPadding, y, xMax, y, paint);
+        if (params.enableLowLine && graphRange.isInRange(params.lowThreshold)) {
+            paint.setColor(params.lowLineColor);
+            y = yOffset - (params.lowThreshold - graphRange.min) * graphRange.scale;
+            canvas.drawLine(params.leftPadding, y, xMax, y, paint);
         }
 
         // get offset of the left most value
@@ -424,22 +289,22 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
             x = xOffset + (2 * DOT_RADIUS + padding) * (i - valueOffset);
             y = yOffset - ((value - graphRange.min) * graphRange.scale);
 
-            if (value <= hypoThreshold) {
-                color = hypoColor;
-            } else if (value <= lowThreshold) {
-                color = lowColor;
-            } else if (value < highThreshold) {
-                color = inRangeColor;
-            } else if (value < hyperThreshold) {
-                color = highColor;
+            if (value <= params.hypoThreshold) {
+                color = params.hypoColor;
+            } else if (value <= params.lowThreshold) {
+                color = params.lowColor;
+            } else if (value < params.highThreshold) {
+                color = params.inRangeColor;
+            } else if (value < params.hyperThreshold) {
+                color = params.highColor;
             } else {
-                color = hyperColor;
+                color = params.hyperColor;
             }
 
             paint.setColor(color);
 
             // draw value with color
-            if (drawChartLine) { // line graph
+            if (params.drawChartLine) { // line graph
                 paint.setStrokeWidth(LINE_WIDTH);
                 if (prevX == 0 || prevY == 0) {
                     canvas.drawLine(x - LINE_WIDTH / 2f, y, x + LINE_WIDTH / 2f, y, paint);
@@ -448,7 +313,7 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
                 }
             }
 
-            if (drawChartDots) { // dot graph
+            if (params.drawChartDots) { // dot graph
                 canvas.drawCircle(x, y, DOT_RADIUS, paint);
             }
 
@@ -462,10 +327,10 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
 
         // get min displayed value
         int min = minValue;
-        if (min <= lowThreshold){
+        if (min <= params.lowThreshold){
             min = GRAPH_MIN_VALUE;
         } else {
-            min = lowThreshold;
+            min = params.lowThreshold;
         }
         min -= GRAPH_DYN_PADDING;
         if (min < GRAPH_MIN_VALUE) {
@@ -473,10 +338,10 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         }
 
         // get max displayed value
-        float height = bounds.height() - topPadding - bottomPadding;
+        float height = bounds.height() - params.topPadding - params.bottomPadding;
         int max = maxValue;
-        if (max < highThreshold) {
-            max = highThreshold;
+        if (max < params.highThreshold) {
+            max = params.highThreshold;
         } else {
             scale = height / ((float) (max - min + 1));
             max += GRAPH_DYN_PADDING / scale; // increase upper boundary if scaled
@@ -539,21 +404,8 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         }
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (CommonConstants.BG_RECEIVER_ACTION.equals(intent.getAction())) {
-            Bundle extras = intent.getExtras();
-            BgData bgData = BgData.fromBundle(extras);
-            if (bgData.getValue() == 0 || bgData.getTimestamp() == 0) {
-                return;
-            }
-            updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
-        } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
-            onConfigChanged(context, sharedPrefs);
-        } else {
-            Log.e(LOG_TAG, "onReceive: unsupported intent: " + intent.getAction());
-        }
+    public long getLastGraphUpdateMin() {
+        return lastGraphUpdateMin;
     }
 
     static class GraphRange {
@@ -572,4 +424,247 @@ public class BgGraph extends BroadcastReceiver implements ComponentPanel {
         }
     }
 
+    public static class BgGraphParams {
+
+        private int leftPadding;
+        private int rightPadding;
+        private int topPadding;
+        private int bottomPadding;
+
+        private int backgroundColor;
+        private int hypoColor;
+        private int lowColor;
+        private int inRangeColor;
+        private int highColor;
+        private int hyperColor;
+
+        private int vertLineColor;
+        private int lowLineColor;
+        private int highLineColor;
+        private int criticalLineColor;
+
+        private int hypoThreshold;
+        private int lowThreshold;
+        private int highThreshold;
+        private int hyperThreshold;
+
+        private boolean enableDynamicRange;
+        private boolean enableVertLines;
+        private boolean enableCriticalLines;
+        private boolean enableHighLine;
+        private boolean enableLowLine;
+
+        private boolean drawChartLine;
+        private boolean drawChartDots;
+
+        private int refreshRateMin;
+
+        public int getLeftPadding() {
+            return leftPadding;
+        }
+
+        public void setLeftPadding(int leftPadding) {
+            this.leftPadding = leftPadding;
+        }
+
+        public int getRightPadding() {
+            return rightPadding;
+        }
+
+        public void setRightPadding(int rightPadding) {
+            this.rightPadding = rightPadding;
+        }
+
+        public int getTopPadding() {
+            return topPadding;
+        }
+
+        public void setTopPadding(int topPadding) {
+            this.topPadding = topPadding;
+        }
+
+        public int getBottomPadding() {
+            return bottomPadding;
+        }
+
+        public void setBottomPadding(int bottomPadding) {
+            this.bottomPadding = bottomPadding;
+        }
+
+        public int getBackgroundColor() {
+            return backgroundColor;
+        }
+
+        public void setBackgroundColor(int backgroundColor) {
+            this.backgroundColor = backgroundColor;
+        }
+
+        public int getHypoColor() {
+            return hypoColor;
+        }
+
+        public void setHypoColor(int hypoColor) {
+            this.hypoColor = hypoColor;
+        }
+
+        public int getLowColor() {
+            return lowColor;
+        }
+
+        public void setLowColor(int lowColor) {
+            this.lowColor = lowColor;
+        }
+
+        public int getInRangeColor() {
+            return inRangeColor;
+        }
+
+        public void setInRangeColor(int inRangeColor) {
+            this.inRangeColor = inRangeColor;
+        }
+
+        public int getHighColor() {
+            return highColor;
+        }
+
+        public void setHighColor(int highColor) {
+            this.highColor = highColor;
+        }
+
+        public int getHyperColor() {
+            return hyperColor;
+        }
+
+        public void setHyperColor(int hyperColor) {
+            this.hyperColor = hyperColor;
+        }
+
+        public int getVertLineColor() {
+            return vertLineColor;
+        }
+
+        public void setVertLineColor(int vertLineColor) {
+            this.vertLineColor = vertLineColor;
+        }
+
+        public int getLowLineColor() {
+            return lowLineColor;
+        }
+
+        public void setLowLineColor(int lowLineColor) {
+            this.lowLineColor = lowLineColor;
+        }
+
+        public int getHighLineColor() {
+            return highLineColor;
+        }
+
+        public void setHighLineColor(int highLineColor) {
+            this.highLineColor = highLineColor;
+        }
+
+        public int getCriticalLineColor() {
+            return criticalLineColor;
+        }
+
+        public void setCriticalLineColor(int criticalLineColor) {
+            this.criticalLineColor = criticalLineColor;
+        }
+
+        public int getHypoThreshold() {
+            return hypoThreshold;
+        }
+
+        public void setHypoThreshold(int hypoThreshold) {
+            this.hypoThreshold = hypoThreshold;
+        }
+
+        public int getLowThreshold() {
+            return lowThreshold;
+        }
+
+        public void setLowThreshold(int lowThreshold) {
+            this.lowThreshold = lowThreshold;
+        }
+
+        public int getHighThreshold() {
+            return highThreshold;
+        }
+
+        public void setHighThreshold(int highThreshold) {
+            this.highThreshold = highThreshold;
+        }
+
+        public int getHyperThreshold() {
+            return hyperThreshold;
+        }
+
+        public void setHyperThreshold(int hyperThreshold) {
+            this.hyperThreshold = hyperThreshold;
+        }
+
+        public boolean isEnableDynamicRange() {
+            return enableDynamicRange;
+        }
+
+        public void setEnableDynamicRange(boolean enableDynamicRange) {
+            this.enableDynamicRange = enableDynamicRange;
+        }
+
+        public boolean isEnableVertLines() {
+            return enableVertLines;
+        }
+
+        public void setEnableVertLines(boolean enableVertLines) {
+            this.enableVertLines = enableVertLines;
+        }
+
+        public boolean isEnableCriticalLines() {
+            return enableCriticalLines;
+        }
+
+        public void setEnableCriticalLines(boolean enableCriticalLines) {
+            this.enableCriticalLines = enableCriticalLines;
+        }
+
+        public boolean isEnableHighLine() {
+            return enableHighLine;
+        }
+
+        public void setEnableHighLine(boolean enableHighLine) {
+            this.enableHighLine = enableHighLine;
+        }
+
+        public boolean isEnableLowLine() {
+            return enableLowLine;
+        }
+
+        public void setEnableLowLine(boolean enableLowLine) {
+            this.enableLowLine = enableLowLine;
+        }
+
+        public boolean isDrawChartLine() {
+            return drawChartLine;
+        }
+
+        public void setDrawChartLine(boolean drawChartLine) {
+            this.drawChartLine = drawChartLine;
+        }
+
+        public boolean isDrawChartDots() {
+            return drawChartDots;
+        }
+
+        public void setDrawChartDots(boolean drawChartDots) {
+            this.drawChartDots = drawChartDots;
+        }
+
+        public int getRefreshRateMin() {
+            return refreshRateMin;
+        }
+
+        public void setRefreshRateMin(int refreshRateMin) {
+            this.refreshRateMin = refreshRateMin;
+        }
+    }
 }

@@ -37,7 +37,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
-import sk.trupici.gwatch.wear.components.BgGraph;
+import sk.trupici.gwatch.wear.components.BgGraphPanel;
 import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.components.DatePanel;
 import sk.trupici.gwatch.wear.components.WatchHands;
@@ -179,7 +179,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
             case BG_GRAPH:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
                 view.findViewById(R.id.page_title).setVisibility(View.VISIBLE);
-                view.setId(BgGraph.CONFIG_ID);
+                view.setId(BgGraphPanel.CONFIG_ID);
                 return new ConfigItemListPageViewHolder(view);
             case DATE_PANEL:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_config_page2, parent, false);
@@ -209,7 +209,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
             ConfigItemListPageViewHolder listHolder = (ConfigItemListPageViewHolder) holder;
             if (BgPanel.CONFIG_ID == listHolder.getViewId()) {
                 onBindBgPanelConfigViewHolder(listHolder, position);
-            } else if (BgGraph.CONFIG_ID == listHolder.getViewId()) {
+            } else if (BgGraphPanel.CONFIG_ID == listHolder.getViewId()) {
                 onBindBgGraphConfigViewHolder(listHolder, position);
             } else if (DatePanel.CONFIG_ID == listHolder.getViewId()) {
                 onBindDatePanelConfigViewHolder(listHolder, position);
@@ -281,7 +281,7 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         ConfigItemListAdapter adapter = new ConfigItemListAdapter(
                 context,
                 holder.getRecyclerView(),
-                BgGraph.CONFIG_ID,
+                BgGraphPanel.CONFIG_ID,
                 BgGraphMenuItems.items,
                 prefs,
                 watchfaceConfig);

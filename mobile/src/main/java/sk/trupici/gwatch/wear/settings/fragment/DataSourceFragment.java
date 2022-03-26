@@ -47,11 +47,15 @@ public class DataSourceFragment extends sk.trupici.gwatch.wear.settings.fragment
         if (!TMP_FRAGMENT_TAG.equals(getTag())) {
             // show/hide patched LibreLink data source functionality
             CheckBoxPreference pref = (CheckBoxPreference) getPreferenceScreen().findPreference("pref_data_source_libre");
+            CheckBoxPreference pref2 = (CheckBoxPreference) getPreferenceScreen().findPreference("pref_data_source_libre_send_to_aaps");
             if (PreferenceUtils.isConfigured(GWatchApplication.getAppContext(), "pref_data_source_libre_visible", false)) {
                 pref.setVisible(true);
+                pref2.setVisible(true);
             } else if (pref != null) {
                 pref.setChecked(false);
                 pref.setVisible(false);
+                pref2.setChecked(false);
+                pref2.setVisible(false);
             }
         }
         super.onViewCreated(view, savedInstanceState);

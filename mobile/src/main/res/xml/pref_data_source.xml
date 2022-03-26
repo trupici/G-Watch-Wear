@@ -76,6 +76,14 @@
         android:visibility="gone"
         app:iconSpaceReserved="false"
         />
+    <androidx.preference.CheckBoxPreference
+        android:title="@string/pref_data_source_libre_send_to_aaps"
+        android:key="pref_data_source_libre_send_to_aaps"
+        android:defaultValue="false"
+        android:visibility="gone"
+        app:iconSpaceReserved="true"
+        android:dependency="pref_data_source_libre"
+        />
 
     <androidx.preference.PreferenceCategory
         android:title="@string/pref_data_source_nightscout"

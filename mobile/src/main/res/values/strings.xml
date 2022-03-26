@@ -118,6 +118,7 @@
     <string name="pref_data_source_title">Data Source</string>
     <string name="pref_data_source_summary">Select application to use as data source for glucose values</string>
     <string name="pref_data_source_patched_app">Requires patched version with data broadcasts</string>
+    <string name="pref_data_source_libre_send_to_aaps">Propagate to AAPS</string>
 
     <string name="pref_glucose_levels_title">Glucose Levels</string>
     <string name="pref_glucose_levels_summary">Personalize thresholds for glucose ranges</string>

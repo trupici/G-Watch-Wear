@@ -28,6 +28,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.common.data.GlucosePacket;
 import sk.trupici.gwatch.wear.common.data.Packet;
 import sk.trupici.gwatch.wear.common.util.BgUtils;
+import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 
 /**
  * Modify method sendIntent in ThirdPartyIntegration.smali to send data to any app:
@@ -111,6 +112,8 @@ public class LibreLinkReceiver extends BGReceiver {
     private final static String SRC_LABEL = "Libre";
     private final static String PREFERENCE_KEY = "pref_data_source_libre";
 
+    private final static String PREF_KEY_SEND_TO_AAPS = "pref_data_source_libre_send_to_aaps";
+
     @Override
     public String getPreferenceKey() {
         return PREFERENCE_KEY;
@@ -131,17 +134,36 @@ public class LibreLinkReceiver extends BGReceiver {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             Log.i(GWatchApplication.LOG_TAG, "Bundle: " + extras.toString());
-            long timestamp = extras.getLong(EXTRA_TIMESTAMP);
-            double glucoseValue = extras.getDouble(EXTRA_GLUCOSE);
+            long timestamp = extras.getLong(EXTRA_TIMESTAMP, 0L);
+            double glucoseValue = extras.getDouble(EXTRA_GLUCOSE, 0.0);
             if (BuildConfig.DEBUG) {
                 Log.w(GWatchApplication.LOG_TAG, "Glucose: " + glucoseValue + " mg/dl / " + BgUtils.convertGlucoseToMmolL(glucoseValue) + " mmol/l");
                 Log.w(GWatchApplication.LOG_TAG, "Timestamp: " + timestamp);
             }
+
+            if (PreferenceUtils.isConfigured(context, PREF_KEY_SEND_TO_AAPS, false)) {
+                sendIntentToAAPS(context, timestamp, glucoseValue);
+            }
+
             short glucose = (short)Math.round(glucoseValue);
             if (glucose > 0) {
                 return new GlucosePacket(glucose, timestamp, (byte) 0, null, null, getSourceLabel());
             }
         }
         return null;
+    }
+
+    private void sendIntentToAAPS(Context context, long timestamp, double bgValue) {
+        // pretend Tomato app broadcast
+        try {
+            Intent aapsIntent = new Intent("com.fanqies.tomatofn.BgEstimate");
+            aapsIntent.putExtra("com.fanqies.tomatofn.Extras.Time", timestamp);
+            aapsIntent.putExtra("com.fanqies.tomatofn.Extras.BgEstimate", bgValue);
+            aapsIntent.setPackage("info.nightscout.androidaps");
+            aapsIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            context.sendBroadcast(aapsIntent);
+        } catch (Exception e) {
+            Log.e(GWatchApplication.LOG_TAG, "Failed to send data to AAPS", e);
+        }
     }
 }

@@ -108,12 +108,6 @@ public class BgDataProviderService extends ComplicationProviderService {
         int value = prefs.getInt(PREF_VALUE, 0);
         long lastUpdate = prefs.getLong(PREF_LAST_UPDATE, 0);
 
-//        text = "TEST";
-//        title = "test";
-//        lastUpdate = System.currentTimeMillis();
-//        PreferenceUtils.setStringValue(this, PREF_TEXT, text);
-//        PreferenceUtils.setStringValue(this, PREF_TITLE, title);
-
         boolean isNoData = text == null || System.currentTimeMillis() - lastUpdate > HOUR_IN_MILLIS;
 
         if (BuildConfig.DEBUG) {

@@ -39,6 +39,7 @@ import sk.trupici.gwatch.wear.common.data.GlucosePacket;
 import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
+import sk.trupici.gwatch.wear.util.AndroidUtils;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
@@ -125,7 +126,7 @@ public class NotificationService extends Service {
                 context,
                 REQUEST_CODE,
                 showTaskIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | AndroidUtils.getMutableFlag(true));
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_watch)

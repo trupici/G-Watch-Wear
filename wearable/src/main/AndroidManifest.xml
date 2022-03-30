@@ -62,9 +62,9 @@
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
                 android:value="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />
-<!--            <meta-data-->
-<!--                android:name="com.google.android.wearable.watchface.companionConfigurationAction"-->
-<!--                android:value="com.example.android.wearable.watchface.CONFIG_WATCH_ANALOG"/>-->
+            <meta-data
+                android:name="com.google.android.wearable.watchface.companionConfigurationAction"
+                android:value="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG"/>
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />

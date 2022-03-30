@@ -75,7 +75,7 @@ public class AlarmUtils {
             intent.putExtra(KEY_ALARM_ELAPSED, elapsed);
 //            intent.putExtra(KEY_ALARM_RTC, rtc);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT | AndroidUtils.getMutableFlag(true));
 
             try {
                 alarmManager.cancel(pendingIntent);

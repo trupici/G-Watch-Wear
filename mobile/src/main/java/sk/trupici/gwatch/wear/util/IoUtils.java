@@ -18,10 +18,12 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.os.VibratorManager;
 
 import androidx.annotation.RequiresApi;
 
@@ -30,22 +32,33 @@ public class IoUtils {
     private static final long VIBE_DURATION = 200;
 
     public static void vibrate(Context context) {
-        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            vibrateOld(vibrator, VIBE_DURATION);
+            vibrateOld(context, VIBE_DURATION);
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            vibrate8(context, VIBE_DURATION);
         } else {
-            vibrate(vibrator, VIBE_DURATION);
+            vibrate31(context, VIBE_DURATION);
         }
     }
 
     @SuppressWarnings("deprecation")
-    private static void vibrateOld(Vibrator vibrator, long duration) {
+    private static void vibrateOld(Context context, long duration) {
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(VIBE_DURATION);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private static void vibrate(Vibrator vibrator, long duration) {
+    private static void vibrate8(Context context, long duration) {
+        @SuppressWarnings("deprecation")
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         vibrator.vibrate(VibrationEffect.createOneShot(VIBE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    private static void vibrate31(Context context, long duration) {
+        @SuppressLint("WrongConstant")
+        VibratorManager vibratorManager = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+        vibratorManager.getDefaultVibrator().vibrate(VibrationEffect.createOneShot(VIBE_DURATION, VibrationEffect.DEFAULT_AMPLITUDE));
     }
 
 }

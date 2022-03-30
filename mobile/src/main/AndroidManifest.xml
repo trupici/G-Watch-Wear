@@ -95,8 +95,6 @@
         android:theme="@style/AppTheme"
         android:allowBackup="true"
         >
-<!--        android:theme="@style/Theme.GWatchWearApp"-->
-
 
         <receiver
             android:name=".receivers.BootReceiver"
@@ -128,7 +126,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget">
+        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget" android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -160,6 +158,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme"
             android:parentActivityName=".view.MainActivity"
+            android:exported="false"
             />
 
         <activity android:name=".view.PacketViewActivity"
@@ -167,6 +166,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:parentActivityName=".view.MainActivity"
+            android:exported="false"
             />
 
         <activity android:name=".view.AboutActivity"
@@ -174,7 +174,20 @@
             android:screenOrientation="portrait"
             android:theme="@style/DialogTheme"
             android:parentActivityName=".view.MainActivity"
+            android:exported="false"
             />
+
+        <activity
+            android:name=".view.AnalogConfigActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />
+                <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

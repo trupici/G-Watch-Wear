@@ -51,6 +51,7 @@ import sk.trupici.gwatch.wear.common.data.Trend;
 import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
+import sk.trupici.gwatch.wear.util.AndroidUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
@@ -320,7 +321,7 @@ public class WidgetUpdateService extends JobService {
         if (intent == null) { // backup - launch this app
             intent = new Intent(context, MainActivity.class);
         }
-        return PendingIntent.getActivity(context, 0, intent, 0);
+        return PendingIntent.getActivity(context, 0, intent, AndroidUtils.getMutableFlag(true));
     }
 
     private String getSourceAppPackageToLaunch(Context context) {

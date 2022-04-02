@@ -54,6 +54,11 @@ public class WatchDispatcher implements Dispatcher {
     }
 
     @Override
+    public void reconnect(Context context) {
+        setupWearClient(context);
+    }
+
+    @Override
     public boolean dispatch(Packet packet) {
         Log.d(LOG_TAG, "dispatch: " + packet.toText(GWatchApplication.getAppContext(), null));
         WidgetUpdateService.updateWidget(packet);
@@ -65,7 +70,9 @@ public class WatchDispatcher implements Dispatcher {
         }
 
         if (nodeId != null) {
-            notifySendingPacket(packet);
+            final Context context = GWatchApplication.getAppContext();
+
+            showSendingPacket(GWatchApplication.getAppContext(), packet);
 
             String messagePath = getMessagePath(packet);
             if (messagePath == null) {
@@ -77,7 +84,7 @@ public class WatchDispatcher implements Dispatcher {
                     .sendMessage(nodeId, messagePath, packet.getData())
                     .addOnSuccessListener(i -> {
                         Log.d(LOG_TAG, "onSuccess: " + i);
-                        notifyPacketSent(GWatchApplication.getAppContext());
+                        showMessage(context.getString(R.string.packet_sent, StringUtils.formatTime(new Date())));
                         if (packet instanceof ConfigPacket) {
                             UiUtils.showToast(GWatchApplication.getAppContext(), R.string.cfg_transfer_ok);
                         }
@@ -90,7 +97,7 @@ public class WatchDispatcher implements Dispatcher {
                     });
             return true;
         } else if (BuildConfig.DEBUG){
-            Log.i(GWatchApplication.LOG_TAG, "Service not bound.");
+            Log.w(GWatchApplication.LOG_TAG, "Service not bound.");
         }
         return false;
     }
@@ -114,9 +121,12 @@ public class WatchDispatcher implements Dispatcher {
 
     private void setupWearClient(Context context) {
 
+        GWatchApplication.getPacketConsole().onWatchConnectionChanged(false);
+        showMessage(context.getString(R.string.connecting_watch));
+
         // Build a new MessageClient for the Wearable API
-        MessageClient mewssageClient = Wearable.getMessageClient(context);
-        mewssageClient.addListener((messageEvent) -> { // TODO
+        MessageClient messageClient = Wearable.getMessageClient(context);
+        messageClient.addListener((messageEvent) -> { // TODO
             Log.d(LOG_TAG, "onMessageReceived: " + messageEvent);
         });
 
@@ -124,6 +134,9 @@ public class WatchDispatcher implements Dispatcher {
             @Override
             public void run() {
                 nodeId = pickBestNodeId(getNodes(context));
+                boolean isConnected = nodeId != null;
+                showMessage(context.getString(isConnected ? R.string.status_ok : R.string.status_failed));
+                GWatchApplication.getPacketConsole().onWatchConnectionChanged(isConnected);
             }
         }.start();
     }
@@ -154,26 +167,6 @@ public class WatchDispatcher implements Dispatcher {
 
     }
 
-    private void notifyPacketSent(Context context) {
-        try {
-            if (context != null) {
-                String status = GWatchApplication.getAppContext().getString(R.string.packet_sent, StringUtils.formatTime(new Date()));
-                GWatchApplication.getPacketConsole().showPacketStatus(status);
-            }
-        } catch (Throwable e) {
-            Log.e(GWatchApplication.LOG_TAG, e.getLocalizedMessage(), e);
-        }
-    }
-
-    private void notifySendingPacket(Packet packet) {
-        try {
-            GWatchApplication.getPacketConsole().showPacket(GWatchApplication.getAppContext(), packet);
-        } catch (Throwable e) {
-            String errMsg = e.getLocalizedMessage();
-            Log.e(GWatchApplication.LOG_TAG, errMsg == null ? e.getClass().getSimpleName() : errMsg, e);
-        }
-    }
-
     private void updateNotificationService(Packet packet) {
         try {
             if (packet instanceof AAPSPacket) {
@@ -198,6 +191,24 @@ public class WatchDispatcher implements Dispatcher {
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "updateNotificationService: failed to update notification service", e);
+        }
+    }
+
+
+    protected void showMessage(String message) {
+        try {
+            GWatchApplication.getPacketConsole().showText(message);
+        } catch (Throwable e) {
+            Log.e(GWatchApplication.LOG_TAG, e.getLocalizedMessage(), e);
+        }
+    }
+
+    private void showSendingPacket(Context context, Packet packet) {
+        try {
+            showMessage(packet.toText(context, context.getString(R.string.sending_packet)));
+        } catch (Throwable e) {
+            String errMsg = e.getLocalizedMessage();
+            Log.e(GWatchApplication.LOG_TAG, errMsg == null ? e.getClass().getSimpleName() : errMsg, e);
         }
     }
 }

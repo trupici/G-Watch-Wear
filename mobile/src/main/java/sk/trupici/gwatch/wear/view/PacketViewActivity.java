@@ -143,6 +143,8 @@ public class PacketViewActivity extends LocalizedActivityBase implements PacketC
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_clear) {
             consoleBuffer.init();
+        } else if (id == R.id.action_reconnect) {
+            GWatchApplication.getDispatcher().reconnect(this);
         }
         return super.onOptionsItemSelected(item);
     }

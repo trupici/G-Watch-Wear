@@ -18,9 +18,14 @@
 
 package sk.trupici.gwatch.wear.dispatch;
 
+import android.content.Context;
+
 import sk.trupici.gwatch.wear.common.data.Packet;
 
 public interface Dispatcher {
-    /* dispatch packet to the watch */
+    /** dispatch packet to the watch */
     boolean dispatch(Packet packet);
+
+    /** reconnect to the watch */
+    void reconnect(Context context);
 }

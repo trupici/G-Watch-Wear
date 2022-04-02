@@ -221,7 +221,7 @@ public class DexcomShareFollowerService extends FollowerService {
                     return null;
                 }
                 setSessionData(sessionId);
-                UiUtils.showMessage(context, context.getString(R.string.follower_rsp_ok));
+                UiUtils.showMessage(context, context.getString(R.string.status_ok));
                 return sessionId;
             } else {
                 handleErrorIgnoreInvalidSession(response, null);
@@ -283,7 +283,7 @@ public class DexcomShareFollowerService extends FollowerService {
                     UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, context.getString(R.string.follower_err_no_account_id)));
                     return null;
                 }
-                UiUtils.showMessage(context, context.getString(R.string.follower_rsp_ok));
+                UiUtils.showMessage(context, context.getString(R.string.status_ok));
                 return getSessionId(context, accountId, appId);
             } else {
                 handleErrorIgnoreInvalidSession(response, null);

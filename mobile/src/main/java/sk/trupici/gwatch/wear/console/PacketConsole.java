@@ -18,15 +18,9 @@
 
 package sk.trupici.gwatch.wear.console;
 
-import android.content.Context;
-
-import sk.trupici.gwatch.wear.common.data.Packet;
-
 public interface PacketConsole {
 
     void showText(String text);
-    void showPacketStatus(String status);
-    void showPacket(Context context, Packet packet);
 
     void init();
     String getText();

@@ -52,6 +52,7 @@
     <string name="action_clear">Clear content</string>
     <string name="action_import">Import settings</string>
     <string name="action_export">Export settings</string>
+    <string name="action_reconnect">Reconnect</string>
 
     <string name="action_navigation_up">Navigate up</string>
 
@@ -306,6 +307,7 @@
     <string name="glucose_packet_received">"\n%1$s packet received at: %2$s"</string>
     <string name="glucose_packet_invalid">"No valid glucose data found"</string>
     <string name="wakeup_received">\nWake up alarm...</string>
+    <string name="connecting_watch">\nConnecting watch...</string>
 
     <string name="follower_data_request">"\nSending %1$s data request..."</string>
     <string name="follower_data_received">"%1$s data received at: %2$s"</string>
@@ -318,8 +320,9 @@
         <item quantity="other">entries</item>
     </plurals>
 
-    <string name="follower_rsp_ok">OK</string>
-    <string name="follower_rsp_err">FAILED</string>
+    <string name="status_ok">OK</string>
+    <string name="status_failed">FAILED</string>
+
     <string name="follower_rsp_err_message">FAILED: %1$s</string>
     <string name="follower_err_no_session">No session id</string>
     <string name="follower_err_no_account_id">No account id</string>

@@ -18,15 +18,12 @@
 
 package sk.trupici.gwatch.wear.console;
 
-import android.content.Context;
-
+import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
-import sk.trupici.gwatch.wear.common.data.Packet;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 
 public class ConsoleBuffer implements PacketConsole {
@@ -80,21 +77,10 @@ public class ConsoleBuffer implements PacketConsole {
     @Override
     public synchronized String getText() {
         StringBuilder strBuffer = new StringBuilder();
-        Iterator<String> it = buffer.iterator();
-        while (it.hasNext()) {
-            strBuffer.append(it.next()).append("\n");
+        for (String s : buffer) {
+            strBuffer.append(s).append("\n");
         }
         return strBuffer.toString();
-    }
-
-    @Override
-    public void showPacket(Context context, final Packet packet) {
-        appendText(packet.toText(context, context.getString(R.string.sending_packet)));
-    }
-
-    @Override
-    public void showPacketStatus(final String status) {
-        appendText(status);
     }
 
     @Override
@@ -115,9 +101,7 @@ public class ConsoleBuffer implements PacketConsole {
             buffer.removeFirst();
         }
 
-        for (String line : textLines) {
-            buffer.add(line);
-        }
+        Collections.addAll(buffer, textLines);
 
         if (view != null) {
             view.setText(getText());

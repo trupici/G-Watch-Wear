@@ -28,25 +28,19 @@
 <!--        android:orderInCategory="100"-->
 <!--        app:showAsAction="always" />-->
 
-<!--    <item android:id="@+id/action_sync"-->
-<!--        android:title="@string/action_sync"-->
-<!--        android:icon="@drawable/ic_sync_problem"-->
-<!--        app:iconTint="@color/def_white"-->
-<!--        android:orderInCategory="200"-->
-<!--        app:showAsAction="never" />-->
 
-<!--    <item android:id="@+id/action_send"-->
-<!--        android:title="@string/action_send"-->
-<!--        android:icon="@drawable/ic_send"-->
-<!--        app:iconTint="@color/def_white"-->
-<!--        android:orderInCategory="300"-->
-<!--        app:showAsAction="never" />-->
+    <item android:id="@+id/action_reconnect"
+        android:title="@string/action_reconnect"
+        android:icon="@drawable/ic_sync_problem"
+        app:iconTint="@color/def_white"
+        android:orderInCategory="200"
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_clear"
         android:title="@string/action_clear"
-        android:icon="@drawable/delete_24"
+        android:icon="@drawable/ic_delete"
         app:iconTint="@color/def_white"
         android:orderInCategory="400"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>

@@ -177,17 +177,17 @@
             android:exported="false"
             />
 
-        <activity
-            android:name=".view.AnalogConfigActivity"
-            android:screenOrientation="portrait"
-            android:exported="true"
-            >
-            <intent-filter>
-                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />
-                <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+<!--        <activity-->
+<!--            android:name=".view.AnalogConfigActivity"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:exported="true"-->
+<!--            >-->
+<!--            <intent-filter>-->
+<!--                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />-->
+<!--                <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

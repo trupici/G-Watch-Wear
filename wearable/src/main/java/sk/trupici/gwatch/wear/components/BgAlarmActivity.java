@@ -58,13 +58,15 @@ public class BgAlarmActivity extends WearableDialogActivity {
     // timer to finish the alarm after configured time
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private final Runnable timerRunnable = () -> {
-        stopAlarm();
+        Log.d(LOG_TAG, "Timer has elapsed");
         finish();
     };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate");
+
         PowerManager powerManager = (PowerManager)getApplicationContext().getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         if (wakeLock.isHeld()) {
@@ -118,11 +120,12 @@ public class BgAlarmActivity extends WearableDialogActivity {
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
+        Log.d(LOG_TAG, "onDestroy");
         try {
             stopAlarm();
-            super.onStop();
         } finally {
+            super.onDestroy();
             if (wakeLock != null && wakeLock.isHeld()) {
                 wakeLock.release();
             }
@@ -130,6 +133,7 @@ public class BgAlarmActivity extends WearableDialogActivity {
     }
 
     private void startAlarm(BgAlarmController.AlarmConfig alarmConfig, BgAlarmController.AlarmBasicConfig sounds) {
+        Log.d(LOG_TAG, "startAlarm");
 
         if (alarmConfig.type == BgAlarmController.Type.NO_DATA) {
             PreferenceUtils.setLongValue(getApplicationContext(), BgAlarmController.PREF_NO_DATA_LAST_TRIGGERED_AT, System.currentTimeMillis());
@@ -162,10 +166,13 @@ public class BgAlarmActivity extends WearableDialogActivity {
         vibrator.vibrate(effect, aa);
 
         // schedule timer to finish
+        Log.d(LOG_TAG, "Starting timer for: " + alarmConfig.duration * CommonConstants.SECOND_IN_MILLIS);
         timerHandler.postDelayed(timerRunnable, alarmConfig.duration * CommonConstants.SECOND_IN_MILLIS);
     }
 
     protected void stopAlarm() {
+        Log.d(LOG_TAG, "stopAlarm");
+
         // stop timer
         timerHandler.removeCallbacks(timerRunnable);
 

@@ -30,6 +30,7 @@ import sk.trupici.gwatch.wear.common.data.GlucosePacket;
 import sk.trupici.gwatch.wear.common.data.PacketBase;
 import sk.trupici.gwatch.wear.common.data.PacketType;
 import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.components.BgGraph;
 import sk.trupici.gwatch.wear.data.BgData;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 
@@ -112,6 +113,9 @@ public class BgDataProcessor extends Worker {
             editor.putLong(PREF_LAST_BG_TIMESTAMP, bgTimestamp);
             editor.commit();
         }
+
+        // update graph data with new value
+        BgGraph.updateAndRedraw((double)bgValue, bgTimestamp, prefs, samplePeriod);
 
         // broadcast received values to all registered values
         BgData bgData = new BgData(bgValue, bgTimestamp, valueDiff, timestampDiff, trend);

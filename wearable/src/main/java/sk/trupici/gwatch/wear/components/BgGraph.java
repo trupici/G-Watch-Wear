@@ -75,7 +75,10 @@ public class BgGraph {
 
         ambientPaint = UiUtils.createAmbientPaint();
 
-        restoreChartData(sharedPrefs);
+        lastGraphUpdateMin = restoreChartData(sharedPrefs, graphData);
+        if (lastGraphUpdateMin > 0) {
+            recalculateDynamicRange();
+        }
         reconfigure(params);
     }
 
@@ -105,58 +108,17 @@ public class BgGraph {
     }
 
     public void updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs) {
-        if (BuildConfig.DEBUG && bgValue != null) {
-            Log.d(LOG_TAG, "graph: updateGraphData: " + bgValue);
+        // update or reload
+        if (bgValue == null) { // graph data has been already updated by BgData Provider, just reload
+            lastGraphUpdateMin = restoreChartData(sharedPrefs, graphData);
+        } else { // refresh data (scroll left chart)
+            lastGraphUpdateMin = updateGraphData(bgValue, timestamp, sharedPrefs, graphData, lastGraphUpdateMin, params.refreshRateMin);
         }
 
-        final long now = System.currentTimeMillis() / MINUTE_IN_MILLIS; // minutes
-        if (now < 0) {
-            Log.e(LOG_TAG, "graph: now is negative: " + now);
-            return;
-        }
-
-        boolean dataChanged = false;
-
-        if (lastGraphUpdateMin != 0) {
-            // shift data left
-            int roll = (int) ((now - lastGraphUpdateMin) / params.refreshRateMin);
-            if (roll > 0) {
-                lastGraphUpdateMin = now;
-                if (BuildConfig.DEBUG) {
-                    Log.w(LOG_TAG, "graph: clearing data buffer: " + roll);
-                }
-                if (roll >= GRAPH_DATA_LEN) {
-                    Arrays.fill(graphData, 0);
-                } else {
-                    graphData = Arrays.copyOfRange(graphData, roll, roll + GRAPH_DATA_LEN);
-                    recalculateDynamicRange();
-                }
-                dataChanged = true;
-            }
-        } else {
-            lastGraphUpdateMin = now;
-        }
-
-        // set new data
-        if (bgValue != null) {
-            long tsData = timestamp / MINUTE_IN_MILLIS;
-            int diff = (int) Math.round((now - tsData)/(double)params.refreshRateMin);
-            if (0 <= diff && diff < GRAPH_DATA_LEN) {
-                int newValue = bgValue.intValue();
-                int idx = GRAPH_DATA_LEN - 1 - diff;
-                int oldValue = graphData[idx];
-                int value = oldValue == 0 ? newValue : (oldValue + newValue)/2; // kind of average
-                graphData[idx] = value;
-                updateDynamicRange(value);
-                dataChanged = true;
-            }
-//            lastGraphUpdateMin = now;
-        }
-
-
-        if (dataChanged) {
+        // redraw chart
+        if (lastGraphUpdateMin > 0) {
+            recalculateDynamicRange();
             drawChart();
-            storeChartData(sharedPrefs);
         }
     }
 
@@ -358,7 +320,11 @@ public class BgGraph {
     }
 
 
-    private void storeChartData(SharedPreferences sharedPrefs) {
+    /**
+     * Store graph data to its persistent storage
+     */
+    public static void storeChartData(SharedPreferences sharedPrefs, int[] graphData, long lastGraphUpdateMin) {
+        Log.w(LOG_TAG, "storeChartData: ");
         try {
             String serialized = Arrays.stream(graphData)
                     .mapToObj(Integer::toString)
@@ -367,25 +333,27 @@ public class BgGraph {
             SharedPreferences.Editor edit = sharedPrefs.edit();
             edit.putString(PREF_DATA, serialized);
             edit.putInt(PREF_DATA_LAST_UPD_MIN, (int) lastGraphUpdateMin);
-            edit.apply();
+            edit.commit();
         } catch (Exception e) {
             Log.e(LOG_TAG, "graph: storeChartData: failed to store data: " + e.getLocalizedMessage());
         }
     }
 
-    private void restoreChartData(SharedPreferences sharedPrefs) {
-        lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, -1);
+    /**
+     * Restore graph data from persistent storage and return the time of the last update
+     */
+    public static long restoreChartData(SharedPreferences sharedPrefs, int[] graphData) {
+        Log.w(LOG_TAG, "restoreChartData: ");
+        int lastGraphUpdateMin = sharedPrefs.getInt(PREF_DATA_LAST_UPD_MIN, -1);
         if (lastGraphUpdateMin == -1) {
-            lastGraphUpdateMin = 0;
             Log.w(LOG_TAG, "graph: no data timestamp to restore");
-            return;
+            return 0L;
         }
 
         String serialized = sharedPrefs.getString(PREF_DATA, null);
         if (serialized == null) {
             Log.w(LOG_TAG, "graph: no data to restore");
-            lastGraphUpdateMin = 0;
-            return;
+            return 0L;
         }
 
         try {
@@ -394,14 +362,84 @@ public class BgGraph {
                     .toArray();
             if (data.length != GRAPH_DATA_LEN) {
                 Log.w(LOG_TAG, "graph: failed to deserialize data");
-                lastGraphUpdateMin = 0;
-                return;
+                return 0L;
             }
             System.arraycopy(data, 0, graphData, 0, Math.min(GRAPH_DATA_LEN, data.length));
-            recalculateDynamicRange();
+            return lastGraphUpdateMin;
         } catch (Exception e) {
             Log.e(LOG_TAG, "graph: failed to restore data: " + e.getLocalizedMessage());
+            return 0L;
         }
+    }
+
+    /**
+     *  Update persisted graph data and redraw graph
+     */
+    public static void updateAndRedraw(Double bgValue, long bgTimestamp, SharedPreferences sharedPrefs, int refreshRateMin) {
+        Log.w(LOG_TAG, "updateAndRedraw: ");
+        int[] graphData = new int[BgGraph.GRAPH_DATA_LEN];
+        long lastGraphUpdateMin = BgGraph.restoreChartData(sharedPrefs, graphData);
+        BgGraph.updateGraphData((double)bgValue, bgTimestamp, sharedPrefs, graphData, lastGraphUpdateMin, refreshRateMin);
+    }
+
+    /**
+     * Update chart data and store data to persistent storage
+     *
+     * @see #storeChartData(SharedPreferences, int[], long)
+     */
+    public static long updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs, int[] graphData, long lastGraphUpdateMin, int refreshRateMin) {
+        Log.w(LOG_TAG, "updateGraphData: " + bgValue + ", " + timestamp + ", " + lastGraphUpdateMin);
+        if (BuildConfig.DEBUG && bgValue != null) {
+            Log.d(LOG_TAG, "graph: updateGraphData: " + bgValue);
+        }
+
+        final long now = System.currentTimeMillis() / MINUTE_IN_MILLIS; // minutes
+        if (now < 0) {
+            Log.e(LOG_TAG, "graph: now is negative: " + now);
+            return 0L;
+        }
+
+        boolean dataChanged = false;
+
+        if (lastGraphUpdateMin != 0) {
+            // shift data left
+            int roll = (int) ((now - lastGraphUpdateMin) / refreshRateMin);
+            if (roll > 0) {
+                lastGraphUpdateMin = now;
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "graph: clearing data buffer: " + roll);
+                }
+                if (roll >= GRAPH_DATA_LEN) {
+                    Arrays.fill(graphData, 0);
+                } else {
+                    graphData = Arrays.copyOfRange(graphData, roll, roll + GRAPH_DATA_LEN);
+                }
+                dataChanged = true;
+            }
+        } else {
+            lastGraphUpdateMin = now;
+        }
+
+        // set new data
+        if (bgValue != null) {
+            long tsData = timestamp / MINUTE_IN_MILLIS;
+            int diff = (int) Math.round((now - tsData)/(double)refreshRateMin);
+            if (0 <= diff && diff < GRAPH_DATA_LEN) {
+                int newValue = bgValue.intValue();
+                int idx = GRAPH_DATA_LEN - 1 - diff;
+                int oldValue = graphData[idx];
+                int value = oldValue == 0 ? newValue : (oldValue + newValue)/2; // kind of average
+                graphData[idx] = value;
+                dataChanged = true;
+            }
+//            lastGraphUpdateMin = now;
+        }
+
+        if (dataChanged) {
+            storeChartData(sharedPrefs, graphData, (int) lastGraphUpdateMin);
+        }
+
+        return lastGraphUpdateMin;
     }
 
     public long getLastGraphUpdateMin() {

@@ -109,11 +109,9 @@ public class BgGraph {
 
     public void updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs) {
         // update or reload
-        if (bgValue == null) { // graph data has been already updated by BgData Provider, just reload
-            lastGraphUpdateMin = restoreChartData(sharedPrefs, graphData);
-        } else { // refresh data (scroll left chart)
-            lastGraphUpdateMin = updateGraphData(bgValue, timestamp, sharedPrefs, graphData, lastGraphUpdateMin, params.refreshRateMin);
-        }
+        // graph data might be already updated, e.g. by BgData Provider, reload
+        lastGraphUpdateMin = restoreChartData(sharedPrefs, graphData);
+        lastGraphUpdateMin = updateGraphData(bgValue, timestamp, sharedPrefs, graphData, lastGraphUpdateMin, params.refreshRateMin);
 
         // redraw chart
         if (lastGraphUpdateMin > 0) {

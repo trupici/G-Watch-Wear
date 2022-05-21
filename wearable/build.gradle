@@ -20,8 +20,8 @@ android {
         applicationId "sk.trupici.gwatch.wear"
         minSdk 30
         targetSdk 30
-        versionCode 2000005 // use 2xxxxxx codes for watch app
-        versionName "0.9.3"
+        versionCode 2000006 // use 2xxxxxx codes for watch app
+        versionName "0.9.4"
 
         multiDexEnabled true
     }

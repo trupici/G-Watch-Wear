@@ -156,7 +156,7 @@ public abstract class FollowerService extends Service {
         initLastSampleTime();
     }
 
-    private void initLastSampleTime() {
+    protected void initLastSampleTime() {
         setLastSampleTime(System.currentTimeMillis() - getSamplePeriodMs() - getSampleToRequestDelay());
     }
 
@@ -210,7 +210,8 @@ public abstract class FollowerService extends Service {
             }
         }
         // fresh sample received - schedule next regular request
-        return sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - now;
+        long delayMs = sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - now;
+        return Math.max(delayMs, getSamplePeriodMs());
     }
 
     /**

@@ -67,6 +67,7 @@ import sk.trupici.gwatch.wear.common.util.PacketUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
+import sk.trupici.gwatch.wear.followers.LibreLinkUpFollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
 import sk.trupici.gwatch.wear.settings.ConfigData;
 import sk.trupici.gwatch.wear.settings.ConfigType;
@@ -355,6 +356,9 @@ public class SettingsActivity extends LocalizedActivityBase implements
             } else if (key.contains("pref_data_source_dexcom_share_enable")) {
                 // fake preference value to indicate dexcom share follower config change
                 addPreference(changedPrefs, new ValuePreference(this, "pref_data_source_dexcom_share_enable", (byte)1));
+            } else if (key.contains("pref_data_source_librelinkup_enable")) {
+                // fake preference value to indicate librelinkup follower config change
+                addPreference(changedPrefs, new ValuePreference(this, "pref_data_source_librelinkup_enable", (byte)1));
             } else if (PreferenceUtils.PREF_LOCALE.equals(key)) {
                 restartIfLangChanged(((ListPreference) pref).getValue(), sharedPreferences);
             } else {
@@ -432,6 +436,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
         boolean widgetPrefsUpdated = false;
         boolean nightscoutPrefsUpdated = false;
         boolean dexcomSharePrefsUpdated = false;
+        boolean libreLinkUpPrefsUpdated = false;
 
         for (Preference pref : changedPrefs) {
             if (BuildConfig.DEBUG) {
@@ -446,6 +451,8 @@ public class SettingsActivity extends LocalizedActivityBase implements
                 nightscoutPrefsUpdated = true;
             } else if (pref.getKey().contains("dexcom_share")) {
                 dexcomSharePrefsUpdated = true;
+            } else if (pref.getKey().contains("librelinkup")) {
+                libreLinkUpPrefsUpdated = true;
             }
 
             ConfigData mapping = PreferenceMap.data.get(pref.getKey());
@@ -566,6 +573,12 @@ public class SettingsActivity extends LocalizedActivityBase implements
                 Log.d(LOG_TAG, "Dexcom share follower update request due to config change");
             }
             FollowerService.reloadSettings(getApplicationContext(), DexcomShareFollowerService.class);
+        }
+        if (libreLinkUpPrefsUpdated) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "LibreLinkUp follower update request due to config change");
+            }
+            FollowerService.reloadSettings(getApplicationContext(), LibreLinkUpFollowerService.class);
         }
         return result;
     }

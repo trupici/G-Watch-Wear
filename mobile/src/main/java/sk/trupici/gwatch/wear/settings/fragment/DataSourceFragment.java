@@ -72,10 +72,17 @@ public class DataSourceFragment extends sk.trupici.gwatch.wear.settings.fragment
         if ("pref_data_source_nightscout_enable".equals(key)) {
             if (twoStatePreference.isChecked()) {
                 checkPreference("pref_data_source_dexcom_share_enable", false);
+                checkPreference("pref_data_source_librelinkup_enable", false);
             }
         } else if ("pref_data_source_dexcom_share_enable".equals(key)) {
             if (twoStatePreference.isChecked()) {
                 checkPreference("pref_data_source_nightscout_enable", false);
+                checkPreference("pref_data_source_librelinkup_enable", false);
+            }
+        } else if ("pref_data_source_librelinkup_enable".equals(key)) {
+            if (twoStatePreference.isChecked()) {
+                checkPreference("pref_data_source_nightscout_enable", false);
+                checkPreference("pref_data_source_dexcom_share_enable", false);
             }
         } else if ("pref_data_source_dexcom".equals(key)) {
             if (twoStatePreference.isChecked()) {

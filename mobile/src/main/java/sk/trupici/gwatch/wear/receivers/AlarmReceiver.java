@@ -30,6 +30,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
+import sk.trupici.gwatch.wear.followers.LibreLinkUpFollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
@@ -59,6 +60,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 FollowerService.requestNewValue(context, intent, NightScoutFollowerService.class);
             } else if (PreferenceUtils.isConfigured(context, DexcomShareFollowerService.PREF_DEXCOM_ENABLED, false)) {
                 FollowerService.requestNewValue(context, intent, DexcomShareFollowerService.class);
+            } else if (PreferenceUtils.isConfigured(context, LibreLinkUpFollowerService.PREF_LLU_ENABLED, false)) {
+                FollowerService.requestNewValue(context, intent, LibreLinkUpFollowerService.class);
             } else {
                 if (GWatchApplication.isDebugEnabled()) {
                     UiUtils.showMessage(context, context.getString(R.string.wakeup_received));

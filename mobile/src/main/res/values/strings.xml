@@ -278,6 +278,13 @@
     <string name="pref_dexcom_share_us_account_summary_off">International account</string>
     <string name="pref_dexcom_share_us_account_summary_on">US account</string>
 
+    <string name="pref_data_source_librelinkup" translatable="false">LibreLinkUp</string>
+    <string name="pref_librelinkup_enable">Enable LibreLinkUp Follower</string>
+    <string name="pref_librelinkup_account_title">Email</string>
+    <string name="pref_librelinkup_account_summary"> </string>
+    <string name="pref_librelinkup_secret_title">Password</string>
+    <string name="pref_librelinkup_secret_summary"> </string>
+
     <string name="pref_cloud_request_latency_title">Cloud latency:</string>
     <string name="pref_cloud_request_latency_summary">Delay to be added to regular schedule to avoid retries (delay from collecting value to cloud server response), 10–150 seconds</string>
 

@@ -142,6 +142,7 @@
         <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" />
         <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" />
         <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" />
+        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" />
 
         <activity
             android:name=".view.MainActivity"

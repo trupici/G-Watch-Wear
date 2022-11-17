@@ -207,14 +207,14 @@
             android:defaultValue="false"
             app:iconSpaceReserved="false"
             />
-        <sk.trupici.g_watch.settings.TextSummaryPreference
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
             android:title="@string/pref_librelinkup_account_title"
             android:summary="@string/pref_librelinkup_account_summary"
             android:key="cfg_librelinkup_account"
             app:iconSpaceReserved="false"
             android:dependency="pref_data_source_librelinkup_enable"
             />
-        <sk.trupici.g_watch.settings.TextSummaryPreference
+        <sk.trupici.gwatch.wear.settings.TextSummaryPreference
             android:title="@string/pref_librelinkup_secret_title"
             android:summary="@string/pref_librelinkup_secret_summary"
             android:key="cfg_librelinkup_password"
@@ -222,7 +222,7 @@
             app:iconSpaceReserved="false"
             android:dependency="pref_data_source_librelinkup_enable"
             />
-        <sk.trupici.g_watch.settings.IntegerPreference
+        <sk.trupici.gwatch.wear.settings.IntegerPreference
             android:title="@string/pref_cloud_request_latency_title"
             android:summary="@string/pref_cloud_request_latency_summary"
             android:key="cfg_librelinkup_latency"

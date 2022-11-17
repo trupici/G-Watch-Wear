@@ -181,7 +181,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
                 String token = extractToken(receivedData);
                 if (token == null) {
                     if (parseRedirect(receivedData)) {
-                        token = authenticate(context);
+                        return authenticate(context);
                     }
                 }
                 if (token != null) {
@@ -352,15 +352,17 @@ public class LibreLinkUpFollowerService extends FollowerService {
                 JSONObject obj = new JSONObject(rsp);
                 JSONObject data = obj.optJSONObject("data");
                 if (data != null) {
-                    JSONObject redirect = data.optJSONObject("redirect");
+                    Boolean redirect = data.optBoolean("redirect");
                     if (redirect != null) {
                         if (BuildConfig.DEBUG) {
                             Log.i(LOG_TAG, "Redirect: " + redirect);
                         }
-                        String region = redirect.optString("region");
-                        if (region != null) {
-                            serverUrl = resolveRegionalUrl(region);
-                            return serverUrl != null;
+                        if (Boolean.TRUE.equals(redirect)) {
+                            String region = data.optString("region");
+                            if (region != null) {
+                                serverUrl = resolveRegionalUrl(region);
+                                return serverUrl != null;
+                            }
                         }
                     }
                     return false;

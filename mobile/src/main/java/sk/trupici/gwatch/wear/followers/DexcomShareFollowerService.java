@@ -445,7 +445,7 @@ public class DexcomShareFollowerService extends FollowerService {
             account = EMPTY_STRING; // avoid evaluation on next requests
             return null;
         }
-        return account;
+        return account.trim();
     }
 
     /**
@@ -466,7 +466,7 @@ public class DexcomShareFollowerService extends FollowerService {
             secret = EMPTY_STRING;
             return null;
         }
-        return secret;
+        return secret.trim();
     }
 
     private String getServerUrl(Context context) {

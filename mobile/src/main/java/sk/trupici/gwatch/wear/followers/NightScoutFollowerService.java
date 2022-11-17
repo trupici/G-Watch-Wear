@@ -217,7 +217,7 @@ public class NightScoutFollowerService extends FollowerService {
                 apiSecret = EMPTY_STRING; // avoid evaluation on next requests
                 return null;
             }
-            apiSecret = StringUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(plain.getBytes(Charsets.UTF_8)));
+            apiSecret = StringUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(plain.trim().getBytes(Charsets.UTF_8)));
         } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to secure NS secret", e);
         }

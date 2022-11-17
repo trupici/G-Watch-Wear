@@ -54,6 +54,8 @@ public class NightScoutFollowerService extends FollowerService {
     private static final String SRC_LABEL = "NightScout";
 
     private static final int DEF_NS_SAMPLE_LATENCY_MS = 15;
+    private static final int DEF_NS_SAMPLE_FAST_PERIOD_MS = 60000;
+    private static final int DEF_NS_MISSED_SAMPLE_FAST_PERIOD_MS = 0; // disable missed sample feature
 
     public static final String PREF_NS_ENABLED = "pref_data_source_nightscout_enable";
     private static final String PREF_NS_URL = "cfg_nightscout_url";
@@ -61,15 +63,21 @@ public class NightScoutFollowerService extends FollowerService {
     private static final String PREF_NS_EXPLICIT_TRUST = "cfg_nightscout_explicit_trust";
     private static final String PREF_NS_TOKEN = "cfg_nightscout_token";
     private static final String PREF_NS_REQUEST_LATENCY = "cfg_nightscout_latency";
+    private static final String PREF_NS_FAST_SAMPLE_PERIOD = "cfg_nightscout_fast_period";
 
     private static String apiSecret;
     private static String nsToken;
+
+    private static long sampleToRequestDelay = DEF_NS_SAMPLE_LATENCY_MS * 1000L;
+    private static boolean isFastSamplingEnabled = false;
 
     @Override
     protected void init() {
         super.init();
         apiSecret = null;
         nsToken = null;
+        sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_NS_REQUEST_LATENCY, DEF_NS_SAMPLE_LATENCY_MS) * 1000L;
+        isFastSamplingEnabled = PreferenceUtils.isConfigured(GWatchApplication.getAppContext(), PREF_NS_FAST_SAMPLE_PERIOD, false);
     }
 
     @Override
@@ -84,8 +92,17 @@ public class NightScoutFollowerService extends FollowerService {
 
     @Override
     protected long getSampleToRequestDelay() {
-        int delay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_NS_REQUEST_LATENCY, DEF_NS_SAMPLE_LATENCY_MS);
-        return delay * 1000;
+        return sampleToRequestDelay;
+    }
+
+    @Override
+    protected long getSamplePeriodMs() {
+        return isFastSamplingEnabled ? DEF_NS_SAMPLE_FAST_PERIOD_MS : super.getSamplePeriodMs();
+    }
+
+    @Override
+    protected long getMissedSamplePeriodMs() {
+        return isFastSamplingEnabled ? DEF_NS_MISSED_SAMPLE_FAST_PERIOD_MS : super.getMissedSamplePeriodMs();
     }
 
     @Override
@@ -175,7 +192,9 @@ public class NightScoutFollowerService extends FollowerService {
      * Get date for If-Modified-Since http header
      */
     private Date getModifiedSince() {
-        long since = getLastSampleTime() != null ? getLastSampleTime() : System.currentTimeMillis() - DEF_SAMPLE_PERIOD_MS - DEF_SAMPLE_LATENCY_MS;
+        long since = getLastSampleTime() != null
+                ? getLastSampleTime()
+                : System.currentTimeMillis() - getSamplePeriodMs() - getSampleToRequestDelay();
         return new Date(since);
     }
 

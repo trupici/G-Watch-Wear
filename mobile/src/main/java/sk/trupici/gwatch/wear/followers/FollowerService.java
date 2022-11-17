@@ -157,7 +157,7 @@ public abstract class FollowerService extends Service {
     }
 
     private void initLastSampleTime() {
-        setLastSampleTime(System.currentTimeMillis() - DEF_SAMPLE_PERIOD_MS - getSampleToRequestDelay());
+        setLastSampleTime(System.currentTimeMillis() - getSamplePeriodMs() - getSampleToRequestDelay());
     }
 
     protected void scheduleNewRequest(Context context, long delayMs) {
@@ -176,6 +176,23 @@ public abstract class FollowerService extends Service {
     }
 
     /**
+     * Returns a period for server requests to get a new BG value.
+     * @see #DEF_SAMPLE_PERIOD_MS
+     */
+    protected long getSamplePeriodMs() {
+        return DEF_SAMPLE_PERIOD_MS;
+    }
+
+    /**
+     * Returns a period for the next server requests when missed sample is detected,
+     * or 0 if no special handling for missed sample is required.
+     * @see #MISSED_SAMPLE_PERIOD_MS
+     */
+    protected long getMissedSamplePeriodMs() {
+        return MISSED_SAMPLE_PERIOD_MS;
+    }
+
+    /**
      * Returns delay in ms for scheduling next request to NS server
      * @param packet last received glucose packet
      * @return delay in milliseconds (from now) when to request next value from NS server
@@ -184,14 +201,16 @@ public abstract class FollowerService extends Service {
         long now = System.currentTimeMillis();
         Long sampleTime = (packet != null) ? Long.valueOf(packet.getTimestamp()) : getLastSampleTime();
         if (sampleTime == null || sampleTime > now) { // no valid info about last sample
-            return DEF_SAMPLE_PERIOD_MS;
-        } else if (sampleTime < now - 2 * DEF_SAMPLE_PERIOD_MS) { // sample older than fast polling period
-            return DEF_SAMPLE_PERIOD_MS;
-        } else if (sampleTime < now - DEF_SAMPLE_PERIOD_MS - getSampleToRequestDelay()) { // sample missed -> fast polling
-            return MISSED_SAMPLE_PERIOD_MS;
-        } else { // fresh sample received - schedule next regular request
-            return sampleTime + DEF_SAMPLE_PERIOD_MS + getSampleToRequestDelay() - now;
+            return getSamplePeriodMs();
+        } else if (getMissedSamplePeriodMs() > 0) {
+            if (sampleTime < now - 2 * getSamplePeriodMs()) { // sample older than fast polling period
+                return getSamplePeriodMs();
+            } else if (sampleTime < now - getSamplePeriodMs() - getSampleToRequestDelay()) { // sample missed -> fast polling
+                return getMissedSamplePeriodMs();
+            }
         }
+        // fresh sample received - schedule next regular request
+        return sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - now;
     }
 
     /**

@@ -58,7 +58,7 @@
 
     <!-- ABOUT dialog -->
 
-    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.4</string>
+    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.5</string>
 
     <string name="about_author">Author: Juraj Antal</string>
 
@@ -265,6 +265,8 @@
     <string name="pref_nightscout_exp_trust_summary">Use, if you have issues with server certificate (self-signed, private CA, etc.)</string>
     <string name="pref_nightscout_token_title">Access Token</string>
     <string name="pref_nightscout_token_summary">Optional, depends on NS setup and role</string>
+    <string name="pref_nightscout_fast_period_title">1 min poll period</string>
+    <string name="pref_nightscout_fast_period_summary">Enable, if you use CGM with 1 minute readings (e.g. Libre 3)</string>
 
     <string name="pref_data_source_dexcom_share" translatable="false">Dexcom Share</string>
     <string name="pref_dexcom_share_enable">Enable Dexcom Share Follower</string>

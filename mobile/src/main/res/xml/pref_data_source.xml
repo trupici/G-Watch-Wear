@@ -137,6 +137,14 @@
             app:iconSpaceReserved="false"
             android:dependency="pref_data_source_nightscout_enable"
             />
+        <androidx.preference.CheckBoxPreference
+            android:title="@string/pref_nightscout_fast_period_title"
+            android:summary="@string/pref_nightscout_fast_period_summary"
+            android:key="cfg_nightscout_fast_period"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            android:dependency="pref_data_source_nightscout_enable"
+            />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
         android:title="@string/pref_data_source_dexcom_share"

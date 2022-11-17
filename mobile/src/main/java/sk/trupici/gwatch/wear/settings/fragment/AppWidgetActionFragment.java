@@ -44,19 +44,21 @@ public class AppWidgetActionFragment extends sk.trupici.gwatch.wear.settings.fra
         }
 
         if ("pref_widget_launch_me".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_glimp".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_xdrip".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_aaps".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_diabox".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_dexcom".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom_follow");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom_follow", "pref_widget_launch_juggluco");
         } else if ("pref_widget_launch_dexcom_follow".equals(key)) {
-            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom");
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_juggluco");
+        } else if ("pref_widget_launch_juggluco".equals(key)) {
+            selectRadioButton(twoStatePreference, "pref_widget_launch_me", "pref_widget_launch_glimp", "pref_widget_launch_xdrip", "pref_widget_launch_aaps", "pref_widget_launch_diabox", "pref_widget_launch_dexcom", "pref_widget_launch_dexcom_follow");
         }
         return false;
     }

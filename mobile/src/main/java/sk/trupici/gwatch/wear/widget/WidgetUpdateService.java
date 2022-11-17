@@ -333,6 +333,8 @@ public class WidgetUpdateService extends JobService {
             return "info.nightscout.androidaps";
         } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_diabox", false)) {
             return "com.outshineiot.diabox";
+        } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_juggluco", false)) {
+            return "tk.glucodata";
         } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_dexcom", false)) {
             return DexcomUtils.getInstalledDexcomAppPackage();
         } else if (PreferenceUtils.isConfigured(context, "pref_widget_launch_dexcom_follow", false)) {

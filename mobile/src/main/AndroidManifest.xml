@@ -83,6 +83,7 @@
         <package android:name="com.dexcom.follow.region5.mgdl" />
         <package android:name="com.dexcom.follow.region6.mgdl" />
         <package android:name="com.dexcom.follow.region7.mgdl" />
+        <package android:name="tk.glucodata" />
     </queries>
 
 
@@ -123,6 +124,8 @@
                 <action android:name="com.outshineiot.diabox.BgEstimate"/>
                 <!-- Broadcast from BYOD App -->
                 <action android:name="com.dexcom.cgm.EXTERNAL_BROADCAST"/>
+                <!-- Broadcast from Juggluco -->
+                <action android:name="glucodata.Minute"/>
             </intent-filter>
         </receiver>
 

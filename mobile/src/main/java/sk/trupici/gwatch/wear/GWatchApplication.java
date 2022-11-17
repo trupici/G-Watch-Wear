@@ -40,6 +40,7 @@ import sk.trupici.gwatch.wear.receivers.BGReceiver;
 import sk.trupici.gwatch.wear.receivers.DexComReceiver;
 import sk.trupici.gwatch.wear.receivers.DiaboxReceiver;
 import sk.trupici.gwatch.wear.receivers.GlimpReceiver;
+import sk.trupici.gwatch.wear.receivers.JugglucoReceiver;
 import sk.trupici.gwatch.wear.receivers.LibreAlarmReceiver;
 import sk.trupici.gwatch.wear.receivers.LibreLinkReceiver;
 import sk.trupici.gwatch.wear.receivers.XDripReceiver;
@@ -92,6 +93,7 @@ public class GWatchApplication extends Application {
         registerReceiver(new DexComReceiver());
         registerReceiver(new LibreAlarmReceiver());
         registerReceiver(new DiaboxReceiver());
+        registerReceiver(new JugglucoReceiver());
 
         NotificationService.startService(this);
 

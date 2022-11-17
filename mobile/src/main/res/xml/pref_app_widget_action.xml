@@ -70,5 +70,11 @@
             android:defaultValue="false"
             app:iconSpaceReserved="false"
             />
+        <androidx.preference.CheckBoxPreference
+            android:title="Juggluco"
+            android:key="pref_widget_launch_juggluco"
+            android:defaultValue="false"
+            app:iconSpaceReserved="false"
+            />
     </androidx.preference.PreferenceCategory>
 </androidx.preference.PreferenceScreen>

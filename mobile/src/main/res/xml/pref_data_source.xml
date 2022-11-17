@@ -62,6 +62,12 @@
         app:iconSpaceReserved="false"
         />
     <androidx.preference.CheckBoxPreference
+        android:title="Juggluco"
+        android:key="pref_data_source_juggluco"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
         android:title="DexCom App"
         android:summary="@string/pref_data_source_patched_app"
         android:key="pref_data_source_dexcom"

@@ -22,7 +22,7 @@
 
     <string name="app_desc_title" translatable="false">G-Watch Wear App</string>
     <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!</string>
-    <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, NightScout, Dexcom Share) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
+    <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, Juggluco, NightScout, Dexcom Share, LibreLink) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
 
     <string name="app_desc_config">The appearance and behavior of G-Watch watch faces can be configured directly on the watch. BG data source to use to get readings is configured in mobile app Settings. Select Settings menu option or swipe left on the main app screen to see all configuration options.</string>
     <string name="app_desc_widget">Use G-Watch Wear App widget to see your bg values also on the phone.</string>
@@ -88,6 +88,7 @@
     <string name="about_diabox"><body><b>DiaBox</b> application by Bubblan, www.bubblan.org</body></string>
     <string name="about_dexcom"><body><b>DexCom</b> and <b>Dexcom Share</b> application by Dexcom, Inc., www.dexcom.com</body></string>
     <string name="about_nightscout"><body><b>NightScout</b> application by Nightscout Foundation, www.nightscout.info</body></string>
+    <string name="about_juggluco"><body><b>Juggluco</b> application by Jaap Korthals Altes, http://jkaltes.byethost16.com/Juggluco</body></string>
 
     <string name="about_resources_title">Resources</string>
     <string name="about_resources">This application uses resources from the following sites:</string>

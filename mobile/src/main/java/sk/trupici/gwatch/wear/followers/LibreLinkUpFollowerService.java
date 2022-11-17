@@ -352,18 +352,14 @@ public class LibreLinkUpFollowerService extends FollowerService {
                 JSONObject obj = new JSONObject(rsp);
                 JSONObject data = obj.optJSONObject("data");
                 if (data != null) {
-                    Boolean redirect = data.optBoolean("redirect");
-                    if (redirect != null) {
+                    boolean redirect = data.optBoolean("redirect");
+                    if (redirect) {
                         if (BuildConfig.DEBUG) {
                             Log.i(LOG_TAG, "Redirect: " + redirect);
                         }
-                        if (Boolean.TRUE.equals(redirect)) {
-                            String region = data.optString("region");
-                            if (region != null) {
-                                serverUrl = resolveRegionalUrl(region);
-                                return serverUrl != null;
-                            }
-                        }
+                        String region = data.optString("region");
+                        serverUrl = resolveRegionalUrl(region);
+                        return serverUrl != null;
                     }
                     return false;
                 }

@@ -35,6 +35,7 @@ import sk.trupici.gwatch.wear.console.PacketConsole;
 import sk.trupici.gwatch.wear.dispatch.Dispatcher;
 import sk.trupici.gwatch.wear.dispatch.WatchDispatcher;
 import sk.trupici.gwatch.wear.receivers.AAPSReceiver;
+import sk.trupici.gwatch.wear.receivers.AidexReceiver;
 import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
 import sk.trupici.gwatch.wear.receivers.BGReceiver;
 import sk.trupici.gwatch.wear.receivers.DexComReceiver;
@@ -94,6 +95,7 @@ public class GWatchApplication extends Application {
         registerReceiver(new LibreAlarmReceiver());
         registerReceiver(new DiaboxReceiver());
         registerReceiver(new JugglucoReceiver());
+        registerReceiver(new AidexReceiver());
 
         NotificationService.startService(this);
 

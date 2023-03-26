@@ -16,7 +16,7 @@ The list of supported features for this release:
 - customizable BG graph
 - 3rd party complications support.
 - adjustable BG thresholds from thr mobile app
-- support of xDrip+, Diabox, AndroidAPS, Glimp, BTOD, Nightscout and Dexcom share as a source of BG data.
+- support of xDrip+, Diabox, AndroidAPS, Glimp, BYOD, Juggluco, AiDEX, Nightscout and Dexcom share as a source of BG data.
 - integrated BG values complication provider for other watch faces
 - phone app widget with current BG value, trend, BG graph and data source indicator
 

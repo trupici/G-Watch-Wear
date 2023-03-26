@@ -46,6 +46,9 @@
     <!-- BYOD app integration -->
     <uses-permission android:name="com.dexcom.cgm.EXTERNAL_PERMISSION" />
 
+    <!-- AiDEX app integration -->
+    <uses-permission android:name="com.microtechmd.cgms.aidex.permissions.RECEIVE_BG_ESTIMATE" />
+
     <queries>
         <package android:name="com.samsung.accessory" />
         <package android:name="it.ct.glicemia" />
@@ -84,6 +87,10 @@
         <package android:name="com.dexcom.follow.region6.mgdl" />
         <package android:name="com.dexcom.follow.region7.mgdl" />
         <package android:name="tk.glucodata" />
+        <package android:name="com.microtechmd.cgms.mg" />
+        <package android:name="com.microtechmd.cgms.mmol" />
+        <package android:name="com.microtechmd.cgms.uk" />
+        <package android:name="com.microtechmd.cgms.aidex" />
     </queries>
 
 
@@ -126,6 +133,8 @@
                 <action android:name="com.dexcom.cgm.EXTERNAL_BROADCAST"/>
                 <!-- Broadcast from Juggluco -->
                 <action android:name="glucodata.Minute"/>
+                <!-- Broadcast from AiDEX -->
+                <action android:name="com.microtechmd.cgms.aidex.action.BgEstimate" />
             </intent-filter>
         </receiver>
 

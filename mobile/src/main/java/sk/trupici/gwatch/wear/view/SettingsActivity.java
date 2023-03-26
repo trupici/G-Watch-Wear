@@ -97,6 +97,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
     public static final int REQUEST_CODE_IMPORT_FROM = 2;
 
     public static final int REQUEST_CODE_DEXCOM_PERMISSION = 10;
+    public static final int REQUEST_CODE_AIDEX_PERMISSION = 20;
 
     private static final String CONFIG_FILE_NAME = "gwatch-wear-settings.xml";
     private static final String CONFIG_MEDIA_TYPE = "application/xml";

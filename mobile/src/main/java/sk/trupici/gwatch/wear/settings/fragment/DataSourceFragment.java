@@ -30,6 +30,7 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
+import sk.trupici.gwatch.wear.util.AidexUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.view.SettingsActivity;
 
@@ -87,6 +88,10 @@ public class DataSourceFragment extends sk.trupici.gwatch.wear.settings.fragment
         } else if ("pref_data_source_dexcom".equals(key)) {
             if (twoStatePreference.isChecked()) {
                 DexcomUtils.checkAndRequestDexcomPermission((SettingsActivity)getActivity(), SettingsActivity.REQUEST_CODE_DEXCOM_PERMISSION);
+            }
+        } else if ("pref_data_source_aidex".equals(key)) {
+            if (twoStatePreference.isChecked()) {
+                AidexUtils.checkAndRequestAppPermission((SettingsActivity)getActivity(), SettingsActivity.REQUEST_CODE_AIDEX_PERMISSION);
             }
         }
         return false;

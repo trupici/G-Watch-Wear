@@ -49,6 +49,8 @@ public abstract class GlucosePacketBase extends PacketBase {
         if (header != null) {
             text.append(header).append("\n");
         }
+
+
         text.append(context.getString(R.string.packet_type, getType().name())).append("\n");
         text.append(context.getString(R.string.packet_source, getSource())).append("\n");
         text.append(context.getString(R.string.packet_received_at, StringUtils.formatTime(new Date(receivedAt)))).append("\n");

@@ -466,6 +466,14 @@
                             android:paddingTop="8dp"
                             android:autoLink="all"
                             />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/about_aidex"
+                            android:textSize="14sp"
+                            android:paddingTop="8dp"
+                            android:autoLink="all"
+                            />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>

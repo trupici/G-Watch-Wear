@@ -27,13 +27,13 @@
     <androidx.preference.CheckBoxPreference
         android:title="Glimp"
         android:key="pref_data_source_glimp"
-        android:defaultValue="true"
+        android:defaultValue="false"
         app:iconSpaceReserved="false"
         />
     <androidx.preference.CheckBoxPreference
         android:title="xDrip+"
         android:key="pref_data_source_xdrip"
-        android:defaultValue="true"
+        android:defaultValue="false"
         app:iconSpaceReserved="false"
         />
     <androidx.preference.CheckBoxPreference
@@ -64,6 +64,12 @@
     <androidx.preference.CheckBoxPreference
         android:title="Juggluco"
         android:key="pref_data_source_juggluco"
+        android:defaultValue="false"
+        app:iconSpaceReserved="false"
+        />
+    <androidx.preference.CheckBoxPreference
+        android:title="AiDEX"
+        android:key="pref_data_source_aidex"
         android:defaultValue="false"
         app:iconSpaceReserved="false"
         />

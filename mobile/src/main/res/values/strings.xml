@@ -22,7 +22,7 @@
 
     <string name="app_desc_title" translatable="false">G-Watch Wear App</string>
     <string name="app_desc_intro">Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!</string>
-    <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, Juggluco, NightScout, Dexcom Share, LibreLink) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
+    <string name="app_desc_text">G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, DexCom, LibreAlarm, AndroidAPS, Juggluco, AiDEX, NightScout, Dexcom Share, LibreLink) and sends collected data to the watch. G-Watch watch faces then display received values to its user. G-Watch faces also serve as a complication provider so you can see your BG data also in your favorite watch face.</string>
 
     <string name="app_desc_config">The appearance and behavior of G-Watch watch faces can be configured directly on the watch. BG data source to use to get readings is configured in mobile app Settings. Select Settings menu option or swipe left on the main app screen to see all configuration options.</string>
     <string name="app_desc_widget">Use G-Watch Wear App widget to see your bg values also on the phone.</string>
@@ -58,14 +58,14 @@
 
     <!-- ABOUT dialog -->
 
-    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.5</string>
+    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.6-b</string>
 
     <string name="about_author">Author: Juraj Antal</string>
 
     <string name="about_design_title">Design and art work:</string>
     <string name="about_designer" translatable="false"><a href="https://getwatchmaker.com/user/Bkd6tbYxr">Frederik Wagner</a></string>
 
-    <string name="about_copyright" translatable="false">Copyright © 2022</string>
+    <string name="about_copyright" translatable="false">Copyright © 2023</string>
     <string name="about_email" translatable="false">email: trupici.sk@gmail.com</string>
     <string name="about_fb" translatable="false">facebook: fb.me/gwatchapp</string>
     <string name="about_source_code_title">Source code:</string>
@@ -89,6 +89,7 @@
     <string name="about_dexcom"><body><b>DexCom</b> and <b>Dexcom Share</b> application by Dexcom, Inc., www.dexcom.com</body></string>
     <string name="about_nightscout"><body><b>NightScout</b> application by Nightscout Foundation, www.nightscout.info</body></string>
     <string name="about_juggluco"><body><b>Juggluco</b> application by Jaap Korthals Altes, http://jkaltes.byethost16.com/Juggluco</body></string>
+    <string name="about_aidex"><body><b>AiDEX</b> application by MicroTech Medical, https://www.microtechmd.com/en/</body></string>
 
     <string name="about_resources_title">Resources</string>
     <string name="about_resources">This application uses resources from the following sites:</string>
@@ -339,4 +340,5 @@
 
 
     <string name="dexcom_app_not_installed">Dexcom App is not installed!</string>
+    <string name="aidex_app_not_installed">AiDEX app is not installed!</string>
 </resources>

@@ -65,7 +65,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
     private static final String LLU_SERVER_URL = "https://api.libreview.io";
     private static final String LLU_SERVER_URL_PATTERN = "https://api-%s.libreview.io";
 
-    public static final String USER_AGENT = "LibreLinkUp/4.1.1 CFNetwork/711.2.23 Darwin/14.0.0";
+    public static final String USER_AGENT = "LibreLinkUp/4.7.0 CFNetwork/711.2.23 Darwin/14.0.0";
 
     private static final int DEF_LLU_SAMPLE_LATENCY_MS = 15;
     private static final int DEF_LLU_SAMPLE_PERIOD_MS = 60000;
@@ -141,7 +141,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
         return new Request.Builder()
                 .addHeader("User-Agent", USER_AGENT)
                 .addHeader("product", "llu.ios")
-                .addHeader("version", "4.1.1")
+                .addHeader("version", "4.7.0")
                 .addHeader("Accept", "application/json")
                 .addHeader("Pragma", "no-cache")
                 ;
@@ -374,7 +374,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
     }
 
     private String resolveRegionalUrl(String region) {
-        if (region == null || region.length() != 2) {
+        if (region == null || region.length() < 2 || region.length() > 4) {
             return null;
         } else {
             return String.format(LLU_SERVER_URL_PATTERN, region);

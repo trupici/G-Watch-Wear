@@ -26,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.preference.PreferenceManager;
@@ -33,7 +34,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.util.IoUtils;
 
-public class AboutActivity extends LocalizedActivityBase  {
+public class AboutActivity extends AppCompatActivity {
 
     private static final long CHANGE_OPTIONS_LIMIT = 3000; // 3s
     private static final long CHANGE_OPTIONS_TAP_COUNT = 5;

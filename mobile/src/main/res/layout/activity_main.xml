@@ -99,6 +99,14 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="12dp"
                 android:textSize="16sp"
+                android:text="@string/app_desc_wiki"
+                android:autoLink="web" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:textSize="16sp"
                 android:text="@string/app_desc_more_info"
                 android:autoLink="web" />
 

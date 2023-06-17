@@ -29,6 +29,7 @@ import sk.trupici.gwatch.wear.common.data.AAPSPacket;
 import sk.trupici.gwatch.wear.common.data.Packet;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
+import sk.trupici.gwatch.wear.util.AndroidUtils;
 
 /**
  */
@@ -102,7 +103,8 @@ public class AAPSReceiver extends BGReceiver {
         if (BuildConfig.DEBUG) {
             if (bundle != null) {
                 for (String key : bundle.keySet()) {
-                    Log.i(GWatchApplication.LOG_TAG, key + " : " + (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+                    Object value = AndroidUtils.getBundleObject(bundle, key);
+                    Log.i(GWatchApplication.LOG_TAG, key + " : " + (value != null ? value : "NULL"));
                 }
             }
         }

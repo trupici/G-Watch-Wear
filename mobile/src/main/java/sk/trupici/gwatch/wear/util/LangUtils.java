@@ -18,7 +18,7 @@
 
 package sk.trupici.gwatch.wear.util;
 
-import android.annotation.SuppressLint;
+import android.app.LocaleManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -27,52 +27,62 @@ import android.os.Build;
 import android.os.LocaleList;
 import android.util.Log;
 
+import java.util.Arrays;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
+import sk.trupici.gwatch.wear.R;
 
 public class LangUtils {
 
     public static final String DEF_LANG = "system";
 
-    @SuppressLint("ConstantLocale")
-    private static final String systemDefault = Locale.getDefault().getLanguage();
 
-    public static Context createLangContext(Context context) {
-        String langCode = getSavedLang(context);
-        if (DEF_LANG.equals(langCode)) {
-            langCode = systemDefault;
-        }
-
-        return updateLocale(context, langCode);
-    }
-
-    public static Context updateLocale(Context context, String localeCode) {
+    public static boolean updateLocale(Context context, String localeCode) {
         if (BuildConfig.DEBUG) {
             Log.w(GWatchApplication.LOG_TAG, "Setting locale: " + localeCode);
         }
-
-        Locale locale = new Locale(localeCode);
-        Locale.setDefault(locale);
-
-        Configuration config = new Configuration(context.getResources().getConfiguration());
-        setLocale(config, locale);
-        return context.createConfigurationContext(config);
-    }
-
-    public static String getCurrentLang(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return context.getResources().getConfiguration().getLocales().get(0).getLanguage();
-        } else{
-            return getLocaleOld(context).getLanguage();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.getSystemService(LocaleManager.class).setApplicationLocales(new LocaleList(Locale.forLanguageTag(localeCode)));
+            return false;
+        } else {
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(localeCode));
+            return true;
         }
     }
 
-    public static String getSavedLang(Context context) {
+    public static LocaleList getPreferredLocaleList(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return context.getSystemService(LocaleManager.class).getApplicationLocales();
+        } else {
+            LocaleListCompat compat = AppCompatDelegate.getApplicationLocales();
+            return LocaleList.forLanguageTags(compat.toLanguageTags());
+        }
+    }
+
+    public static String getCurrentLang(Context context) {
+        LocaleList localeList = getPreferredLocaleList(context);
+        return localeList.isEmpty() ? Locale.getDefault().getLanguage() : localeList.get(0).getLanguage();
+    }
+
+    public static void syncLangPreference(Context context) {
+        LocaleList localeList = getPreferredLocaleList(context);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(PreferenceUtils.PREF_LOCALE, DEF_LANG);
+        String langCode;
+        if (localeList.isEmpty()) {
+            langCode = DEF_LANG;
+        } else {
+            langCode = localeList.get(0).getLanguage();
+            String[] supportedLangs = context.getResources().getStringArray(R.array.language_codes);
+            if (supportedLangs == null || !Arrays.asList(supportedLangs).contains(langCode)) {
+                langCode = DEF_LANG;
+            }
+        }
+        prefs.edit().putString(PreferenceUtils.PREF_LANG, langCode).apply();
     }
 
     public static void setLocale(Configuration configuration, Locale locale) {

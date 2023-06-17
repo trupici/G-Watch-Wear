@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import sk.trupici.gwatch.wear.GWatchApplication;
@@ -41,11 +42,12 @@ import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 
-public class MainActivity extends LocalizedActivityBase implements HorizontalSwipeDetector.SwipeListener, ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends AppCompatActivity implements HorizontalSwipeDetector.SwipeListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static MainActivity activity;
 
     public static final int REQUEST_CODE_BATTERY_OPTIMIZATIONS = 1;
+    public static final int REQUEST_CODE_POST_NOTIFICATIONS = 11;
 
     public static MainActivity getActivity() {
         return MainActivity.activity;
@@ -75,6 +77,7 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
                 } // ignore result from permission request explanation
         );
         checkAndRequestBatteryOptimization();
+        checkAndRequestNotificationsPermission();
     }
 
 
@@ -190,8 +193,6 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
                 String packageName = getPackageName();
                 if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
                     try {
-                        //some device doesn't has activity to handle this intent
-                        //so add try catch
                         Intent intent = new Intent();
                         intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                         intent.setData(Uri.parse("package:" + packageName));
@@ -200,6 +201,15 @@ public class MainActivity extends LocalizedActivityBase implements HorizontalSwi
                         // intentionally blank
                     }
                 }
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Notifications permission
+    private void checkAndRequestNotificationsPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (!UiUtils.requestPermission(this, Manifest.permission.POST_NOTIFICATIONS, REQUEST_CODE_POST_NOTIFICATIONS)) {
             }
         }
     }

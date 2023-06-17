@@ -7,7 +7,7 @@ buildscript {
      }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
-        classpath "com.localazy:gradle:1.5.3"
+        classpath "com.localazy:gradle:1.5.4"
     }
 }
 

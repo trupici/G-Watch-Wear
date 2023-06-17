@@ -29,13 +29,14 @@ import android.widget.TextView;
 
 import java.lang.reflect.Method;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.console.PacketConsole;
 import sk.trupici.gwatch.wear.console.PacketConsoleView;
 
-public class PacketViewActivity extends LocalizedActivityBase implements PacketConsoleView, HorizontalSwipeDetector.SwipeListener {
+public class PacketViewActivity extends AppCompatActivity implements PacketConsoleView, HorizontalSwipeDetector.SwipeListener {
 
     protected Menu menu;
 

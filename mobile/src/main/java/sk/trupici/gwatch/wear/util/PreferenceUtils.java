@@ -48,8 +48,7 @@ import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 
 public class PreferenceUtils {
 
-    public static final String PREF_LOCALE = "pref_language";
-    public static final String DEF_VALUE_LOCALE = "system";
+    public static final String PREF_LANG = "pref_language";
 
     public static final String DUMMY_KEY_PREFIX = "dummy";
 
@@ -253,5 +252,4 @@ public class PreferenceUtils {
             preferenceScreen.findPreference("cfg_sec_hand_cap").setEnabled(enable);
         }
     }
-
 }

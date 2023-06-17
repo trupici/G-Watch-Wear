@@ -59,6 +59,7 @@ public class NotificationService extends Service {
     private static final String NO_DATA = "--";
 
     private static Notification currentNotification;
+    private static long lastBgUpdate;
 
     public static void startService(Context context) {
         Intent startIntent = new Intent(context, NotificationService.class);
@@ -70,6 +71,15 @@ public class NotificationService extends Service {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "updateBgPacket: " + packet.toText(context, null));
         }
+
+        long ignoreDataThreshold = System.currentTimeMillis() - sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MILLIS;
+        if (packet.getTimestamp() <= lastBgUpdate || packet.getTimestamp() < ignoreDataThreshold) {
+            Log.d(LOG_TAG, "updateBgPacket: ignoring packet due to old data");
+            return;
+        }
+
+        lastBgUpdate = packet.getTimestamp();
+
         Intent startIntent = new Intent(context, NotificationService.class);
         startIntent.setAction(ACTION_BG_VALUE);
         startIntent.putExtra("data", packet.getData());
@@ -90,20 +100,17 @@ public class NotificationService extends Service {
         }
 
         Context context = GWatchApplication.getAppContext();
-        if (ACTION_START.equals(intent.getAction())) {
-            startForeground(NOTIFICATION_ID, getOrCreateNotification(context));
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
-        } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
-            GlucosePacket packet = GlucosePacket.of(intent.getByteArrayExtra("data"));
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, packet));
-        } else if (ACTION_TEXT.equals(intent.getAction())) {
-            String text = intent.getStringExtra("text");
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
-        }
-
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (ACTION_START.equals(intent.getAction())) {
+                startForeground(NOTIFICATION_ID, getOrCreateNotification(context));
+                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
+            } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
+                GlucosePacket packet = GlucosePacket.of(intent.getByteArrayExtra("data"));
+                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, packet));
+            } else if (ACTION_TEXT.equals(intent.getAction())) {
+                String text = intent.getStringExtra("text");
+                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
+            }
         return START_NOT_STICKY;
     }
 
@@ -147,11 +154,11 @@ public class NotificationService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "G-Watch Wear Notification Channel",
-                    NotificationManager.IMPORTANCE_MIN);
+                    NotificationManager.IMPORTANCE_LOW);
             serviceChannel.setShowBadge(false);
             serviceChannel.enableLights(false);
             serviceChannel.enableVibration(false);
-            serviceChannel.setImportance(NotificationManager.IMPORTANCE_MIN);
+            serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
             manager.createNotificationChannel(serviceChannel);
         }
     }

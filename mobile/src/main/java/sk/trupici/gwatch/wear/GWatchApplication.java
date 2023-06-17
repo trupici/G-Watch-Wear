@@ -45,7 +45,6 @@ import sk.trupici.gwatch.wear.receivers.LibreAlarmReceiver;
 import sk.trupici.gwatch.wear.receivers.LibreLinkReceiver;
 import sk.trupici.gwatch.wear.receivers.XDripReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
-import sk.trupici.gwatch.wear.util.LangUtils;
 
 public class GWatchApplication extends Application {
 
@@ -81,7 +80,7 @@ public class GWatchApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        GWatchApplication.context = LangUtils.createLangContext(getApplicationContext());
+        GWatchApplication.context = getApplicationContext();
         packetConsole.init();
         dispatcher.init(context);
 

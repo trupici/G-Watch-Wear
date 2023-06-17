@@ -22,6 +22,10 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <uses-permission android:name="com.samsung.accessory.permission.ACCESSORY_FRAMEWORK" />
     <uses-permission android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY" />
 
@@ -45,6 +49,10 @@
     <uses-permission android:name="com.eveningoutpost.dexdrip.permissions.RECEIVE_BG_ESTIMATE" />
     <!-- BYOD app integration -->
     <uses-permission android:name="com.dexcom.cgm.EXTERNAL_PERMISSION" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <queries>
         <package android:name="com.samsung.accessory" />
@@ -95,6 +103,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:allowBackup="true"
+        android:localeConfig="@xml/locales_config"
         >
 
         <receiver
@@ -129,7 +138,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget" android:exported="false">
+        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -181,21 +190,17 @@
             android:exported="false"
             />
 
-<!--        <activity-->
-<!--            android:name=".view.AnalogConfigActivity"-->
-<!--            android:screenOrientation="portrait"-->
-<!--            android:exported="true"-->
-<!--            >-->
-<!--            <intent-filter>-->
-<!--                <action android:name="sk.trupici.gwatch.wear.CONFIG_WATCH_ANALOG" />-->
-<!--                <category android:name="com.google.android.wearable.watchface.category.COMPANION_CONFIGURATION" />-->
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
     </application>
 
 </manifest>

@@ -43,6 +43,7 @@ import java.util.Properties;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
@@ -83,7 +84,7 @@ import sk.trupici.gwatch.wear.widget.WidgetUpdateService;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 
-public class SettingsActivity extends LocalizedActivityBase implements
+public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
         SharedPreferences.OnSharedPreferenceChangeListener,
         HorizontalSwipeDetector.SwipeListener,
@@ -115,6 +116,8 @@ public class SettingsActivity extends LocalizedActivityBase implements
         Log.e("gwatch", "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        LangUtils.syncLangPreference(this);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -359,7 +362,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
             } else if (key.contains("pref_data_source_librelinkup_enable")) {
                 // fake preference value to indicate librelinkup follower config change
                 addPreference(changedPrefs, new ValuePreference(this, "pref_data_source_librelinkup_enable", (byte)1));
-            } else if (PreferenceUtils.PREF_LOCALE.equals(key)) {
+            } else if (PreferenceUtils.PREF_LANG.equals(key)) {
                 restartIfLangChanged(((ListPreference) pref).getValue(), sharedPreferences);
             } else {
                 changedPrefs.put(pref.getKey(), pref);
@@ -777,6 +780,7 @@ public class SettingsActivity extends LocalizedActivityBase implements
         Log.d(LOG_TAG, "restartIfLangChanged: " + currentLang + " -> " + newLangCode);
         if (!currentLang.startsWith(newLangCode)) {
             sharedPreferences.edit().commit(); // commit here to be sure everything is really saved
+            LangUtils.updateLocale(this, newLangCode);
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

@@ -35,6 +35,7 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.data.Packet;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
+import sk.trupici.gwatch.wear.util.AndroidUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static android.content.Context.POWER_SERVICE;
@@ -103,7 +104,7 @@ public abstract class BGReceiver extends BroadcastReceiver {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             for (String key : bundle.keySet()) {
-                Object value = bundle.get(key);
+                Object value = AndroidUtils.getBundleObject(bundle, key);
                 Log.i(GWatchApplication.LOG_TAG, indent + key + ": " + value);
             }
         } else {

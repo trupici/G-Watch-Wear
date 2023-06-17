@@ -31,7 +31,7 @@
     <string name="app_desc_first_run_text">G-Watch watch face needs 1&#8208;2 glucose samples (up to 10 minutes) to display correct values. During this initial time no glucose value, trend or status is displayed.</string>
     <string name="app_desc_important_note_title"><b>Important note</b></string>
     <string name="app_desc_disable_batt_opt_text">Don\&#39;t forget to disable all battery optimizations for G-Watch Wear App, otherwise you can miss glucose values if app is stopped by power manager. The same applies for apps required to transfer data to watch: Galaxy Wearable, its watch plugin and system Bluetooth app.</string>
-
+    <string name="app_desc_wiki">App WIKI pages contain detailed instructions how to install, use and configure the app: https://github.com/trupici/G-Watch-Wear/wiki</string>
 
     <!-- Dialog actions -->
 
@@ -58,14 +58,14 @@
 
     <!-- ABOUT dialog -->
 
-    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.6a</string>
+    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.6</string>
 
     <string name="about_author">Author: Juraj Antal</string>
 
     <string name="about_design_title">Design and art work:</string>
     <string name="about_designer" translatable="false"><a href="https://getwatchmaker.com/user/Bkd6tbYxr">Frederik Wagner</a></string>
 
-    <string name="about_copyright" translatable="false">Copyright © 2022</string>
+    <string name="about_copyright" translatable="false">Copyright © 2023</string>
     <string name="about_email" translatable="false">email: trupici.sk@gmail.com</string>
     <string name="about_fb" translatable="false">facebook: fb.me/gwatchapp</string>
     <string name="about_source_code_title">Source code:</string>

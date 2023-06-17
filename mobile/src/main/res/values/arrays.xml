@@ -20,12 +20,14 @@
     <string-array name="languages">
         <item>System</item>
         <item>English</item>
+        <item>Русский</item>
         <item>Slovenčina</item>
     </string-array>
 
     <string-array name="language_codes">
         <item>system</item>
         <item>en</item>
+        <item>ru</item>
         <item>sk</item>
     </string-array>
 </resources>

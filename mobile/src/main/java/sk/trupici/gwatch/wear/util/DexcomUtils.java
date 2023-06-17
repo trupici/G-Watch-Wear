@@ -18,10 +18,14 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 import androidx.appcompat.app.AppCompatActivity;
 import sk.trupici.gwatch.wear.GWatchApplication;
@@ -48,30 +52,27 @@ public class DexcomUtils {
     }
 
     public static boolean checkIfDexcomInstalled() {
-        return getInstalledDexcomAppPackage() != null;
+        return getInstalledAppPackage(p -> (p.startsWith(DEXCOM_PACKAGE_PREFIX) && !p.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX))) != null;
     }
 
     public static String getInstalledDexcomAppPackage() {
-        try {
-            PackageManager packageManager = GWatchApplication.getAppContext().getPackageManager();
-            int disabledFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? getDisabledComponentsOld() : PackageManager.MATCH_DISABLED_COMPONENTS;
-            for (PackageInfo packageInfo : packageManager.getInstalledPackages(disabledFlag)) {
-                if (packageInfo.packageName.startsWith(DEXCOM_PACKAGE_PREFIX) && !packageInfo.packageName.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX)) {
-                    return packageInfo.packageName;
-                }
-            }
-        } catch (Exception e) {
-            Log.e(GWatchApplication.LOG_TAG, e.toString(), e);
-        }
-        return null;
+        return getInstalledAppPackage(p -> (p.startsWith(DEXCOM_PACKAGE_PREFIX) && !p.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX)));
     }
 
     public static String getInstalledDexcomFollowAppPackage() {
+        return getInstalledAppPackage(p -> p.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX));
+    }
+
+    public static String getInstalledAppPackage(Predicate<String> predicate) {
         try {
             PackageManager packageManager = GWatchApplication.getAppContext().getPackageManager();
-            int disabledFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? getDisabledComponentsOld() : PackageManager.MATCH_DISABLED_COMPONENTS;
-            for (PackageInfo packageInfo : packageManager.getInstalledPackages(disabledFlag)) {
-                if (packageInfo.packageName.startsWith(DEXCOM_FOLLOWER_PACKAGE_PREFIX)) {
+            int disabledFlag = PackageManager.MATCH_DISABLED_COMPONENTS;
+            @SuppressLint("QueryPermissionsNeeded")
+            List<PackageInfo> packageInfoList = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                    ? packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(disabledFlag))
+                    : getInstalledPackages(disabledFlag);
+            for (PackageInfo packageInfo : packageInfoList) {
+                if (predicate.test(packageInfo.packageName)) {
                     return packageInfo.packageName;
                 }
             }
@@ -81,12 +82,11 @@ public class DexcomUtils {
         return null;
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     @SuppressWarnings("deprecation")
-    private static int getDisabledComponentsOld() {
-        //no inspection
-        return PackageManager.GET_DISABLED_COMPONENTS;
+    private static List<PackageInfo> getInstalledPackages(int flags) {
+        return GWatchApplication.getAppContext().getPackageManager().getInstalledPackages(flags);
     }
-
 
     /**
      * Translates DexCom trend value to G-Watch internal trend representation

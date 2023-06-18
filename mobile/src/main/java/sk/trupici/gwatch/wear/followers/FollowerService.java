@@ -211,7 +211,7 @@ public abstract class FollowerService extends Service {
         }
         // fresh sample received - schedule next regular request
         long delayMs = sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - now;
-        return Math.max(delayMs, getSamplePeriodMs());
+        return Math.max(delayMs, getMissedSamplePeriodMs() > 0 ? getMissedSamplePeriodMs() : MISSED_SAMPLE_PERIOD_MS);
     }
 
     /**

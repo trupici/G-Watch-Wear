@@ -160,7 +160,7 @@ public class PacketUtils {
      */
     public static int encodeBoolean(byte[] data, int offset, boolean value) {
         int idx = offset;
-        data[idx++] = value ? (byte)0 : (byte)1;
+        data[idx++] = value ? (byte)1 : (byte)0;
         return idx - offset;
     }
 

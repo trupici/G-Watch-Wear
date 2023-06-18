@@ -121,7 +121,7 @@ public class ConfigListenerService extends WearableListenerService {
                 edit.putInt(cfg.getPrefName(), intValue);
                 break;
             case BOOLEAN:
-                boolean boolValue = (tlv.getValue()[0] != 0);
+                boolean boolValue = PacketUtils.decodeBoolean(tlv.getValue(), 0);
                 edit.putBoolean(cfg.getPrefName(), boolValue);
                 break;
             case FLOAT:

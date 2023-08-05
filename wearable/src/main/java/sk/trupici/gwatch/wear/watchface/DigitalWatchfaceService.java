@@ -71,6 +71,8 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
 
         private RectF pbCircleBounds;
 
+        private float pbStrokeWidth;
+
         private Map<ComplicationId, ComplicationSettings> complSettingsMap;
 
         protected Engine() {
@@ -94,7 +96,8 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             paint = UiUtils.createPaint();
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeWidth(context.getResources().getInteger(R.integer.digital_compl_progressbar_width));
+            pbStrokeWidth = context.getResources().getInteger(R.integer.digital_compl_progressbar_width);
+            paint.setStrokeWidth(pbStrokeWidth);
 
             clearPaint = UiUtils.createErasePaint();
 
@@ -313,8 +316,14 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             float xPadding = pbPadding * width / refScreenWidth;
             float yPadding = pbPadding * height / refScreenHeight;
             pbCircleBounds = new RectF(xPadding, yPadding, width-xPadding, height-yPadding);
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "adjustSize: circleBounds " + pbCircleBounds);
+            }
 
-            paint.setStrokeWidth(paint.getStrokeWidth() * width / refScreenWidth);
+            paint.setStrokeWidth(pbStrokeWidth * width / refScreenWidth);
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "adjustSize: strokeWidth " + paint.getStrokeWidth());
+            }
 
             // update progress bars bounds
             complSettingsMap.get(ComplicationId.TOP_LEFT).getProgressAttrs().setBounds(

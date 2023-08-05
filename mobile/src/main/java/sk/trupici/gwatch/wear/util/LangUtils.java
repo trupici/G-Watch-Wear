@@ -21,18 +21,17 @@ package sk.trupici.gwatch.wear.util;
 import android.app.LocaleManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.LocaleList;
 import android.util.Log;
 
-import java.util.Arrays;
-import java.util.Locale;
-
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 import androidx.preference.PreferenceManager;
+
+import java.util.Arrays;
+import java.util.Locale;
+
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
@@ -83,30 +82,5 @@ public class LangUtils {
             }
         }
         prefs.edit().putString(PreferenceUtils.PREF_LANG, langCode).apply();
-    }
-
-    public static void setLocale(Configuration configuration, Locale locale) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            setLocaleConfigOld(configuration, locale);
-        } else {
-            configuration.setLocales(new LocaleList(locale));
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void setLocaleConfigOld(Configuration configuration, Locale locale) {
-        configuration.setLocale(locale);
-    }
-
-    @SuppressWarnings("deprecation")
-    private static Locale getLocaleOld(Context context) {
-        return context.getResources().getConfiguration().locale;
-    }
-
-    @SuppressWarnings("deprecation")
-    private static Context updateConfigOld(Context context, Configuration config) {
-        Resources resources = context.getResources();
-        resources.updateConfiguration(config, resources.getDisplayMetrics());
-        return context;
     }
 }

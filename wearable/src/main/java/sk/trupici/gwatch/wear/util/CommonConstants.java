@@ -21,6 +21,7 @@ public interface CommonConstants {
     String REMOTE_CONFIG_ACTION = "sk.trupici.gwatch.wear.REMOTE_CONFIG_ACTION";
 
     String PREF_IS_UNIT_CONVERSION = "bg_is_unit_conversion";
+    String PREF_BG_PANEL_SHOW_VALUE = "bg_panel_show_value";
 
     String PREF_HYPER_THRESHOLD = "bg_threshold_hyper";
     String PREF_HIGH_THRESHOLD = "bg_threshold_high";

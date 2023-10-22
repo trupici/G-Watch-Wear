@@ -85,7 +85,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private float topOffset;
     private float bottomOffset;
 
-    private Rect bounds;
+    private RectF bounds;
     private Paint bkgPaint;
     private TextPaint textPaint;
     private String bgLine1;
@@ -95,7 +95,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
     private long lastBgUpdate;
 
     boolean isUnitConversion;
-
+    boolean showBgValue;
+    
     private int backgroundColor;
     private int hyperColor;
     private int highColor;
@@ -157,7 +158,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onCreate(Context context, SharedPreferences sharedPrefs) {
-        RectF bounds = watchfaceConfig.getBgPanelBounds(context);
+        bounds = watchfaceConfig.getBgPanelBounds(context);
+
         sizeFactors = new RectF(
                 bounds.left / (float)refScreenWidth,
                 bounds.top / (float)refScreenHeight,
@@ -216,11 +218,11 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
-        bounds = new Rect(
-                (int) (sizeFactors.left * width),
-                (int) (sizeFactors.top * height),
-                (int) (sizeFactors.right * width),
-                (int) (sizeFactors.bottom * height));
+        bounds = new RectF(
+                sizeFactors.left * width,
+                sizeFactors.top * height,
+                sizeFactors.right * width,
+                sizeFactors.bottom * height);
 
         float yScale = (float) height / refScreenHeight;
         topOffset = watchfaceConfig.getBgPanelTopOffset(context) * yScale;
@@ -232,7 +234,7 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         yLine2 = bounds.bottom - bottomOffset - paddedHeight / 10f;
 
 
-        bkgBitmap = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+        bkgBitmap = Bitmap.createBitmap((int)bounds.width(), (int)bounds.height(), Bitmap.Config.ARGB_8888);
         drawBackgroundAndBorder();
 
         if (showBgIndicator) {
@@ -262,6 +264,8 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
 
         isUnitConversion = sharedPrefs.getBoolean(CommonConstants.PREF_IS_UNIT_CONVERSION,
                 context.getResources().getBoolean(R.bool.def_bg_is_unit_conversion));
+        showBgValue = sharedPrefs.getBoolean(CommonConstants.PREF_BG_PANEL_SHOW_VALUE,
+                context.getResources().getBoolean(R.bool.def_bg_show_value));
 
         // thresholds
         hyperThreshold = sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, context.getResources().getInteger(R.integer.def_bg_threshold_hyper));
@@ -304,6 +308,29 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
             textPaint.setColor(getRangedColor(isNoData()));
         }
 
+        DrawTextLines(canvas);
+
+        if (showBgIndicator) {
+            Boolean isNoData = isNoData();
+            Paint paint = isAmbientMode ? ambientPaint : indicatorPaint;
+            drawIndicatorBar(canvas, paint, lowIndicatorBounds, getLowIndicatorColor(isNoData));
+            drawIndicatorBar(canvas, paint, inRangeIndicatorBounds, getInRangeIndicatorColor(isNoData));
+            drawIndicatorBar(canvas, paint, highIndicatorBounds, getHighIndicatorColor(isNoData));
+        }
+   }
+
+   private void DrawTextLines(Canvas canvas){
+        if(!showBgValue){
+            // only line 2 centered vertically
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            float textSize = bounds.width() / 4f;
+            textPaint.setTextSize(textSize);
+            textPaint.setFakeBoldText(true);
+            float yCenteredStart = bounds.bottom - bounds.height() / 2f + textSize / 2f;
+            canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT, xLine, yCenteredStart, textPaint);
+            return;
+        }
+
         // line 1
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTextSize(paddedHeight / 2f);
@@ -314,14 +341,6 @@ public class BgPanel extends BroadcastReceiver implements ComponentPanel {
         textPaint.setTextSize(paddedHeight / 3f);
         textPaint.setFakeBoldText(false);
         canvas.drawText(bgLine2 != null ? bgLine2 : ComplicationConfig.NO_DATA_TEXT, xLine, yLine2, textPaint);
-
-        if (showBgIndicator) {
-            Boolean isNoData = isNoData();
-            Paint paint = isAmbientMode ? ambientPaint : indicatorPaint;
-            drawIndicatorBar(canvas, paint, lowIndicatorBounds, getLowIndicatorColor(isNoData));
-            drawIndicatorBar(canvas, paint, inRangeIndicatorBounds, getInRangeIndicatorColor(isNoData));
-            drawIndicatorBar(canvas, paint, highIndicatorBounds, getHighIndicatorColor(isNoData));
-        }
    }
 
     private void drawBackgroundAndBorder() {

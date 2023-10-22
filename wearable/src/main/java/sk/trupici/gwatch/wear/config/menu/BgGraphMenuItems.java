@@ -31,6 +31,11 @@ public class BgGraphMenuItems {
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_graph_enable_dynamic_range),
             new BoolConfigItem(
+                    R.string.config_item_graph_show_bg_value,
+                    BgGraphPanel.PREF_SHOW_BG_VALUE,
+                    ConfigItem.Type.TYPE_SWITCH,
+                    R.bool.def_graph_show_bg_value),
+            new BoolConfigItem(
                     R.string.config_item_graph_draw_dots,
                     BgGraphPanel.PREF_TYPE_DOTS,
                     ConfigItem.Type.TYPE_SWITCH,

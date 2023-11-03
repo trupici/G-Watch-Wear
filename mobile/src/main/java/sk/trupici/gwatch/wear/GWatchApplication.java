@@ -122,7 +122,7 @@ public class GWatchApplication extends Application {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(receiver.getAction());
         intentFilter.setPriority(DEF_RECEIVER_PRIO);
-        registerReceiver(receiver, intentFilter);
+        registerReceiver(receiver, intentFilter, RECEIVER_EXPORTED);
         bgReceivers.add(receiver);
     }
     public void processIntent(Context context, Intent intent) {

@@ -18,6 +18,8 @@
 
 package sk.trupici.gwatch.wear.receivers;
 
+import static android.content.Context.POWER_SERVICE;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,8 +36,6 @@ import sk.trupici.gwatch.wear.followers.LibreLinkUpFollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
-
-import static android.content.Context.POWER_SERVICE;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -76,5 +76,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public static void scheduleNextAlarm(Context context, long delayMs) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         AlarmUtils.scheduleAlarm(context, delayMs, intent, WAKE_UP_CODE);
+        Log.d(GWatchApplication.LOG_TAG, "Scheduled alarm: code=" + WAKE_UP_CODE + ", delay=" + delayMs);
     }
 }

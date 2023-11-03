@@ -17,12 +17,12 @@ android {
             }
         }
     }
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "sk.trupici.gwatch.wear"
         minSdk 25
-        targetSdk 33
+        targetSdk 34
         versionCode 1000009 // use 1xxxxxx codes for mobile app
         versionName "0.9.6"
 
@@ -60,15 +60,15 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
     implementation 'com.google.android.gms:play-services-base:18.2.0'
-    implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
 
     implementation 'com.github.martin-stone:hsv-alpha-color-picker-android:3.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
-    implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
 
     implementation 'androidx.cardview:cardview:1.0.0'
 

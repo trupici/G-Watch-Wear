@@ -54,6 +54,8 @@
 
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <queries>
         <package android:name="com.samsung.accessory" />
         <package android:name="it.ct.glicemia" />
@@ -110,7 +112,9 @@
             android:name=".receivers.BootReceiver"
             android:directBootAware="true"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="RECEIVER_EXPORTED"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -119,7 +123,9 @@
         <receiver
             android:name=".receivers.ExplicitBgBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="RECEIVER_EXPORTED"
+            >
             <intent-filter>
                 <!-- Broadcast from Glimp -->
                 <action android:name="it.ct.glicemia.ACTION_GLUCOSE_MEASURED"/>
@@ -138,7 +144,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget" android:exported="true">
+        <receiver android:name=".widget.WidgetProvider" android:label="G-Watch widget" android:exported="true" android:permission="RECEIVER_EXPORTED" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -151,10 +157,10 @@
         </service>
 
         <receiver android:name=".receivers.AlarmReceiver" android:enabled="true" android:exported="false"/>
-        <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" />
-        <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" />
-        <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" />
-        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" />
+        <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
+        <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
+        <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
+        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
 
         <activity
             android:name=".view.MainActivity"

@@ -18,6 +18,8 @@
 
 package sk.trupici.gwatch.wear.service;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -64,6 +66,7 @@ public class NotificationService extends Service {
     public static void startService(Context context) {
         Intent startIntent = new Intent(context, NotificationService.class);
         startIntent.setAction(ACTION_START);
+
         ContextCompat.startForegroundService(context, startIntent);
     }
 
@@ -101,16 +104,16 @@ public class NotificationService extends Service {
 
         Context context = GWatchApplication.getAppContext();
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (ACTION_START.equals(intent.getAction())) {
-                startForeground(NOTIFICATION_ID, getOrCreateNotification(context));
-                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
-            } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
-                GlucosePacket packet = GlucosePacket.of(intent.getByteArrayExtra("data"));
-                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, packet));
-            } else if (ACTION_TEXT.equals(intent.getAction())) {
-                String text = intent.getStringExtra("text");
-                mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
-            }
+        startForeground(NOTIFICATION_ID, getOrCreateNotification(context));
+        if (ACTION_START.equals(intent.getAction())) {
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, NO_DATA));
+        } else if (ACTION_BG_VALUE.equals(intent.getAction())) {
+            GlucosePacket packet = GlucosePacket.of(intent.getByteArrayExtra("data"));
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, packet));
+        } else if (ACTION_TEXT.equals(intent.getAction())) {
+            String text = intent.getStringExtra("text");
+            mNotificationManager.notify(NOTIFICATION_ID, createUpdateNotification(context, text == null || text.length() == 0 ? NO_DATA : text));
+        }
         return START_NOT_STICKY;
     }
 

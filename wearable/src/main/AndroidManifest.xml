@@ -30,6 +30,9 @@
         <package android:name="info.nightscout.androidaps" />
         <package android:name="com.eveningoutpost.dexdrip" />
         <package android:name="com.outshineiot.diabox" />
+        <intent>
+            <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
+        </intent>
     </queries>
 
     <application

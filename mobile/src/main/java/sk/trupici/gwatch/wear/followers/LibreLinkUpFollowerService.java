@@ -16,6 +16,8 @@
 
 package sk.trupici.gwatch.wear.followers;
 
+import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -43,8 +45,6 @@ import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
-
-import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 
 
 /**
@@ -190,12 +190,18 @@ public class LibreLinkUpFollowerService extends FollowerService {
                 }
                 Log.e(LOG_TAG, getClass().getSimpleName() + " failed");
                 UiUtils.showMessage(context, context.getString(R.string.status_failed));
+            } else if (response.code() == 429) {
+                String retryAfter = response.header("Retry-After");
+                throw new TooManyRequestsException(retryAfter, "HTTP " + response.code() + " - Retry-After: " + retryAfter);
             } else {
                 throw new CommunicationException("HTTP " + response.code() + " - " + response.message());
             }
         } catch (Throwable t) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", t);
             UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));
+            if (t instanceof TooManyRequestsException) {
+                throw (TooManyRequestsException) t;
+            }
         }
         return null;
     }
@@ -230,12 +236,18 @@ public class LibreLinkUpFollowerService extends FollowerService {
                     UiUtils.showMessage(context, context.getString(R.string.status_ok));
                     return connectionId;
                 }
+            } else if (response.code() == 429) {
+                String retryAfter = response.header("Retry-After");
+                throw new TooManyRequestsException(retryAfter, "HTTP " + response.code() + " - Retry-After: " + retryAfter);
             } else {
                 throw new CommunicationException("HTTP " + response.code() + " - " + response.message());
             }
         } catch (Throwable t) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", t);
             UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));
+            if (t instanceof TooManyRequestsException) {
+                throw (TooManyRequestsException) t;
+            }
         }
         return null;
     }
@@ -266,12 +278,18 @@ public class LibreLinkUpFollowerService extends FollowerService {
                     Log.i(GWatchApplication.LOG_TAG, "LibreLinkUp data received: " + receivedData);
                 }
                 return parseLastBgValue(receivedData);
+            } else if (response.code() == 429) {
+                String retryAfter = response.header("Retry-After");
+                throw new TooManyRequestsException(retryAfter, "HTTP " + response.code() + " - Retry-After: " + retryAfter);
             } else {
                 throw new CommunicationException("HTTP " + response.code() + " - " + response.message());
             }
         } catch (Throwable t) {
             Log.e(LOG_TAG, getClass().getSimpleName() + " failed", t);
             UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));
+            if (t instanceof TooManyRequestsException) {
+                throw (TooManyRequestsException) t;
+            }
         }
         return null;
     }

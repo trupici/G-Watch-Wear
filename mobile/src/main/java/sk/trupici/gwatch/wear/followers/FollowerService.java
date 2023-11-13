@@ -18,6 +18,8 @@
 
 package sk.trupici.gwatch.wear.followers;
 
+import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +27,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -37,8 +42,6 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -46,14 +49,13 @@ import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.data.GlucosePacket;
+import sk.trupici.gwatch.wear.common.util.CommonConstants;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
 import sk.trupici.gwatch.wear.util.AlarmUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
-
-import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 
 public abstract class FollowerService extends Service {
 
@@ -138,6 +140,25 @@ public abstract class FollowerService extends Service {
                             }
                         }
                     }
+                } catch (TooManyRequestsException e) {
+                    // process reschedule
+                    String retryAfter = e.getRetryAfter();
+                    Log.w(LOG_TAG, "Request rejected with HTTP 429, Retry-After: " + retryAfter);
+                    long nextRequestDelay = 0;
+                    if (retryAfter == null || retryAfter.length() == 0) {
+                        nextRequestDelay = getSamplePeriodMs();
+                    } else {
+                        try {
+                            nextRequestDelay = Integer.parseInt(retryAfter) * CommonConstants.SECOND_IN_MILLIS;
+                        } catch (Exception ex) {
+                            Log.e(LOG_TAG, "Failed to parse Retry-After value: " + retryAfter, ex);
+                        }
+                        if (nextRequestDelay <= 0) {
+                            nextRequestDelay = getSamplePeriodMs();
+                        }
+                    }
+                    scheduleNewRequest(context, nextRequestDelay);
+                    return;
                 } catch (Throwable t) {
                     Log.e(LOG_TAG, t.getLocalizedMessage(), t);
                 }
@@ -200,20 +221,19 @@ public abstract class FollowerService extends Service {
     private long getNextRequestDelay(GlucosePacket packet) {
         long now = System.currentTimeMillis();
         Long sampleTime = (packet != null) ? Long.valueOf(packet.getTimestamp()) : getLastSampleTime();
-        if (sampleTime == null || sampleTime > now) { // no valid info about last sample
-            return getSamplePeriodMs();
-        } else if (getMissedSamplePeriodMs() > 0) {
-            if (sampleTime < now - 2 * getSamplePeriodMs()) { // sample older than fast polling period
-                return getSamplePeriodMs();
-            } else if (sampleTime < now - getSamplePeriodMs() - getSampleToRequestDelay()) { // sample missed -> fast polling
-                return getMissedSamplePeriodMs();
+        if (sampleTime != null && sampleTime < now) {
+            // received sample with valid timestamp
+            if (now - sampleTime > getSamplePeriodMs() + getSampleToRequestDelay()) {
+                // sample is old - use fast sampling to get the next value
+                // if sample is not too old and fast sampling is configured
+                if (getMissedSamplePeriodMs() > 0 && now - sampleTime < 2 * getSamplePeriodMs() + getSampleToRequestDelay()) {
+                    return getMissedSamplePeriodMs();
+                }
             }
         }
-        // fresh sample received - schedule next regular request
-        long delayMs = sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - now;
-        return Math.max(delayMs, getMissedSamplePeriodMs() > 0 ? getMissedSamplePeriodMs() : MISSED_SAMPLE_PERIOD_MS);
+        // use default period
+        return getSamplePeriodMs();
     }
-
     /**
      * Returns a {@code OkHttpClient} instance to use for NS server requests.
      * A new {@code OkHttpClient} is created if no instance is available.

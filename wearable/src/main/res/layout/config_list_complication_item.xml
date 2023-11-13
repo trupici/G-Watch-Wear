@@ -50,5 +50,6 @@
             android:tint="@color/red"
             android:background="@color/transparent"
             android:visibility="invisible"
-            tools:ignore="UseAppTint" />
+            tools:ignore="UseAppTint"
+            />
 </FrameLayout>

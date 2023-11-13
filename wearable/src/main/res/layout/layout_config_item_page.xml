@@ -14,35 +14,39 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/page_item_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:paddingVertical="@dimen/config_view_padding"
-    android:paddingHorizontal="10dp"
+    android:layout_marginTop="@dimen/config_indicator_size"
     >
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="20"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/label_container"
         android:background="@color/transparent"
         android:scaleType="fitCenter"
         />
 
     <FrameLayout
+        android:id="@+id/label_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_height="@dimen/config_page_label_total_height"
+        app:layout_constraintBottom_toBottomOf="parent"
         >
         <TextView
+            android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_gravity="center_horizontal|top"
-            android:id="@+id/label"
             android:paddingTop="@dimen/config_page_vertical_padding"
             android:paddingBottom="@dimen/config_page_vertical_padding"
             />
@@ -55,4 +59,4 @@
             android:scaleType="fitCenter"
             />
     </FrameLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

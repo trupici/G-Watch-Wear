@@ -14,47 +14,40 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/config_page_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
-    android:layout_margin="0dp"
-    >
+    android:background="@color/transparent"
+    android:layout_gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal|top"
-        android:id="@+id/page_title"
-        android:visibility="gone"
-        />
 
     <FrameLayout
+        android:id="@+id/backgrounds"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="0dp"
+        android:layout_height="match_parent"
+        />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vertical_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/transparent"
         >
+        <requestFocus/>
+    </androidx.viewpager2.widget.ViewPager2>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/backgrounds"
-            />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/vertical_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_margin="0dp"
-
-            android:background="@color/transparent"
-            >
-            <requestFocus/>
-        </androidx.viewpager2.widget.ViewPager2>
-    </FrameLayout>
-
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/page_indicator2"
+        android:layout_width="@dimen/config_indicator_size"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/config_indicator_outer"
+        android:paddingStart="@dimen/config_indicator_inner"
+        android:layout_gravity="end|center_vertical"
+        android:gravity="start|center_vertical"
+        android:orientation="vertical"
+        android:background="@color/transparent"
+        />
+</FrameLayout>

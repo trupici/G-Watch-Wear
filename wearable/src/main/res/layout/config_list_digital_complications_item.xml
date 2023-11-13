@@ -15,141 +15,134 @@
  limitations under the License.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/complications_item_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/left_complication_view"
     >
 
     <!-- multiple backgrounds scene -->
     <FrameLayout
+        android:id="@+id/backgrounds"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/backgrounds"
         android:background="@color/transparent"
         />
 
     <!-- multiple complications scene -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/complications"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/config_page_more_height"
+        android:layout_marginTop="@dimen/config_indicator_size"
+        android:layout_marginBottom="@dimen/config_page_label_total_height"
         >
         <FrameLayout
             android:id="@+id/top_part"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHeight_percent="0.45"
             />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottom_part"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="14"
-            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/top_part"
+            app:layout_constraintBottom_toBottomOf="parent"
             >
             <FrameLayout
+                android:id="@+id/left_pad"
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:layout_weight="5"
+                app:layout_constraintWidth_percent="0.17"
+                app:layout_constraintLeft_toLeftOf="parent"
                 />
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/complications_container"
                 android:orientation="vertical"
-                android:paddingHorizontal="0dp"
-                android:layout_weight="20"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                app:layout_constraintLeft_toRightOf="@id/left_pad"
+                app:layout_constraintRight_toLeftOf="@id/right_pad"
                 >
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/top_container"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="11"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="0dp"
+                    app:layout_constraintHeight_percent="0.185"
+                    app:layout_constraintTop_toTopOf="parent"
                     >
                         <include layout="@layout/config_list_complication_item"
                             android:id="@+id/top_left_complication"
-                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="5"
-                            />
-                        <FrameLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="20"
+                            app:layout_constraintWidth_percent="0.12"
+                            app:layout_constraintLeft_toLeftOf="parent"
                             />
                         <include layout="@layout/config_list_complication_item"
                             android:id="@+id/top_right_complication"
-                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="5"
+                            android:layout_width="0dp"
+                            app:layout_constraintWidth_percent="0.12"
+                            app:layout_constraintRight_toRightOf="parent"
                             />
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 <FrameLayout
-                    android:layout_height="0dp"
+                    android:id="@+id/padding"
                     android:layout_width="match_parent"
-                    android:layout_weight="5"
+                    android:layout_height="0dp"
+                    app:layout_constraintHeight_percent="0.17"
+                    app:layout_constraintTop_toBottomOf="@id/top_container"
                     />
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/central_container"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="12"
-                    android:orientation="horizontal"
+                    app:layout_constraintHeight_percent="0.29"
+                    app:layout_constraintTop_toBottomOf="@id/padding"
                     >
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        >
-                        <FrameLayout
-                            android:layout_height="match_parent"
-                            android:layout_width="0dp"
-                            android:layout_weight="6"
-                            />
-                        <include layout="@layout/config_list_complication_item"
-                            android:id="@+id/bottom_left_complication"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="8"
-                            />
-                        <FrameLayout
-                            android:layout_height="match_parent"
-                            android:layout_width="0dp"
-                            android:layout_weight="12"
-                            />
-                        <include layout="@layout/config_list_complication_item"
-                            android:id="@+id/bottom_right_complication"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="8"
-                            />
-                        <FrameLayout
-                            android:layout_height="match_parent"
-                            android:layout_width="0dp"
-                            android:layout_weight="6"
-                            />
-                    </LinearLayout>
                     <FrameLayout
+                        android:id="@+id/center_left_padding"
                         android:layout_height="match_parent"
                         android:layout_width="0dp"
-                        android:layout_weight="5"
+                        app:layout_constraintWidth_percent="0.14"
+                        app:layout_constraintLeft_toLeftOf="parent"
                         />
-                </LinearLayout>
-                <FrameLayout
-                    android:layout_height="0dp"
-                    android:layout_width="match_parent"
-                    android:layout_weight="20"
-                    />
+                    <include layout="@layout/config_list_complication_item"
+                        android:id="@+id/bottom_left_complication"
+                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_percent="0.185"
+                        app:layout_constraintLeft_toRightOf="@id/center_left_padding"
+                        />
+                    <include layout="@layout/config_list_complication_item"
+                        android:id="@+id/bottom_right_complication"
+                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_percent="0.185"
+                        app:layout_constraintRight_toLeftOf="@id/center_right_padding"
+                        />
+                    <FrameLayout
+                        android:id="@+id/center_right_padding"
+                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_percent="0.14"
+                        app:layout_constraintRight_toRightOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
             <FrameLayout
+                android:id="@+id/right_pad"
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:layout_weight="5"
+                app:layout_constraintWidth_percent="0.17"
+                app:layout_constraintRight_toRightOf="parent"
                 />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

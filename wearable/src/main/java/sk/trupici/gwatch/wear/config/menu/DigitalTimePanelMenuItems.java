@@ -21,7 +21,6 @@ import sk.trupici.gwatch.wear.components.DigitalTimePanel;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 
 public class DigitalTimePanelMenuItems {
     final public static ConfigItem[] items = {
@@ -58,7 +57,6 @@ public class DigitalTimePanelMenuItems {
                     R.drawable.config_color_edit_24,
                     DigitalTimePanel.PREF_BORDER_COLOR,
                     ConfigItem.Type.TYPE_COLOR,
-                    R.color.def_time_border_color),
-            new PaddingConfigItem()
+                    R.color.def_time_border_color)
     };
 }

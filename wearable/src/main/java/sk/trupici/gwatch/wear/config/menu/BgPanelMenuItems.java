@@ -21,7 +21,6 @@ import sk.trupici.gwatch.wear.components.BgPanel;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 import sk.trupici.gwatch.wear.util.CommonConstants;
 
 public class BgPanelMenuItems {
@@ -85,7 +84,6 @@ public class BgPanelMenuItems {
                     R.drawable.config_color_edit_24,
                     BgPanel.PREF_BORDER_COLOR,
                     ConfigItem.Type.TYPE_COLOR,
-                    R.color.def_bg_border_color),
-            new PaddingConfigItem()
+                    R.color.def_bg_border_color)
     };
 }

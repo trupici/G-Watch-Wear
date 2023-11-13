@@ -24,8 +24,9 @@
     <dimen name="config_page_label_height">20dp</dimen>
     <dimen name="config_page_label_total_height">30dp</dimen>
 
-    <dimen name="config_indicator_height">22dp</dimen>
-    <dimen name="config_indicator_padding">2dp</dimen>
+    <dimen name="config_indicator_size">26dp</dimen>
+    <dimen name="config_indicator_outer">2dp</dimen>
+    <dimen name="config_indicator_inner">4dp</dimen>
 
     <dimen name="layout_ref_screen_width">450px</dimen>
     <dimen name="layout_ref_screen_height">450px</dimen>

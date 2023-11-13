@@ -16,6 +16,10 @@
 
 package sk.trupici.gwatch.wear.config;
 
+import static android.app.Activity.RESULT_OK;
+import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQUEST_CODE;
+import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,15 +31,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-
-import static android.app.Activity.RESULT_OK;
-import static sk.trupici.gwatch.wear.util.CommonConstants.BORDER_TYPE_CONFIG_REQUEST_CODE;
-import static sk.trupici.gwatch.wear.util.CommonConstants.UPDATE_COLORS_CONFIG_REQUEST_CODE;
 
 /**
  * {@code Adapter} for {@code ConfigItem} list
@@ -112,10 +113,6 @@ public class ConfigItemListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             case TYPE_SWITCH:
                 viewHolder = new SwitchViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_switch_item, parent, false));
                 break;
-            case TYPE_PADDING:
-                viewHolder = new RecyclerView.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.config_list_empty_item, parent, false)) {
-                };
-                break;
             default:
                 throw new IllegalArgumentException(""+type);
         }
@@ -150,8 +147,6 @@ public class ConfigItemListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         boolConfigItem.getLabelResourceId(),
                         (boolConfigItem.isGlobal() ? "" : watchfaceConfig.getPrefsPrefix()) + boolConfigItem.getPreferenceName(),
                         defaultValue);
-                break;
-            case TYPE_PADDING:
                 break;
             default:
                 throw new IllegalArgumentException(""+type);

@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
@@ -211,14 +212,15 @@ public abstract class ComplicationViewHolder extends RecyclerView.ViewHolder imp
     @Override
     public void onBackgroundChanged() {
         bkgViewGroup.removeAllViews();
-        ConfigItemData itemData = watchfaceConfig.getSelectedItem(bkgViewGroup.getContext(), ConfigPageData.ConfigType.BACKGROUND);
+        Context context = bkgViewGroup.getContext();
+        ConfigItemData itemData = watchfaceConfig.getSelectedItem(context, ConfigPageData.ConfigType.BACKGROUND);
         if (itemData != null && itemData.getResourceId() != 0) {
-            ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
+            ViewGroup view = (ViewGroup) LayoutInflater.from(context).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
             ImageView bkgView = view.findViewById(R.id.image);
-            bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(itemData.getResourceId()));
+            bkgView.setImageDrawable(ContextCompat.getDrawable(context, itemData.getResourceId()));
             // add more items indicator
             ImageView more = view.findViewById(R.id.label_image);
-            more.setImageDrawable(bkgViewGroup.getContext().getDrawable(R.drawable.config_more_items));
+            more.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.config_more_items));
             bkgViewGroup.addView(view);
         }
     }

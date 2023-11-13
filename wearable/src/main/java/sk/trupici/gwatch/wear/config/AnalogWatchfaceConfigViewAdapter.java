@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
+
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BackgroundPanel;
@@ -78,16 +79,28 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
             }
             AnalogWatchfaceConfigViewAdapter.this.position = position;
 
-            // notify all view holders about page change
             View child = pager.getChildAt(0); // get pager's RecycleView
             if (child instanceof RecyclerView) {
                 RecyclerView recyclerView = (RecyclerView) child;
-                for (int i = 1; i < watchfaceConfig.getItemCount(); i++) { // skip background config
+                for (int i = 0; i < watchfaceConfig.getItemCount(); i++) {
                     View view = recyclerView.getChildAt(i);
                     if (view != null) {
                         RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(view);
-                        if (holder instanceof BackgroundChangeAware) {
-                            ((BackgroundChangeAware)holder).onBackgroundChanged();
+                        // notify all view holders about page change - skip background config
+                        if (i > 0 && holder instanceof BackgroundChangeAware) {
+                            ((BackgroundChangeAware) holder).onBackgroundChanged();
+                        }
+                        // show / hide page indicator after page change
+                        if (holder instanceof ImageSetPageViewHolder) {
+                            ImageSetPageViewHolder imagesHolder = (ImageSetPageViewHolder) holder;
+                            if (imagesHolder.getPageIndicator() != null) {
+                                if (imagesHolder.itemView.getVisibility() == View.VISIBLE) {
+                                    ConfigPageAdapter adapter = ((ConfigPageAdapter) imagesHolder.getVerticalPager().getAdapter());
+                                    if (adapter != null) {
+                                        adapter.getPageIndicatorAdapter().showToFade();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -226,9 +239,10 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
 
     private void onBindImageSetViewHolder(ImageSetPageViewHolder holder, ConfigPageData.ConfigType type, int position) {
         ConfigPageData pageData = watchfaceConfig.getPageData(position);
-        holder.getTitle().setText(context.getString(pageData.getTitleId()));
+//        holder.getTitle().setText(context.getString(pageData.getTitleId()));
 
         holder.getVerticalPager().setAdapter(new ConfigPageAdapter(
+                holder.getPageIndicator(),
                 pageData,
                 watchfaceConfig.getItems(type),
                 watchfaceConfig,
@@ -329,14 +343,6 @@ public class AnalogWatchfaceConfigViewAdapter extends WearableRecyclerView.Adapt
         holder.getRecyclerView().setHasFixedSize(true);
         holder.getRecyclerView().setAdapter(adapter);
         holder.getRecyclerView().setTag(TAG_VERTICAL_SCROLLABLE + position);
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(@NonNull WearableRecyclerView.ViewHolder holder) {
-        if (holder instanceof ImageSetPageViewHolder) {
-            ((ConfigPageAdapter)((ImageSetPageViewHolder) holder).getVerticalPager().getAdapter()).destroy();
-        }
-        super.onViewDetachedFromWindow(holder);
     }
 
     public void dispatchActivityResult(int requestCode, int resultCode, Intent data) {

@@ -45,6 +45,7 @@ public class DigitalWatchfaceConfig implements WatchfaceConfig {
 
     private final static ConfigItemData[] backgroundConfig = new ConfigItemData[] {
             new ConfigItemData(0, "Stripes" , R.drawable.digital_background_default),
+            new ConfigItemData(1, "Pure" , R.drawable.digital_pure_background_1),
     };
 
     private final static ConfigPageData[] CONFIG = {

@@ -25,8 +25,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
+
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 
@@ -41,6 +43,8 @@ public class ConfigPageAdapter extends WearableRecyclerView.Adapter<ConfigPageAd
     final private ConfigItemData[] items;
     final private ViewPager2 pager;
 
+    final private PageIndicatorAdapter pageIndicatorAdapter;
+
     final private ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
         @Override
         public void onPageSelected(int position) {
@@ -51,7 +55,7 @@ public class ConfigPageAdapter extends WearableRecyclerView.Adapter<ConfigPageAd
         }
     };
 
-    public ConfigPageAdapter(ConfigPageData pageData, ConfigItemData[] items, WatchfaceConfig watchfaceConfig, ViewPager2 pager, SharedPreferences prefs) {
+    public ConfigPageAdapter(ViewGroup indicatorView, ConfigPageData pageData, ConfigItemData[] items, WatchfaceConfig watchfaceConfig, ViewPager2 pager, SharedPreferences prefs) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "WatchfaceDataAdapter created");
         }
@@ -63,10 +67,15 @@ public class ConfigPageAdapter extends WearableRecyclerView.Adapter<ConfigPageAd
 
         this.pager.registerOnPageChangeCallback(pageChangeCallback);
         this.pager.setCurrentItem(watchfaceConfig.getSelectedIdx(pager.getContext(), pageData.getType()));
+
+        pageIndicatorAdapter = new PageIndicatorAdapter(
+                indicatorView,
+                items.length,
+                pager);
     }
 
-    public void destroy() {
-        this.pager.unregisterOnPageChangeCallback(pageChangeCallback);
+    public PageIndicatorAdapter getPageIndicatorAdapter() {
+        return pageIndicatorAdapter;
     }
 
     @Override
@@ -91,7 +100,7 @@ public class ConfigPageAdapter extends WearableRecyclerView.Adapter<ConfigPageAd
         }
         ConfigItemData itemData = items[position];
         holder.label.setText(itemData.getLabel());
-        holder.image.setImageDrawable(holder.image.getContext().getDrawable(itemData.getResourceId()));
+        holder.image.setImageDrawable(ContextCompat.getDrawable(holder.image.getContext(), itemData.getResourceId()));
     }
 
     static class ViewHolder extends WearableRecyclerView.ViewHolder {

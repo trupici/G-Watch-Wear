@@ -20,7 +20,6 @@ import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.components.BgAlarmController;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 
 public class AlarmsMenuItems {
     final public static ConfigItem[] items = {
@@ -125,7 +124,6 @@ public class AlarmsMenuItems {
                     BgAlarmController.PREF_NEW_VALUE_NOTIFICATION_ENABLED,
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_notification_new_value_enabled,
-                    true),
-            new PaddingConfigItem()
+                    true)
     };
 }

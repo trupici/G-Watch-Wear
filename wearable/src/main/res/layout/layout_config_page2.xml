@@ -14,32 +14,35 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/config_page2_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="@color/transparent"
     android:layout_gravity="center_horizontal"
-    android:layout_margin="0dp"
     >
 
+    <androidx.wear.widget.WearableRecyclerView
+        android:id="@+id/wearable_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:scrollbars="vertical"
+        >
+        <requestFocus/>
+    </androidx.wear.widget.WearableRecyclerView>
+
     <TextView
+        android:id="@+id/page_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center_horizontal|top"
-        android:id="@+id/page_title"
-        android:visibility="gone"
+        android:visibility="invisible"
+        android:layout_marginTop="@dimen/config_indicator_size"
+        android:paddingBottom="@dimen/config_view_padding"
+        android:background="@color/black"
         />
 
-        <androidx.wear.widget.WearableRecyclerView
-            android:id="@+id/wearable_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/transparent"
-            >
-            <requestFocus/>
-        </androidx.wear.widget.WearableRecyclerView>
-
-</LinearLayout>
+</FrameLayout>

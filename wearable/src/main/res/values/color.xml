@@ -24,6 +24,7 @@
 
     <color name="page_indicator_inactive">#DDDDDD</color>
     <color name="page_indicator_active">#FF00FF</color>
+    <color name="page_vert_indicator_active">#2259FF</color>
 
     <color name="def_bg_background_color">#00000000</color>
     <color name="def_bg_hypo_color">#FFBC0007</color>

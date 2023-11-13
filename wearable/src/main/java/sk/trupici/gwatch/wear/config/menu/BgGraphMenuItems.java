@@ -21,7 +21,6 @@ import sk.trupici.gwatch.wear.components.BgGraphPanel;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 
 public class BgGraphMenuItems {
     final public static ConfigItem[] items = {
@@ -119,7 +118,6 @@ public class BgGraphMenuItems {
                     R.drawable.config_color_edit_24,
                     BgGraphPanel.PREF_LOW_LINE_COLOR,
                     ConfigItem.Type.TYPE_COLOR,
-                    R.color.def_graph_color_low_line),
-            new PaddingConfigItem()
+                    R.color.def_graph_color_low_line)
     };
 }

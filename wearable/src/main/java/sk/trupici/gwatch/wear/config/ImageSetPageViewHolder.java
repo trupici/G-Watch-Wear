@@ -23,8 +23,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.wear.widget.WearableRecyclerView;
+
 import sk.trupici.gwatch.wear.R;
 
 /**
@@ -37,12 +39,15 @@ public class ImageSetPageViewHolder extends WearableRecyclerView.ViewHolder impl
     private final ViewGroup bkgViewGroup;
     private final ConfigPageData.ConfigType dataType;
 
+    private final ViewGroup pageIndicator;
+
     public ImageSetPageViewHolder(WatchfaceConfig watchfaceConfig, @NonNull View itemView, ConfigPageData.ConfigType dataType) {
         super(itemView);
         this.watchfaceConfig = watchfaceConfig;
         title = itemView.findViewById(R.id.page_title);
         verticalPager = itemView.findViewById(R.id.vertical_pager);
         bkgViewGroup = itemView.findViewById(R.id.backgrounds);
+        pageIndicator = itemView.findViewById(R.id.page_indicator2);
         this.dataType = dataType;
     }
 
@@ -58,6 +63,10 @@ public class ImageSetPageViewHolder extends WearableRecyclerView.ViewHolder impl
         return dataType;
     }
 
+    public ViewGroup getPageIndicator() {
+        return pageIndicator;
+    }
+
     @Override
     public void onBackgroundChanged() {
         if (dataType != ConfigPageData.ConfigType.BACKGROUND) {
@@ -66,7 +75,7 @@ public class ImageSetPageViewHolder extends WearableRecyclerView.ViewHolder impl
             if (itemData != null && itemData.getResourceId() != 0) {
                 ViewGroup view = (ViewGroup) LayoutInflater.from(bkgViewGroup.getContext()).inflate(R.layout.layout_config_item_page, bkgViewGroup, false);
                 ImageView bkgView = view.findViewById(R.id.image);
-                bkgView.setImageDrawable(bkgViewGroup.getContext().getDrawable(itemData.getResourceId()));
+                bkgView.setImageDrawable(ContextCompat.getDrawable(bkgViewGroup.getContext(), itemData.getResourceId()));
                 bkgViewGroup.addView(view);
             }
         }

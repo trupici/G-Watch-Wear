@@ -46,7 +46,7 @@ public class AnalogWatchfaceConfig implements WatchfaceConfig {
     final public static int DEF_HANDS_SET_IDX = 0;
 
     private final static ConfigItemData[] backgroundConfig = new ConfigItemData[]{
-            new ConfigItemData(0, "Stripes", R.drawable.analog__active_background_default),
+            new ConfigItemData(0, "Stripes", R.drawable.analog_active_background_default),
             new ConfigItemData(1, "Circuit Board", R.drawable.analog_active_background_1),
             new ConfigItemData(2, "Halftone", R.drawable.analog_active_background_2),
             new ConfigItemData(3, "Classic Silver", R.drawable.analog_classic_background_1),

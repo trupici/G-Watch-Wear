@@ -21,7 +21,6 @@ import sk.trupici.gwatch.wear.components.DatePanel;
 import sk.trupici.gwatch.wear.config.item.BasicConfigItem;
 import sk.trupici.gwatch.wear.config.item.BoolConfigItem;
 import sk.trupici.gwatch.wear.config.item.ConfigItem;
-import sk.trupici.gwatch.wear.config.item.PaddingConfigItem;
 
 public class DatePanelMenuItems {
     final public static ConfigItem[] items = {
@@ -65,7 +64,6 @@ public class DatePanelMenuItems {
                     R.drawable.config_color_edit_24,
                     DatePanel.PREF_BORDER_COLOR,
                     ConfigItem.Type.TYPE_COLOR,
-                    R.color.def_date_border_color),
-            new PaddingConfigItem()
+                    R.color.def_date_border_color)
     };
 }

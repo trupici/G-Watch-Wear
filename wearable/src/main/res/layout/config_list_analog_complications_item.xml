@@ -15,121 +15,95 @@
  limitations under the License.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/complications_item_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/left_complication_view"
     >
 
     <!-- multiple backgrounds scene -->
     <FrameLayout
+        android:id="@+id/backgrounds"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/backgrounds"
         android:background="@color/transparent"
         />
 
     <!-- multiple complications scene -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/complications"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/config_page_more_height"
+        android:layout_marginTop="@dimen/config_indicator_size"
+        android:layout_marginBottom="@dimen/config_page_label_total_height"
         >
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/top_part"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
-            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHeight_percent="0.46"
             />
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottom_part"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
-            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/top_part"
+            app:layout_constraintHeight_percent="0.54"
             >
             <FrameLayout
+                android:id="@+id/left_pad"
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:layout_weight="5"
+                app:layout_constraintWidth_percent="0.20"
+                app:layout_constraintLeft_toLeftOf="parent"
                 />
-            <LinearLayout
-                android:layout_width="0dp"
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/left_container"
+                android:orientation="vertical"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:paddingHorizontal="11dp"
-                android:layout_weight="20"
+                android:layout_width="0dp"
+                app:layout_constraintWidth_percent="0.21"
+                app:layout_constraintLeft_toRightOf="@id/left_pad"
+                app:layout_constraintTop_toTopOf="parent"
                 >
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="8"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-                    <include layout="@layout/config_list_complication_item"
-                        android:id="@+id/left_complication"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        />
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="7"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-                    <include layout="@layout/config_list_complication_item"
-                        android:id="@+id/center_complication"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="2"
-                        android:layout_gravity="bottom"
-                        android:gravity="bottom"
-                        />
-                    <include layout="@layout/config_list_complication_item"
-                        android:id="@+id/bottom_complication"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="2"
-                        />
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="8"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-                    <include layout="@layout/config_list_complication_item"
-                        android:id="@+id/right_complication"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        />
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        />
-                </LinearLayout>
-            </LinearLayout>
-            <FrameLayout
+                <include layout="@layout/config_list_complication_item"
+                    android:id="@+id/left_complication"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintHeight_percent="0.51"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/right_container"
+                android:orientation="vertical"
                 android:layout_height="match_parent"
                 android:layout_width="0dp"
-                android:layout_weight="5"
+                app:layout_constraintWidth_percent="0.21"
+                app:layout_constraintRight_toLeftOf="@id/right_pad"
+                app:layout_constraintTop_toTopOf="parent"
+                >
+                <include layout="@layout/config_list_complication_item"
+                    android:id="@+id/right_complication"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintHeight_percent="0.51"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/right_pad"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                app:layout_constraintWidth_percent="0.20"
+                app:layout_constraintRight_toRightOf="parent"
                 />
-        </LinearLayout>
-    </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

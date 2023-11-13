@@ -33,9 +33,11 @@ public class ConfigItemListPageViewHolder extends WearableRecyclerView.ViewHolde
 
     public ConfigItemListPageViewHolder(@NonNull View itemView) {
         super(itemView);
+        viewId = itemView.getId();
         title = itemView.findViewById(R.id.page_title);
         recyclerView = itemView.findViewById(R.id.wearable_recycler_view);
-        viewId = itemView.getId();
+        // Aligns the first and last items on the list vertically centered on the screen.
+        recyclerView.setEdgeItemsCenteringEnabled(true);
     }
 
     public TextView getTitle() {

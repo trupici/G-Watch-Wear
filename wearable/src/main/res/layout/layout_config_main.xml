@@ -14,29 +14,32 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/config_main_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/black">
-
-    <LinearLayout
-        android:id="@+id/page_indicator"
-        android:layout_width="wrap_content"
-        android:paddingTop="@dimen/config_indicator_padding"
-        android:paddingBottom="3dp"
-        android:layout_height="@dimen/config_indicator_height"
-        android:layout_gravity="center_horizontal|bottom"
-        android:gravity="center_horizontal|bottom"
-        android:orientation="horizontal"/>
+    tools:background="@color/black"
+    app:layout_box="all">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/horizontal_pager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="0dp"
-        android:layout_margin="0dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/transparent"
         />
-</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/page_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/config_indicator_size"
+        android:paddingBottom="@dimen/config_indicator_inner"
+        android:gravity="center_horizontal|bottom"
+        android:orientation="horizontal"
+        android:background="@color/black"
+        />
+
+</androidx.wear.widget.BoxInsetLayout>

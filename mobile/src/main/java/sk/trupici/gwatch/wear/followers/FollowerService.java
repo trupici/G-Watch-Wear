@@ -66,6 +66,8 @@ public abstract class FollowerService extends Service {
     public static final String ACTION_REQUEST_NEW = "FollowerService.REQUEST_NEW";
     public static final String ACTION_RELOAD_SETTINGS = "FollowerService.RELOAD_SETTINGS";
 
+    public static final String EXTRA_TIMESTAMP = "FollowerService.EXTRA_TIMESTAMP";
+
     protected static final long DEF_SAMPLE_PERIOD_MS = 300000; // 5min
     protected static final long MISSED_SAMPLE_PERIOD_MS = 60000; // 1min
     protected static final long DEF_SAMPLE_LATENCY_MS = 15000; // 15s
@@ -109,6 +111,8 @@ public abstract class FollowerService extends Service {
                 initLastSampleTime();
             }
         }
+
+        final long processingTime = intent.getLongExtra(EXTRA_TIMESTAMP, System.currentTimeMillis());
 
         executor.execute(() -> {
             PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
@@ -162,7 +166,7 @@ public abstract class FollowerService extends Service {
                 } catch (Throwable t) {
                     Log.e(LOG_TAG, t.getLocalizedMessage(), t);
                 }
-                scheduleNewRequest(context, getNextRequestDelay(lastPacket));
+                scheduleNewRequest(context, getNextRequestDelay(lastPacket, processingTime));
             } finally {
                 wakeLock.release();
             }
@@ -216,23 +220,23 @@ public abstract class FollowerService extends Service {
     /**
      * Returns delay in ms for scheduling next request to NS server
      * @param packet last received glucose packet
+     * @param processingTime timestamp of this run of processing loop
      * @return delay in milliseconds (from now) when to request next value from NS server
      */
-    private long getNextRequestDelay(GlucosePacket packet) {
-        long now = System.currentTimeMillis();
+    private long getNextRequestDelay(GlucosePacket packet, long processingTime) {
         Long sampleTime = (packet != null) ? Long.valueOf(packet.getTimestamp()) : getLastSampleTime();
-        if (sampleTime != null && sampleTime < now) {
+        if (sampleTime != null && sampleTime < processingTime) {
             // received sample with valid timestamp
-            if (now - sampleTime > getSamplePeriodMs() + getSampleToRequestDelay()) {
+            if (processingTime - sampleTime > getSamplePeriodMs() + getSampleToRequestDelay()) {
                 // sample is old - use fast sampling to get the next value
                 // if sample is not too old and fast sampling is configured
-                if (getMissedSamplePeriodMs() > 0 && now - sampleTime < 2 * getSamplePeriodMs() + getSampleToRequestDelay()) {
-                    return getMissedSamplePeriodMs();
+                if (getMissedSamplePeriodMs() > 0 && processingTime - sampleTime < 2 * getSamplePeriodMs() + getSampleToRequestDelay()) {
+                    return getMissedSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
                 }
             }
         }
         // use default period
-        return getSamplePeriodMs();
+        return getSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
     }
     /**
      * Returns a {@code OkHttpClient} instance to use for NS server requests.
@@ -306,13 +310,14 @@ public abstract class FollowerService extends Service {
         ContextCompat.startForegroundService(context, startIntent);
     }
 
-    public static void requestNewValue(Context context, Intent intent, Class<? extends FollowerService> cls) {
+    public static void requestNewValue(Context context, Intent intent, Class<? extends FollowerService> cls, long processingTime) {
         if (BuildConfig.DEBUG) {
             Log.i(LOG_TAG, cls.getSimpleName() + ": Requesting new value");
         }
         Intent startIntent = new Intent(context, cls);
         startIntent.setAction(ACTION_REQUEST_NEW);
         startIntent.putExtras(intent);
+        startIntent.putExtra(EXTRA_TIMESTAMP, processingTime);
         ContextCompat.startForegroundService(context, startIntent);
     }
 

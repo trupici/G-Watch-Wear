@@ -47,6 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        long processingTime = System.currentTimeMillis();
         PowerManager powerManager = (PowerManager)context.getSystemService(POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
@@ -57,11 +58,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
 
             if (PreferenceUtils.isConfigured(context, NightScoutFollowerService.PREF_NS_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, NightScoutFollowerService.class);
+                FollowerService.requestNewValue(context, intent, NightScoutFollowerService.class, processingTime);
             } else if (PreferenceUtils.isConfigured(context, DexcomShareFollowerService.PREF_DEXCOM_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, DexcomShareFollowerService.class);
+                FollowerService.requestNewValue(context, intent, DexcomShareFollowerService.class, processingTime);
             } else if (PreferenceUtils.isConfigured(context, LibreLinkUpFollowerService.PREF_LLU_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, LibreLinkUpFollowerService.class);
+                FollowerService.requestNewValue(context, intent, LibreLinkUpFollowerService.class, processingTime);
             } else {
                 if (GWatchApplication.isDebugEnabled()) {
                     UiUtils.showMessage(context, context.getString(R.string.wakeup_received));

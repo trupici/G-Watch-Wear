@@ -25,6 +25,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -122,11 +124,13 @@ public class GWatchApplication extends Application {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(receiver.getAction());
         intentFilter.setPriority(DEF_RECEIVER_PRIO);
-        registerReceiver(receiver, intentFilter, RECEIVER_EXPORTED);
+        ContextCompat.registerReceiver(this, receiver, intentFilter, ContextCompat.RECEIVER_EXPORTED);
         bgReceivers.add(receiver);
     }
     public void processIntent(Context context, Intent intent) {
-
+        if (intent.getAction() == null) {
+            return;
+        }
         for (BGReceiver receiver : bgReceivers) {
             if (receiver != null) {
                 if (intent.getAction().equals(receiver.getAction())) {

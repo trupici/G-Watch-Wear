@@ -91,7 +91,11 @@ public abstract class BGReceiver extends BroadcastReceiver {
                 wakeLock.release();
                 // Must call finish() so the BroadcastReceiver can be recycled.
                 if (pendingResult != null) {
-                    pendingResult.finish();
+                    try {
+                        pendingResult.finish();
+                    } catch (IllegalStateException e) {
+                        // ignore, result was already finished
+                    }
                 }
             }
         });

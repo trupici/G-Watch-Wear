@@ -18,7 +18,6 @@ package sk.trupici.gwatch.wear.config;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,8 +104,11 @@ public class PageIndicatorAdapter extends ViewPager2.OnPageChangeCallback {
     }
 
     private void createIndicatorElements() {
-        for (int i=0; i < numElements; i++) {
-            createIndicatorElement(i);
+        if (indicatorView.getChildCount() != numElements) {
+            indicatorView.removeAllViews();
+            for (int i=0; i < numElements; i++) {
+                createIndicatorElement(i);
+            }
         }
     }
 
@@ -131,7 +133,7 @@ public class PageIndicatorAdapter extends ViewPager2.OnPageChangeCallback {
         final Drawable defDrawable = context.getDrawable(R.drawable.circle_8);
         final int defColor = context.getColor(R.color.page_indicator_inactive);
 
-        for (int i=0; i < indicatorView.getChildCount(); i++) {
+        for (int i=0; i < numElements; i++) {
             ImageView childView = (ImageView) indicatorView.getChildAt(i);
             if (i == selectedPosition) {
                 childView.setImageDrawable(context.getDrawable(R.drawable.circle_10));

@@ -1,12 +1,12 @@
 
 # G-Watch Wear App
 
-Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung WearOS smart watch then this is the ideal app for you!
+Looking for more comfortable way how to monitor your glucose levels? If you have a Samsung Wear OS smart watch then this is the ideal app for you!
 
-G-Watch Wear App is a bridge between your CGM app and your Samsung WearOS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, AndroidAPS, NightScout, Dexcom Share, etc...) and sends collected data to the watch. G-Watch watch faces then display received values to its user.
+G-Watch Wear App is a bridge between your CGM app and your Samsung Wear OS watch. It collects glucose values provided by 3rd party CGM applications (Glimp, XDrip+, DiaBox, AndroidAPS, NightScout, Dexcom Share, etc...) and sends collected data to the watch. G-Watch watch faces then display received values to its user.
 
 
-This is the first release of G-Watch App for WearOS watch models. It is primary focused on Glaxy Watch 4 models as a direct successor of previous TizenOS Galaxy models where the original G-Watch App was used.
+This is the first release of G-Watch App for Wear OS watch models. It is primary focused on Glaxy Watch 4 models as a direct successor of previous TizenOS Galaxy models where the original G-Watch App was used.
 
 The list of supported features for this release:
 - 2 configurable watch faces Digital and Analog.

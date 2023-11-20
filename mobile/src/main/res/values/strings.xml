@@ -337,6 +337,7 @@
     <string name="follower_err_no_session">No session id</string>
     <string name="follower_err_no_account_id">No account id</string>
 
+    <string name="follower_request_notification">"Sending %1$s request…"</string>
 
     <string name="dexcom_app_not_installed">Dexcom App is not installed!</string>
 </resources>

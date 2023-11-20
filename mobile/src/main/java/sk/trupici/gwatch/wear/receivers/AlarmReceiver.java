@@ -52,17 +52,19 @@ public class AlarmReceiver extends BroadcastReceiver {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
         wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
 
+        AlarmUtils.evaluateSchedule(intent.getExtras());
+
         try {
             if (BuildConfig.DEBUG) {
-                Log.i(GWatchApplication.LOG_TAG, "Alarm received: " + intent.toString());
+                Log.i(GWatchApplication.LOG_TAG, "Alarm received: " + intent);
             }
 
             if (PreferenceUtils.isConfigured(context, NightScoutFollowerService.PREF_NS_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, NightScoutFollowerService.class, processingTime);
+                FollowerService.scheduleFollowerWork(context, processingTime, NightScoutFollowerService.class);
             } else if (PreferenceUtils.isConfigured(context, DexcomShareFollowerService.PREF_DEXCOM_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, DexcomShareFollowerService.class, processingTime);
+                FollowerService.scheduleFollowerWork(context, processingTime, DexcomShareFollowerService.class);
             } else if (PreferenceUtils.isConfigured(context, LibreLinkUpFollowerService.PREF_LLU_ENABLED, false)) {
-                FollowerService.requestNewValue(context, intent, LibreLinkUpFollowerService.class, processingTime);
+                FollowerService.scheduleFollowerWork(context, processingTime, LibreLinkUpFollowerService.class);
             } else {
                 if (GWatchApplication.isDebugEnabled()) {
                     UiUtils.showMessage(context, context.getString(R.string.wakeup_received));

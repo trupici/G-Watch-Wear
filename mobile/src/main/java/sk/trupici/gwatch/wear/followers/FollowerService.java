@@ -20,23 +20,32 @@ package sk.trupici.gwatch.wear.followers;
 
 import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 
-import android.app.Service;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.PowerManager;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.ForegroundInfo;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -52,21 +61,18 @@ import sk.trupici.gwatch.wear.common.data.GlucosePacket;
 import sk.trupici.gwatch.wear.common.util.CommonConstants;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.receivers.AlarmReceiver;
-import sk.trupici.gwatch.wear.service.NotificationService;
-import sk.trupici.gwatch.wear.util.AlarmUtils;
+import sk.trupici.gwatch.wear.util.AndroidUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
+import sk.trupici.gwatch.wear.view.MainActivity;
 
-public abstract class FollowerService extends Service {
-
-    private static final String WAKE_LOCK_TAG = "gwatch.wear:" + FollowerService.class.getSimpleName() + ".wake_lock";
-    private static final long WAKE_LOCK_TIMEOUT_MS = 60000; // 1 min
-
-    public static final String ACTION_START = "FollowerService.START";
-    public static final String ACTION_REQUEST_NEW = "FollowerService.REQUEST_NEW";
-    public static final String ACTION_RELOAD_SETTINGS = "FollowerService.RELOAD_SETTINGS";
+public abstract class FollowerService extends Worker {
 
     public static final String EXTRA_TIMESTAMP = "FollowerService.EXTRA_TIMESTAMP";
+
+    private static final String CHANNEL_ID = "GWatchFollowerNotificationChannel";
+    private static final int REQUEST_CODE = 2024;
+    public static final int NOTIFICATION_ID = 76801415;
 
     protected static final long DEF_SAMPLE_PERIOD_MS = 300000; // 5min
     protected static final long MISSED_SAMPLE_PERIOD_MS = 60000; // 1min
@@ -74,110 +80,158 @@ public abstract class FollowerService extends Service {
 
     private static OkHttpClient httpClient;
     private static Long lastSampleTime;
-    private static String sessionData;
 
-    private final Executor executor = Executors.newSingleThreadExecutor();
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
     abstract protected boolean isServiceEnabled(Context context);
     abstract protected List<GlucosePacket> getServerValues(Context context);
+    abstract protected String getServiceLabel();
+
+    public FollowerService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public Result doWork() {
+
         if (BuildConfig.DEBUG) {
-            Log.i(LOG_TAG, getClass().getSimpleName() + ": onStartCommand: " + intent);
+            Log.i(LOG_TAG, getClass().getSimpleName() + ": doWork");
         }
         Context context = GWatchApplication.getAppContext();
 
-        startForeground(NotificationService.NOTIFICATION_ID, NotificationService.getOrCreateNotification(context));
-
-        if (ACTION_START.equals(intent.getAction())) {
-            init();
-        } else if (ACTION_RELOAD_SETTINGS.equals(intent.getAction())) {
-            init();
-            if (!isServiceEnabled(context)) {
-                stopSelf();
-                return START_NOT_STICKY;
-            }
-        } else { // ACTION_REQUEST_NEW
-            Bundle alarmBundle = intent.getExtras();
-            AlarmUtils.evaluateSchedule(alarmBundle);
-            if (getLastSampleTime() == null) {
-                initLastSampleTime();
-            }
+        if (!isServiceEnabled(context)) {
+            return Result.success();
+        }
+        if (getLastSampleTime() == null) {
+            initLastSampleTime();
         }
 
-        final long processingTime = intent.getLongExtra(EXTRA_TIMESTAMP, System.currentTimeMillis());
+        final long processingTime = getInputData().getLong(EXTRA_TIMESTAMP, System.currentTimeMillis());
 
-        executor.execute(() -> {
-            PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
-            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG);
-            wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS);
+        GlucosePacket lastPacket = null;
+        try {
+            List<GlucosePacket> packets = getServerValues(context);
+            if (packets != null) {
+                lastPacket = (packets.size() > 0) ? packets.get(0) : null;
 
-            try {
-                GlucosePacket lastPacket = null;
-                try {
-                    List<GlucosePacket> packets = getServerValues(context);
-                    if (packets != null) {
-                        lastPacket = (packets.size() > 0) ? packets.get(0) : null;
+                String entries = context.getResources().getQuantityString(R.plurals.entries, packets.size());
+                UiUtils.showMessage(context,
+                        context.getString(
+                                R.string.follower_entries_received,
+                                packets.size(),
+                                entries,
+                                StringUtils.formatTime(new Date())));
 
-                        String entries = context.getResources().getQuantityString(R.plurals.entries, packets.size());
-                        UiUtils.showMessage(context,
-                                context.getString(
-                                        R.string.follower_entries_received,
-                                        packets.size(),
-                                        entries,
-                                        StringUtils.formatTime(new Date())));
-
-                        if (lastPacket != null) {
-                            if (lastPacket.getTimestamp() != 0) {
-                                setLastSampleTime(lastPacket.getTimestamp());
-                            }
-
-                            for (int i = packets.size() - 1; i >= 0; i--) {
-                                GWatchApplication.getDispatcher().dispatch(packets.get(i));
-                            }
-                        }
+                if (lastPacket != null) {
+                    if (lastPacket.getTimestamp() != 0) {
+                        setLastSampleTime(lastPacket.getTimestamp());
                     }
-                } catch (TooManyRequestsException e) {
-                    // process reschedule
-                    String retryAfter = e.getRetryAfter();
-                    Log.w(LOG_TAG, "Request rejected with HTTP 429, Retry-After: " + retryAfter);
-                    long nextRequestDelay = 0;
-                    if (retryAfter == null || retryAfter.length() == 0) {
-                        nextRequestDelay = getSamplePeriodMs();
-                    } else {
-                        try {
-                            nextRequestDelay = Integer.parseInt(retryAfter) * CommonConstants.SECOND_IN_MILLIS;
-                        } catch (Exception ex) {
-                            Log.e(LOG_TAG, "Failed to parse Retry-After value: " + retryAfter, ex);
-                        }
-                        if (nextRequestDelay <= 0) {
-                            nextRequestDelay = getSamplePeriodMs();
-                        }
+
+                    for (int i = packets.size() - 1; i >= 0; i--) {
+                        GWatchApplication.getDispatcher().dispatch(packets.get(i));
                     }
-                    scheduleNewRequest(context, nextRequestDelay);
-                    return;
-                } catch (Throwable t) {
-                    Log.e(LOG_TAG, t.getLocalizedMessage(), t);
                 }
-                scheduleNewRequest(context, getNextRequestDelay(lastPacket, processingTime));
-            } finally {
-                wakeLock.release();
             }
-        });
+        } catch (TooManyRequestsException e) {
+            // process reschedule
+            String retryAfter = e.getRetryAfter();
+            Log.w(LOG_TAG, "Request rejected with HTTP 429, Retry-After: " + retryAfter);
+            long nextRequestDelay = 0;
+            if (retryAfter == null || retryAfter.length() == 0) {
+                nextRequestDelay = getSamplePeriodMs();
+            } else {
+                try {
+                    nextRequestDelay = Integer.parseInt(retryAfter) * CommonConstants.SECOND_IN_MILLIS;
+                } catch (Exception ex) {
+                    Log.e(LOG_TAG, "Failed to parse Retry-After value: " + retryAfter, ex);
+                }
+                if (nextRequestDelay <= 0) {
+                    nextRequestDelay = getSamplePeriodMs();
+                }
+            }
+            scheduleNewRequest(context, nextRequestDelay);
+            return Result.success();
+        } catch (Throwable t) {
+            Log.e(LOG_TAG, t.getLocalizedMessage(), t);
+        }
+        scheduleNewRequest(context, getNextRequestDelay(lastPacket, processingTime));
 
-        return START_NOT_STICKY;
+        return Result.success();
+    }
+
+    @NonNull
+    @Override
+    public ForegroundInfo getForegroundInfo() {
+        if (BuildConfig.DEBUG) {
+            Log.i(LOG_TAG, "getForegroundInfo");
+        }
+
+        Context context = GWatchApplication.getAppContext();
+
+        createNotificationChannel(context);
+        Notification notification = createNotification(context, context.getString(R.string.follower_request_notification, getServiceLabel()));
+
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                ? new ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+                : new ForegroundInfo(NOTIFICATION_ID, notification);
+    }
+
+    private static Notification createNotification(Context context, String text) {
+        if (BuildConfig.DEBUG) {
+            Log.i(LOG_TAG, "createNotification: " + text);
+        }
+
+        Intent showTaskIntent = new Intent(context, MainActivity.class);
+        showTaskIntent.setAction(Intent.ACTION_MAIN);
+        showTaskIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        showTaskIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                context,
+                REQUEST_CODE,
+                showTaskIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | AndroidUtils.getMutableFlag(true));
+
+        return new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setSmallIcon(R.drawable.ic_watch)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setContentText(text)
+                .setContentIntent(contentIntent)
+                .setOngoing(true)
+                .setSilent(true)
+                .build();
+    }
+
+    private static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            if (manager.getNotificationChannel(CHANNEL_ID) != null) {
+                return;
+            }
+
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "G-Watch Wear Follower Notification Channel",
+                    NotificationManager.IMPORTANCE_LOW);
+            serviceChannel.setShowBadge(false);
+            serviceChannel.enableLights(false);
+            serviceChannel.enableVibration(false);
+            serviceChannel.setSound(null, null);
+            serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                serviceChannel.setAllowBubbles(false);
+            }
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
+
+    protected static void reset() {
+        httpClient = null;
+        lastSampleTime = null;
     }
 
     protected void init() {
-        httpClient = null;
-        sessionData = null;
+        FollowerService.reset();
         initLastSampleTime();
     }
 
@@ -279,14 +333,6 @@ public abstract class FollowerService extends Service {
         FollowerService.lastSampleTime = lastSampleTime;
     }
 
-    public String getSessionData() {
-        return sessionData;
-    }
-
-    public void setSessionData(String sessionData) {
-        FollowerService.sessionData = sessionData;
-    }
-
     protected String getResponseBodyAsString(Response response) throws IOException  {
         ResponseBody body = response.body();
         if (body != null) {
@@ -305,28 +351,38 @@ public abstract class FollowerService extends Service {
         if (BuildConfig.DEBUG) {
             Log.i(LOG_TAG, cls.getSimpleName() + ": start request");
         }
-        Intent startIntent = new Intent(context, cls);
-        startIntent.setAction(ACTION_START);
-        ContextCompat.startForegroundService(context, startIntent);
-    }
 
-    public static void requestNewValue(Context context, Intent intent, Class<? extends FollowerService> cls, long processingTime) {
-        if (BuildConfig.DEBUG) {
-            Log.i(LOG_TAG, cls.getSimpleName() + ": Requesting new value");
-        }
-        Intent startIntent = new Intent(context, cls);
-        startIntent.setAction(ACTION_REQUEST_NEW);
-        startIntent.putExtras(intent);
-        startIntent.putExtra(EXTRA_TIMESTAMP, processingTime);
-        ContextCompat.startForegroundService(context, startIntent);
+        scheduleFollowerWork(context, 0, cls);
     }
 
     public static void reloadSettings(Context context, Class<? extends FollowerService> cls) {
         if (BuildConfig.DEBUG) {
             Log.i(LOG_TAG, cls.getSimpleName() + ": reload settings request");
         }
-        Intent startIntent = new Intent(context, cls);
-        startIntent.setAction(ACTION_RELOAD_SETTINGS);
-        ContextCompat.startForegroundService(context, startIntent);
+
+        try {
+            cls.getDeclaredMethod("reset").invoke(null);
+        } catch (Exception e) {
+            Log.d(LOG_TAG, cls.getSimpleName() + ": initialization failed: " + e.getLocalizedMessage());
+        }
+
+        scheduleFollowerWork(context, 0, cls);
+    }
+
+    public static void scheduleFollowerWork(Context context, long processingTime, Class<? extends FollowerService> cls) {
+        if (BuildConfig.DEBUG) {
+            Log.i(LOG_TAG, cls.getSimpleName() + ": schedule request");
+        }
+        OneTimeWorkRequest.Builder builder = new OneTimeWorkRequest.Builder(cls)
+                        .setConstraints(new Constraints.Builder()
+                                .setTriggerContentMaxDelay(Duration.ofMillis(100))
+                                .build()
+                        ).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST);
+        if (processingTime > 0) {
+            builder.setInputData(new Data.Builder().putLong(FollowerService.EXTRA_TIMESTAMP, processingTime).build());
+        }
+
+        WorkManager workManager = WorkManager.getInstance(context);
+        workManager.enqueue(builder.build());
     }
 }

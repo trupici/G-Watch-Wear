@@ -18,8 +18,13 @@
 
 package sk.trupici.gwatch.wear.followers;
 
+import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+
 import android.content.Context;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.work.WorkerParameters;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -41,9 +46,6 @@ import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.HttpUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
-
-import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
-import static sk.trupici.gwatch.wear.common.util.StringUtils.EMPTY_STRING;
 
 /**
  * NightScout Cloud Follower Service
@@ -67,17 +69,29 @@ public class NightScoutFollowerService extends FollowerService {
 
     private static String apiSecret;
     private static String nsToken;
+    private static String serverUrl;
 
     private static long sampleToRequestDelay = DEF_NS_SAMPLE_LATENCY_MS * 1000L;
     private static boolean isFastSamplingEnabled = false;
 
+    public NightScoutFollowerService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
+    protected static void reset() {
+        FollowerService.reset();
+        Context context = GWatchApplication.getAppContext();
+        nsToken = getNsToken(context);
+        apiSecret = getApiSecret(context);
+        serverUrl = getServerUrl(context);
+        sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(context, PREF_NS_REQUEST_LATENCY, DEF_NS_SAMPLE_LATENCY_MS) * 1000L;
+        isFastSamplingEnabled = PreferenceUtils.isConfigured(context, PREF_NS_FAST_SAMPLE_PERIOD, false);
+    }
+
     @Override
     protected void init() {
         super.init();
-        apiSecret = null;
-        nsToken = null;
-        sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_NS_REQUEST_LATENCY, DEF_NS_SAMPLE_LATENCY_MS) * 1000L;
-        isFastSamplingEnabled = PreferenceUtils.isConfigured(GWatchApplication.getAppContext(), PREF_NS_FAST_SAMPLE_PERIOD, false);
+        NightScoutFollowerService.reset();
     }
 
     @Override
@@ -109,16 +123,15 @@ public class NightScoutFollowerService extends FollowerService {
     protected List<GlucosePacket> getServerValues(Context context) {
         Request.Builder builder = new Request.Builder();
         try {
-            String url = getUrl(context);
-            if (url == null) {
+            if (serverUrl == null) {
+                init();
                 return null;
             }
 
             UiUtils.showMessage(context, context.getString(R.string.follower_data_request, SRC_LABEL));
-            builder = builder.url(url);
-            String secret = getApiSecret(context);
-            if (secret != null) {
-                builder = builder.addHeader("api-secret", secret);
+            builder = builder.url(serverUrl);
+            if (apiSecret != null) {
+                builder = builder.addHeader("api-secret", apiSecret);
             }
             if (getLastSampleTime() != null) {
                 builder.addHeader("If-Modified-Since", HttpUtils.formatHttpDate(getModifiedSince()));
@@ -148,6 +161,11 @@ public class NightScoutFollowerService extends FollowerService {
             UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, t.getLocalizedMessage()));
         }
         return null;
+    }
+
+    @Override
+    protected String getServiceLabel() {
+        return SRC_LABEL;
     }
 
     List<GlucosePacket> parseValues(String nsValue) {
@@ -202,32 +220,23 @@ public class NightScoutFollowerService extends FollowerService {
      * Returns hashed NS api secret value to be sent in http header in requests to NS server
      * or null if no NS API secret was configured
      */
-    private String getApiSecret(Context context) {
-        if (apiSecret != null) {
-            if (apiSecret.length() == 0) { // avoid hash re-calculation
-                return null;
-            } else {
-                return apiSecret;
-            }
-        }
-
+    private static String getApiSecret(Context context) {
         try {
             String plain = PreferenceUtils.getStringValue(context, PREF_NS_API_SECRET, null);
             if (plain == null) {
-                apiSecret = EMPTY_STRING; // avoid evaluation on next requests
                 return null;
             }
-            apiSecret = StringUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(plain.trim().getBytes(Charsets.UTF_8)));
+            return StringUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(plain.trim().getBytes(Charsets.UTF_8)));
         } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to secure NS secret", e);
+            return null;
         }
-        return apiSecret;
     }
 
     /**
      * Returns NS server URL string or null if no NS url was configured
      */
-    private String getUrl(Context context) {
+    private static String getServerUrl(Context context) {
         String url = PreferenceUtils.getStringValue(context, PREF_NS_URL, null);
         if (url == null) {
             return null;
@@ -239,19 +248,16 @@ public class NightScoutFollowerService extends FollowerService {
         }
         url += "/entries/current";
 
-        String nsToken = getNsToken(context);
         if (nsToken != null) {
             url += "?token=" + nsToken;
         }
         return url;
     }
 
-    private String getNsToken(Context context) {
-        if (nsToken != null) {
-            return nsToken;
-        }
-        nsToken = PreferenceUtils.getStringValue(context, PREF_NS_TOKEN, null);
-        return nsToken;
+    private static String getNsToken(Context context) {
+        String token = PreferenceUtils.getStringValue(context, PREF_NS_TOKEN, null);
+        return token != null ? token.trim() : null;
+
     }
 
     /**

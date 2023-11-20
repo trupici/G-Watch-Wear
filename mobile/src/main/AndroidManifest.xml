@@ -15,6 +15,7 @@
  limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="sk.trupici.gwatch.wear">
 
 
@@ -38,7 +39,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -54,8 +54,7 @@
 
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
-    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <queries>
         <package android:name="com.samsung.accessory" />
@@ -156,10 +155,10 @@
         </service>
 
         <receiver android:name=".receivers.AlarmReceiver" android:enabled="true" android:exported="false"/>
-        <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
-        <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
-        <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
-        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
+
+        <service android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
 
         <activity
             android:name=".view.MainActivity"

@@ -18,9 +18,14 @@
 
 package sk.trupici.gwatch.wear.followers;
 
+import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+
 import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.work.WorkerParameters;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,9 +52,6 @@ import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
-
-import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
-import static sk.trupici.gwatch.wear.common.util.StringUtils.EMPTY_STRING;
 
 /**
  * DexCom Cloud Follower Service
@@ -91,13 +93,27 @@ public class DexcomShareFollowerService extends FollowerService {
     public static String secret;
     private static String account;
     private static String serverUrl;
+    private static String sessionId;
+    private static long sampleToRequestDelay;
+
+    public DexcomShareFollowerService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
+    protected static void reset() {
+        FollowerService.reset();
+        sessionId = null;;
+        Context context = GWatchApplication.getAppContext();
+        serverUrl = getServerUrl(context);
+        account = getAccount(context);
+        secret = getSecret(context);
+        sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_DEXCOM_REQUEST_LATENCY, DEF_DEXCOM_SAMPLE_LATENCY_MS) * 1000L;
+    }
 
     @Override
     protected void init() {
         super.init();
-        account = null;
-        secret = null;
-        serverUrl = null;
+        DexcomShareFollowerService.reset();
     }
 
     @Override
@@ -107,22 +123,28 @@ public class DexcomShareFollowerService extends FollowerService {
 
     @Override
     protected List<GlucosePacket> getServerValues(Context context) {
+        if (serverUrl == null) {
+            init();
+        }
         return getDexcomValue(context, false);
     }
 
+    @Override
+    protected String getServiceLabel() {
+        return SRC_LABEL;
+    }
 
     @Override
     protected long getSampleToRequestDelay() {
-        int delay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_DEXCOM_REQUEST_LATENCY, DEF_DEXCOM_SAMPLE_LATENCY_MS);
-        return delay * 1000;
+        return sampleToRequestDelay;
     }
 
     private List<GlucosePacket> getDexcomValue(Context context, boolean recursion) {
         Request.Builder builder = new Request.Builder();
         try {
-            String url = getServerUrl(context) + DEXCOM_PATH_GET_VALUE;
+            String url = serverUrl + DEXCOM_PATH_GET_VALUE;
             builder = builder.url(url);
-            String sessionId = authenticate(context);
+            sessionId = authenticate(context);
             if (sessionId == null) {
                 return null;
             }
@@ -176,21 +198,16 @@ public class DexcomShareFollowerService extends FollowerService {
     }
 
     private String getSessionId(Context context, String accountId, String appId) {
-        String sessionId = getSessionData();
-        if (sessionId != null) {
-            return sessionId;
-        }
-
         Log.e(LOG_TAG, "DSFService: getting session id...");
         UiUtils.showMessage(context, context.getString(R.string.follower_session_request, SRC_LABEL));
 
         Request.Builder builder = new Request.Builder();
         try {
-            String url = getServerUrl(context) + DEXCOM_PATH_GET_SESSION_ID;
+            String url = serverUrl + DEXCOM_PATH_GET_SESSION_ID;
             builder = builder.url(url);
             JSONObject json = new JSONObject();
             json.put("accountId", accountId);
-            json.put("password", getSecret(context));
+            json.put("password", secret);
             json.put("applicationId", appId);
 
             Request request = builder
@@ -214,13 +231,12 @@ public class DexcomShareFollowerService extends FollowerService {
                 if (receivedData == null || receivedData.length() == 0) {
                     throw new CommunicationException(context.getString(R.string.follower_err_no_session));
                 }
-                sessionId = receivedData.replaceAll("\"", StringUtils.EMPTY_STRING);
+                String sessionId = receivedData.replaceAll("\"", StringUtils.EMPTY_STRING);
                 if (INVALID_ID.equals(sessionId)) {
                     Log.e(LOG_TAG, getClass().getSimpleName() + " failed: Invalid session id");
                     UiUtils.showMessage(context, context.getString(R.string.follower_rsp_err_message, context.getString(R.string.follower_err_no_session)));
                     return null;
                 }
-                setSessionData(sessionId);
                 UiUtils.showMessage(context, context.getString(R.string.status_ok));
                 return sessionId;
             } else {
@@ -234,7 +250,6 @@ public class DexcomShareFollowerService extends FollowerService {
     }
 
     private String authenticate(Context context) {
-        String sessionId = getSessionData();
         if (sessionId != null) {
             return sessionId;
         }
@@ -243,20 +258,19 @@ public class DexcomShareFollowerService extends FollowerService {
         UiUtils.showMessage(context, context.getString(R.string.follower_auth_request, SRC_LABEL));
 
         String appId = getApplicationId();
-        Request.Builder builder = new Request.Builder();
+        Request request;
         try {
-            String url = getServerUrl(context) + DEXCOM_PATH_AUTHENTICATE;
-            builder = builder.url(url);
-            String account = getAccount(context);
             if (account == null) {
+                Log.e(LOG_TAG, "No account specified");
                 return null;
             }
+            String url = serverUrl + DEXCOM_PATH_AUTHENTICATE;
             JSONObject json = new JSONObject();
             json.put("accountName", account);
-            json.put("password", getSecret(context));
+            json.put("password", secret);
             json.put("applicationId", appId);
 
-            Request request = builder
+            request = new Request.Builder()
                     .addHeader("User-Agent", USER_AGENT)
                     .addHeader("Accept", "application/json")
                     .url(url)
@@ -268,7 +282,7 @@ public class DexcomShareFollowerService extends FollowerService {
             return null;
         }
 
-        try (Response response = getHttpClient(context).newCall(builder.build()).execute()) {
+        try (Response response = getHttpClient(context).newCall(request).execute()) {
             if (response.isSuccessful()) {
                 String receivedData = getResponseBodyAsString(response);
                 if (BuildConfig.DEBUG) {
@@ -309,7 +323,7 @@ public class DexcomShareFollowerService extends FollowerService {
     }
 
     private void handleErrorIgnoreInvalidSession(Response response, List<String> ignoreList) {
-        setSessionData(null); // force session renegotiation
+        sessionId = null; // force session renegotiation
         try {
             String receivedData = getResponseBodyAsString(response);
             if (BuildConfig.DEBUG) {
@@ -431,48 +445,22 @@ public class DexcomShareFollowerService extends FollowerService {
         }
     }
 
-    private String getAccount(Context context) {
-        if (account != null) {
-            if (account.length() == 0) {
-                return null;
-            } else {
-                return account;
-            }
-        }
-
+    private static String getAccount(Context context) {
         account = PreferenceUtils.getStringValue(context, PREF_DEXCOM_ACCOUNT, null);
-        if (account == null) {
-            account = EMPTY_STRING; // avoid evaluation on next requests
-            return null;
-        }
-        return account.trim();
+        return account != null ? account.trim() : null;
     }
 
     /**
      * Returns secret for account
      * or null if no secret was configured
      */
-    private String getSecret(Context context) {
-        if (secret != null) {
-            if (secret.length() == 0) {
-                return null;
-            } else {
-                return secret;
-            }
-        }
-
+    private static String getSecret(Context context) {
         secret = PreferenceUtils.getStringValue(context, PREF_DEXCOM_SECRET, null);
-        if (secret == null) {
-            secret = EMPTY_STRING;
-            return null;
-        }
-        return secret.trim();
+        return secret != null ? secret.trim() : null;
     }
 
-    private String getServerUrl(Context context) {
+    private static String getServerUrl(Context context) {
         Boolean isUsAccount = PreferenceUtils.isConfigured(context, PREF_DEXCOM_US_ACCOUNT, false);
-
-        serverUrl = isUsAccount ? DEXCOM_US_URL : DEXCOM_NON_US_URL;
-        return serverUrl;
+        return isUsAccount ? DEXCOM_US_URL : DEXCOM_NON_US_URL;
     }
 }

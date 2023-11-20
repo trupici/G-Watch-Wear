@@ -27,6 +27,7 @@ import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.followers.DexcomShareFollowerService;
 import sk.trupici.gwatch.wear.followers.FollowerService;
+import sk.trupici.gwatch.wear.followers.LibreLinkUpFollowerService;
 import sk.trupici.gwatch.wear.followers.NightScoutFollowerService;
 
 public class BootReceiver extends BroadcastReceiver {
@@ -40,6 +41,8 @@ public class BootReceiver extends BroadcastReceiver {
             FollowerService.startService(context, NightScoutFollowerService.class);
         } else if (PreferenceUtils.isConfigured(context, DexcomShareFollowerService.PREF_DEXCOM_ENABLED, false)) {
             FollowerService.startService(context, DexcomShareFollowerService.class);
+        } else if (PreferenceUtils.isConfigured(context, LibreLinkUpFollowerService.PREF_LLU_ENABLED, false)) {
+            FollowerService.startService(context, LibreLinkUpFollowerService.class);
         } else {
             AlarmReceiver.scheduleNextAlarm(context, AlarmReceiver.WAKE_UP_PERIOD);
         }

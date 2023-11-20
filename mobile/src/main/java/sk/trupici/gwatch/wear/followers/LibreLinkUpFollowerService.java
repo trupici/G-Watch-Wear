@@ -21,6 +21,9 @@ import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.work.WorkerParameters;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,12 +80,22 @@ public class LibreLinkUpFollowerService extends FollowerService {
     private static String token;
     private static String connectionId;
 
-    @Override
-    public void init() {
+    public LibreLinkUpFollowerService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
+    protected static void reset() {
+        FollowerService.reset();
         connectionId = null;
         token = null;
         serverUrl = null;
         sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_LLU_REQUEST_LATENCY, DEF_LLU_SAMPLE_LATENCY_MS) * 1000L;
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        LibreLinkUpFollowerService.reset();
     }
 
     @Override
@@ -117,7 +130,6 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
     @Override
     protected List<GlucosePacket> getServerValues(Context context) {
-
         if (token == null) {
             token = authenticate(context);
         }
@@ -125,16 +137,21 @@ public class LibreLinkUpFollowerService extends FollowerService {
             if (connectionId == null) {
                 connectionId = getConnectionId(context);
             }
-        }
-        if (connectionId != null) {
-            List<GlucosePacket> packets = getBgData(context);
-            if (packets != null) {
-                return packets;
+            if (connectionId != null) {
+                List<GlucosePacket> packets = getBgData(context);
+                if (packets != null) {
+                    return packets;
+                }
             }
         }
         // something went wrong...
         init();
         return null;
+    }
+
+    @Override
+    protected String getServiceLabel() {
+        return SRC_LABEL;
     }
 
     private Request.Builder createRequestBuilder() {
@@ -149,7 +166,6 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
     private String authenticate(Context context) {
         Request request;
-
         try {
             String url = getServerUrl() + "/auth/login";
 
@@ -208,7 +224,6 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
     private String getConnectionId(Context context) {
         Request request;
-
         try {
             String url = getServerUrl() + "/llu/connections";
 

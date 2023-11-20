@@ -54,7 +54,8 @@
 
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
 
     <queries>
         <package android:name="com.samsung.accessory" />
@@ -155,10 +156,10 @@
         </service>
 
         <receiver android:name=".receivers.AlarmReceiver" android:enabled="true" android:exported="false"/>
-        <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
-        <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
-        <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
-        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
+        <service android:name=".service.NotificationService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
+        <service android:name=".followers.NightScoutFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
+        <service android:name=".followers.DexcomShareFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
+        <service android:name=".followers.LibreLinkUpFollowerService" android:enabled="true" android:exported="false" android:foregroundServiceType="health" />
 
         <activity
             android:name=".view.MainActivity"

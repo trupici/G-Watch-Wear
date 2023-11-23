@@ -117,7 +117,7 @@ public class ComplicationBgGraphActivity extends WearableDialogActivity {
         graphParams.setHyperThreshold(sharedPrefs.getInt(CommonConstants.PREF_HYPER_THRESHOLD, res.getInteger(R.integer.def_bg_threshold_hyper)));
 
         bgGraph.create(sharedPrefs, graphParams, new RectF(graphBounds));
-        bgGraph.updateGraphData(null, System.currentTimeMillis(), sharedPrefs);
+        bgGraph.updateGraphData(null, System.currentTimeMillis(), null, sharedPrefs);
         graphView.setBgGraph(bgGraph);
 
         new Handler(Looper.getMainLooper()).postDelayed(this::finish, TIME_TO_CLOSE_MS);

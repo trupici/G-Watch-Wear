@@ -47,6 +47,7 @@
     <string name="config_item_no_data_color_label">No data color</string>
 
     <string name="config_item_is_unit_conversion">Use mmol/l</string>
+    <string name="config_item_panel_show_value">Show BG</string>
 
     <string name="config_item_graph_show_critical_lines">Show critical lines</string>
     <string name="config_item_graph_critical_lines_color">Critical lines color</string>
@@ -57,6 +58,7 @@
     <string name="config_item_graph_show_vert_lines">Show hour lines</string>
     <string name="config_item_graph_vert_lines_color">Hour lines color</string>
     <string name="config_item_graph_enable_dynamic_range">Dynamic range</string>
+    <string name="config_item_graph_show_bg_value">Show overlay with BG</string>
     <string name="config_item_graph_draw_dots">Draw dots</string>
     <string name="config_item_graph_draw_line">Draw line</string>
 

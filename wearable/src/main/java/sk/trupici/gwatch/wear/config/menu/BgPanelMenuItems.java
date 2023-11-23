@@ -31,6 +31,12 @@ public class BgPanelMenuItems {
                     ConfigItem.Type.TYPE_SWITCH,
                     R.bool.def_bg_is_unit_conversion,
                     true),
+            new BoolConfigItem(
+                    R.string.config_item_panel_show_value,
+                    CommonConstants.PREF_BG_PANEL_SHOW_VALUE,
+                    ConfigItem.Type.TYPE_SWITCH,
+                    R.bool.def_bg_show_value,
+                    true),
             new BasicConfigItem(
                     R.string.config_item_bg_hypo_color_label,
                     R.drawable.config_color_edit_24,

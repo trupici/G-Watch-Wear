@@ -27,6 +27,7 @@
     <bool name="def_graph_enable_low_line">true</bool>
 
     <bool name="def_graph_enable_dynamic_range">true</bool>
+    <bool name="def_graph_show_bg_value">false</bool>
 
     <bool name="def_graph_type_draw_line">true</bool>
     <bool name="def_graph_type_draw_dots">false</bool>

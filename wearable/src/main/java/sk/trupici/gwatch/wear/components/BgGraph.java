@@ -19,14 +19,19 @@ package sk.trupici.gwatch.wear.components;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.TextPaint;
 import android.util.Log;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import sk.trupici.gwatch.wear.BuildConfig;
+import sk.trupici.gwatch.wear.common.data.Trend;
+import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.util.UiUtils;
 
 import static sk.trupici.gwatch.wear.common.util.CommonConstants.HOUR_IN_MINUTES;
@@ -64,6 +69,9 @@ public class BgGraph {
     private BgGraphParams params;
 
     private RectF bounds;
+
+    private Integer lastBgValue;
+    private Trend lastBgTrend = Trend.UNKNOWN;
 
     public void create(SharedPreferences sharedPrefs, BgGraphParams params, RectF bounds) {
         this.params = params;
@@ -107,11 +115,16 @@ public class BgGraph {
         }
     }
 
-    public void updateGraphData(Double bgValue, long timestamp, SharedPreferences sharedPrefs) {
+    public void updateGraphData(Double bgValue, long timestamp, Trend bgTrend, SharedPreferences sharedPrefs) {
         // update or reload
         // graph data might be already updated, e.g. by BgData Provider, reload
         lastGraphUpdateMin = restoreChartData(sharedPrefs, graphData);
         lastGraphUpdateMin = updateGraphData(bgValue, timestamp, sharedPrefs, graphData, lastGraphUpdateMin, params.refreshRateMin);
+
+        if(bgValue != null) {
+            lastBgValue = bgValue.intValue();
+            lastBgTrend = bgTrend;
+        }
 
         // redraw chart
         if (lastGraphUpdateMin > 0) {
@@ -232,7 +245,6 @@ public class BgGraph {
         int valueOffset = GRAPH_DATA_LEN - count;
 
         // draw values
-        int color;
         float prevX = 0, prevY = 0;
         for (int i = valueOffset; i < GRAPH_DATA_LEN; i++) {
             int value = graphData[i];
@@ -249,19 +261,7 @@ public class BgGraph {
             x = xOffset + (2 * DOT_RADIUS + padding) * (i - valueOffset);
             y = yOffset - ((value - graphRange.min) * graphRange.scale);
 
-            if (value <= params.hypoThreshold) {
-                color = params.hypoColor;
-            } else if (value <= params.lowThreshold) {
-                color = params.lowColor;
-            } else if (value < params.highThreshold) {
-                color = params.inRangeColor;
-            } else if (value < params.hyperThreshold) {
-                color = params.highColor;
-            } else {
-                color = params.hyperColor;
-            }
-
-            paint.setColor(color);
+            paint.setColor(getColor(value));
 
             // draw value with color
             if (params.drawChartLine) { // line graph
@@ -280,6 +280,47 @@ public class BgGraph {
             prevX = x;
             prevY = y;
         }
+
+        if(params.showBgValue) {
+            DrawBgValue(canvas);
+        }
+    }
+
+    private int getColor(int value){
+        if (value <= params.hypoThreshold) {
+            return params.hypoColor;
+        } else if (value <= params.lowThreshold) {
+            return params.lowColor;
+        } else if (value < params.highThreshold) {
+            return params.inRangeColor;
+        } else if (value < params.hyperThreshold) {
+            return params.highColor;
+        }
+        return params.hyperColor;
+    }
+
+    private void DrawBgValue(Canvas canvas){
+        if(lastBgValue == null) {
+            return;
+        }
+
+        TextPaint bgValueTextPaint = UiUtils.createTextPaint();
+        bgValueTextPaint.setColor(getColor(lastBgValue));
+        float textSize = (bounds.height() - params.bottomPadding - params.topPadding);
+        bgValueTextPaint.setTextSize(textSize);
+
+        boolean isUnitConversion = false;
+        String bgValueString = BgUtils.formatBgValueString(lastBgValue, lastBgTrend, isUnitConversion);
+
+        Paint bgBalueBackgroundPaint = new Paint();
+        bgBalueBackgroundPaint.setColor(Color.argb(200, 0, 0,0));
+        Rect textBounds = new Rect();
+        bgValueTextPaint.getTextBounds(bgValueString,  0, bgValueString.length(), textBounds);
+        canvas.drawRect(params.leftPadding, 0, params.leftPadding + textBounds.width() , bounds.height(), bgBalueBackgroundPaint);
+
+        float xLineAlternate = params.leftPadding;
+        float yLineAlternate = bounds.height() - (bounds.height() - textBounds.height())/2;
+        canvas.drawText(bgValueString, xLineAlternate, yLineAlternate, bgValueTextPaint);
     }
 
     private GraphRange getDynamicRange() {
@@ -485,6 +526,7 @@ public class BgGraph {
         private int hyperThreshold;
 
         private boolean enableDynamicRange;
+        private boolean showBgValue;
         private boolean enableVertLines;
         private boolean enableCriticalLines;
         private boolean enableHighLine;
@@ -645,6 +687,14 @@ public class BgGraph {
 
         public void setEnableDynamicRange(boolean enableDynamicRange) {
             this.enableDynamicRange = enableDynamicRange;
+        }
+
+        public boolean showBgValue() {
+            return showBgValue;
+        }
+
+        public void setShowBgValue(boolean showBgValue) {
+            this.showBgValue = showBgValue;
         }
 
         public boolean isEnableVertLines() {

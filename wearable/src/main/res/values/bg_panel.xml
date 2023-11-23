@@ -24,6 +24,7 @@
 
     <integer name="def_bg_sample_period">5</integer>
     <bool name="def_bg_is_unit_conversion">false</bool>
+    <bool name="def_bg_show_value">true</bool>
 
     <color name="def_bg_border_color">#00000000</color>
     <string name="def_bg_border_type" translatable="false">NONE</string>

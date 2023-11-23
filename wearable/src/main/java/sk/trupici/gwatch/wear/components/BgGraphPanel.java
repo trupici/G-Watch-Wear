@@ -57,6 +57,7 @@ public class BgGraphPanel extends BroadcastReceiver implements ComponentPanel {
     public static final String PREF_ENABLE_LOW_LINE = "graph_enable_low_line";
 
     public static final String PREF_ENABLE_DYNAMIC_RANGE = "graph_enable_dynamic_range";
+    public static final String PREF_SHOW_BG_VALUE = "show_bg_value";
 
     public static final String PREF_TYPE_LINE = "graph_type_draw_line";
     public static final String PREF_TYPE_DOTS = "graph_type_draw_dots";
@@ -138,6 +139,7 @@ public class BgGraphPanel extends BroadcastReceiver implements ComponentPanel {
         params.setEnableLowLine(sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_LOW_LINE, context.getResources().getBoolean(R.bool.def_graph_enable_low_line)));
 
         params.setEnableDynamicRange(sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_ENABLE_DYNAMIC_RANGE, context.getResources().getBoolean(R.bool.def_graph_enable_dynamic_range)));
+        params.setShowBgValue(sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_SHOW_BG_VALUE, context.getResources().getBoolean(R.bool.def_graph_show_bg_value)));
 
         params.setDrawChartLine(sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_LINE, context.getResources().getBoolean(R.bool.def_graph_type_draw_line)));
         params.setDrawChartDots(sharedPrefs.getBoolean(watchfaceConfig.getPrefsPrefix() + PREF_TYPE_DOTS, context.getResources().getBoolean(R.bool.def_graph_type_draw_dots)));
@@ -165,7 +167,7 @@ public class BgGraphPanel extends BroadcastReceiver implements ComponentPanel {
     public void refresh(long timeMs, SharedPreferences sharedPrefs) {
         long currentMinute = timeMs / MINUTE_IN_MILLIS;
         if (bgGraph.getLastGraphUpdateMin() != currentMinute) {
-            bgGraph.updateGraphData(null, timeMs, sharedPrefs);
+            bgGraph.updateGraphData(null, timeMs, null, sharedPrefs);
         }
     }
 
@@ -179,7 +181,7 @@ public class BgGraphPanel extends BroadcastReceiver implements ComponentPanel {
             if (bgData.getValue() == 0 || bgData.getTimestamp() == 0) {
                 return;
             }
-            bgGraph.updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), sharedPrefs);
+            bgGraph.updateGraphData((double)bgData.getValue(), bgData.getTimestamp(), bgData.getTrend(), sharedPrefs);
         } else if (CommonConstants.REMOTE_CONFIG_ACTION.equals(intent.getAction())) {
             onConfigChanged(context, sharedPrefs);
         } else {

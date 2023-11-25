@@ -58,7 +58,7 @@
 
     <!-- ABOUT dialog -->
 
-    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.7</string>
+    <string name="about_app_name" translatable="false">G-Watch Wear App 0.9.8</string>
 
     <string name="about_author">Author: Juraj Antal</string>
 

@@ -25,7 +25,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -142,27 +141,25 @@ public class NotificationService extends Service {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentText(text)
                 .setContentIntent(contentIntent)
-                .setOngoing(true)
+//                .setOngoing(true)
                 .build();
     }
 
     private static void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager manager = context.getSystemService(NotificationManager.class);
-            if (manager.getNotificationChannel(CHANNEL_ID) != null) {
-                return;
-            }
-
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "G-Watch Wear Notification Channel",
-                    NotificationManager.IMPORTANCE_LOW);
-            serviceChannel.setShowBadge(false);
-            serviceChannel.enableLights(false);
-            serviceChannel.enableVibration(false);
-            serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
-            manager.createNotificationChannel(serviceChannel);
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager.getNotificationChannel(CHANNEL_ID) != null) {
+            return;
         }
+
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "G-Watch Wear Notification Channel",
+                NotificationManager.IMPORTANCE_LOW);
+        serviceChannel.setShowBadge(false);
+        serviceChannel.enableLights(false);
+        serviceChannel.enableVibration(false);
+        serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
+        manager.createNotificationChannel(serviceChannel);
     }
 
     public static Notification getOrCreateNotification(Context context) {

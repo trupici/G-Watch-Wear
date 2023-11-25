@@ -187,7 +187,7 @@ public class WatchDispatcher implements Dispatcher {
             }
 
             if (packet instanceof GlucosePacket) {
-//                NotificationService.updateBgData(GWatchApplication.getAppContext(), (GlucosePacket) packet);
+                NotificationService.updateBgData(GWatchApplication.getAppContext(), (GlucosePacket) packet);
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "updateNotificationService: failed to update notification service", e);

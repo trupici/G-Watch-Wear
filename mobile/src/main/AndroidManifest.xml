@@ -55,7 +55,10 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
 
     <queries>
         <package android:name="com.samsung.accessory" />
@@ -156,6 +159,8 @@
         </service>
 
         <receiver android:name=".receivers.AlarmReceiver" android:enabled="true" android:exported="false"/>
+
+        <service android:name=".service.NotificationService" android:exported="false" android:foregroundServiceType="health"/>
 
         <service android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"

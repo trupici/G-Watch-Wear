@@ -97,7 +97,7 @@ public class GWatchApplication extends Application {
         registerReceiver(new DiaboxReceiver());
         registerReceiver(new JugglucoReceiver());
 
-//        NotificationService.startService(this);
+        NotificationService.startService(this);
 
         AlarmReceiver.scheduleNextAlarm(context, 15);
 

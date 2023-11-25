@@ -18,6 +18,7 @@
 
 package sk.trupici.gwatch.wear.widget;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
@@ -36,9 +37,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.Arrays;
 
-import androidx.core.content.ContextCompat;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.GWatchApplication;
 import sk.trupici.gwatch.wear.R;
@@ -55,6 +57,7 @@ import sk.trupici.gwatch.wear.util.AndroidUtils;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
+@SuppressLint("SpecifyJobSchedulerIdRange")
 public class WidgetUpdateService extends JobService {
 
     private static final String LOG_TAG = WidgetUpdateService.class.getSimpleName();
@@ -88,6 +91,7 @@ public class WidgetUpdateService extends JobService {
 
     private static WidgetData lastWidgetData = new WidgetData();
 
+
     @Override
     public boolean onStartJob(JobParameters params) {
 
@@ -107,11 +111,10 @@ public class WidgetUpdateService extends JobService {
 
         updateWidget(appWidgetManager, appWidgetIds, widgetData, action);
 
-        jobFinished(params, false);
         if (action != null) {
             scheduleTimeUpdate(context, widgetData);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -542,7 +545,6 @@ public class WidgetUpdateService extends JobService {
                     .setOverrideDeadline(1000) // max delay 1s
                     .build();
             JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            jobScheduler.cancel(WidgetUpdateService.WIDGET_JOB_ID);
             jobScheduler.schedule(jobInfo);
         }
     }

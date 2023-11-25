@@ -79,41 +79,43 @@ public class BgAlarmActivity extends WearableDialogActivity {
         setContentView(R.layout.layout_alarm);
 
         Bundle extras = getIntent().getExtras();
-        final BgAlarmController.AlarmBasicConfig sounds = (BgAlarmController.AlarmBasicConfig) extras.getSerializable(EXTRAS_SOUNDS_CONFIG);
-        final BgAlarmController.AlarmConfig alarmConfig = (BgAlarmController.AlarmConfig) extras.getSerializable(EXTRAS_ALARM_CONFIG);
-        final String bgValue = extras.getString(EXTRAS_BG_VALUE, null);
-        final String text = extras.getString(EXTRAS_ALARM_TEXT, null);
-        final int textColor = extras.getInt(EXTRAS_ALARM_TEXT_COLOR, 0);
-        if (text == null) {
-            Log.e(LOG_TAG, "AlarmActivity: invalid text: " + bgValue);
-            return;
-        }
+        if (extras != null) { // reported by google Crashes and ANRs
+            final BgAlarmController.AlarmBasicConfig sounds = (BgAlarmController.AlarmBasicConfig) extras.getSerializable(EXTRAS_SOUNDS_CONFIG);
+            final BgAlarmController.AlarmConfig alarmConfig = (BgAlarmController.AlarmConfig) extras.getSerializable(EXTRAS_ALARM_CONFIG);
+            final String bgValue = extras.getString(EXTRAS_BG_VALUE, null);
+            final String text = extras.getString(EXTRAS_ALARM_TEXT, null);
+            final int textColor = extras.getInt(EXTRAS_ALARM_TEXT_COLOR, 0);
+            if (text == null) {
+                Log.e(LOG_TAG, "AlarmActivity: invalid text: " + bgValue);
+                return;
+            }
 
-        TextView textView = findViewById(R.id.alarm_text);
-        textView.setText(text);
-        textView.setTextColor(textColor);
+            TextView textView = findViewById(R.id.alarm_text);
+            textView.setText(text);
+            textView.setTextColor(textColor);
 
-        textView = findViewById(R.id.bg_value);
-        textView.setText(StringUtils.notNullString(bgValue));
-        textView.setTextColor(textColor);
+            textView = findViewById(R.id.bg_value);
+            textView.setText(StringUtils.notNullString(bgValue));
+            textView.setTextColor(textColor);
 
-        startAlarm(alarmConfig, sounds);
+            startAlarm(alarmConfig, sounds);
 
-        if (alarmConfig.type == BgAlarmController.Type.CRITICAL) {
-            findViewById(R.id.snooze_button).setVisibility(View.INVISIBLE);
-        } else {
-            findViewById(R.id.snooze_button).setOnClickListener(view -> {
-                String prefName;
-                if (alarmConfig.type == BgAlarmController.Type.NO_DATA) {
-                    prefName = BgAlarmController.PREF_NO_DATA_LAST_SNOOZED_AT;
-                } else if (alarmConfig.type == BgAlarmController.Type.FAST_DROP) {
-                    prefName = BgAlarmController.PREF_FAST_DROP_LAST_SNOOZED_AT;
-                } else {
-                    prefName = BgAlarmController.PREF_LAST_SNOOZED_AT;
-                }
-                PreferenceUtils.setLongValue(getApplicationContext(), prefName,  System.currentTimeMillis());
-                finish();
-            });
+            if (alarmConfig.type == BgAlarmController.Type.CRITICAL) {
+                findViewById(R.id.snooze_button).setVisibility(View.INVISIBLE);
+            } else {
+                findViewById(R.id.snooze_button).setOnClickListener(view -> {
+                    String prefName;
+                    if (alarmConfig.type == BgAlarmController.Type.NO_DATA) {
+                        prefName = BgAlarmController.PREF_NO_DATA_LAST_SNOOZED_AT;
+                    } else if (alarmConfig.type == BgAlarmController.Type.FAST_DROP) {
+                        prefName = BgAlarmController.PREF_FAST_DROP_LAST_SNOOZED_AT;
+                    } else {
+                        prefName = BgAlarmController.PREF_LAST_SNOOZED_AT;
+                    }
+                    PreferenceUtils.setLongValue(getApplicationContext(), prefName, System.currentTimeMillis());
+                    finish();
+                });
+            }
         }
 
         findViewById(R.id.dismiss_button).setOnClickListener(view -> finish());

@@ -26,6 +26,6 @@
     android:updatePeriodMillis="60000"
     android:widgetCategory="home_screen|keyguard"
     android:previewImage="@drawable/widget_preview"
-    >
+    android:widgetFeatures="configuration_optional|reconfigurable">
 
 </appwidget-provider>

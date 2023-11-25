@@ -65,7 +65,15 @@ public class BackgroundPanel implements ComponentPanel {
 
     @Override
     public void onSizeChanged(Context context, int width, int height) {
-        bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+        if (bitmap == null) {
+            bitmap = BitmapFactory.decodeResource(context.getResources(),
+                    watchfaceConfig.getSelectedItem(context, ConfigPageData.ConfigType.BACKGROUND).getResourceId()
+            );
+        }
+
+        if (bitmap != null) {
+            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+        }
     }
 
     @Override

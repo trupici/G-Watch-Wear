@@ -183,11 +183,16 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
         @Override
         public void onComplicationDataUpdate(int complicationId, ComplicationData complicationData) {
             Log.d(LOG_TAG, "onComplicationDataUpdate() id: " + complicationId);
+            if (complicationData == null || watchfaceConfig == null) {
+                return;
+            }
 
             // Updates correct ComplicationDrawable with updated data.
             ComplicationConfig complicationConfig = watchfaceConfig.getComplicationConfig(ComplicationId.valueOf(complicationId));
-            complicationConfig.getComplicationDrawable().setComplicationData(complicationData);
-            invalidate();
+            if (complicationConfig != null) {
+                complicationConfig.getComplicationDrawable().setComplicationData(complicationData);
+                invalidate();
+            }
         }
 
         @Override

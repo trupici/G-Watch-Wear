@@ -250,6 +250,10 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
             if (BuildConfig.DEBUG) {
                 Log.d(LOG_TAG, "onComplicationDataUpdate() id: " + complicationId);
             }
+            if (complicationData == null || watchfaceConfig == null || complSettingsMap == null) {
+                return;
+            }
+
             // Updates correct ComplicationDrawable with updated data.
             ComplicationId id = ComplicationId.valueOf(complicationId);
 
@@ -263,9 +267,15 @@ public class DigitalWatchfaceService extends WatchfaceServiceBase {
                 }
             }
 
-            watchfaceConfig.getComplicationConfig(id).getComplicationDrawable().setComplicationData(complicationData);
-            complSettingsMap.get(id).setComplicationData(complicationData);
-            drawComplicationProgressBar(id);
+            ComplicationConfig complicationConfig = watchfaceConfig.getComplicationConfig(id);
+            if (complicationConfig != null && complicationConfig.getComplicationDrawable() != null) {
+                complicationConfig.getComplicationDrawable().setComplicationData(complicationData);
+            }
+            ComplicationSettings complicationSettings = complSettingsMap.get(id);
+            if (complicationSettings != null) {
+                complicationSettings.setComplicationData(complicationData);
+                drawComplicationProgressBar(id);
+            }
 
             invalidate();
         }

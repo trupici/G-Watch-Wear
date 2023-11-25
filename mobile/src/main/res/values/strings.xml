@@ -340,4 +340,6 @@
     <string name="follower_request_notification">"Sending %1$s request…"</string>
 
     <string name="dexcom_app_not_installed">Dexcom App is not installed!</string>
+
+    <string name="desc_fgs_special_use" translatable="false">This service informs user about the last measured blood glucose level in form of a notification. This notifications can be also put on the phone lock screen having info available instantly without the need to unlock the phone. This notification can be also displayed on the various paired devices not supported by G-Watch Wear Wear OS companion app, e.g fitness trackers. Some users even use it for automation - further bg value processing.</string>
 </resources>

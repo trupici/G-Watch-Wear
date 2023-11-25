@@ -47,6 +47,7 @@ import sk.trupici.gwatch.wear.receivers.LibreAlarmReceiver;
 import sk.trupici.gwatch.wear.receivers.LibreLinkReceiver;
 import sk.trupici.gwatch.wear.receivers.XDripReceiver;
 import sk.trupici.gwatch.wear.service.NotificationService;
+import sk.trupici.gwatch.wear.util.DelayedWorker;
 
 public class GWatchApplication extends Application {
 
@@ -99,6 +100,8 @@ public class GWatchApplication extends Application {
 //        NotificationService.startService(this);
 
         AlarmReceiver.scheduleNextAlarm(context, 15);
+
+        DelayedWorker.schedule(context);
     }
 
     @Override

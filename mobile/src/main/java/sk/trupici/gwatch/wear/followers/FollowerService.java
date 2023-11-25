@@ -90,6 +90,7 @@ public abstract class FollowerService extends Worker {
         super(context, workerParams);
     }
 
+    @NonNull
     @Override
     public Result doWork() {
 
@@ -196,32 +197,30 @@ public abstract class FollowerService extends Worker {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentText(text)
                 .setContentIntent(contentIntent)
-                .setOngoing(true)
+//                .setOngoing(true)
                 .setSilent(true)
                 .build();
     }
 
     private static void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager manager = context.getSystemService(NotificationManager.class);
-            if (manager.getNotificationChannel(CHANNEL_ID) != null) {
-                return;
-            }
-
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "G-Watch Wear Follower Notification Channel",
-                    NotificationManager.IMPORTANCE_LOW);
-            serviceChannel.setShowBadge(false);
-            serviceChannel.enableLights(false);
-            serviceChannel.enableVibration(false);
-            serviceChannel.setSound(null, null);
-            serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                serviceChannel.setAllowBubbles(false);
-            }
-            manager.createNotificationChannel(serviceChannel);
+        NotificationManager manager = context.getSystemService(NotificationManager.class);
+        if (manager.getNotificationChannel(CHANNEL_ID) != null) {
+            return;
         }
+
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "G-Watch Wear Follower Notification Channel",
+                NotificationManager.IMPORTANCE_LOW);
+        serviceChannel.setShowBadge(false);
+        serviceChannel.enableLights(false);
+        serviceChannel.enableVibration(false);
+        serviceChannel.setSound(null, null);
+        serviceChannel.setImportance(NotificationManager.IMPORTANCE_LOW);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            serviceChannel.setAllowBubbles(false);
+        }
+        manager.createNotificationChannel(serviceChannel);
     }
 
 

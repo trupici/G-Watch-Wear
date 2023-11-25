@@ -82,6 +82,10 @@ public class BgAlarmActivity extends WearableDialogActivity {
         if (extras != null) { // reported by google Crashes and ANRs
             final BgAlarmController.AlarmBasicConfig sounds = (BgAlarmController.AlarmBasicConfig) extras.getSerializable(EXTRAS_SOUNDS_CONFIG);
             final BgAlarmController.AlarmConfig alarmConfig = (BgAlarmController.AlarmConfig) extras.getSerializable(EXTRAS_ALARM_CONFIG);
+            if (alarmConfig == null) {
+                Log.e(LOG_TAG, "AlarmActivity: invalid alarm configuration");
+                return;
+            }
             final String bgValue = extras.getString(EXTRAS_BG_VALUE, null);
             final String text = extras.getString(EXTRAS_ALARM_TEXT, null);
             final int textColor = extras.getInt(EXTRAS_ALARM_TEXT_COLOR, 0);

@@ -18,20 +18,20 @@
 
 package sk.trupici.gwatch.wear.util;
 
+import static android.content.Context.ALARM_SERVICE;
+import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import sk.trupici.gwatch.wear.BuildConfig;
 
-import static android.content.Context.ALARM_SERVICE;
-import static sk.trupici.gwatch.wear.GWatchApplication.LOG_TAG;
+import sk.trupici.gwatch.wear.BuildConfig;
 
 public class AlarmUtils {
 
@@ -83,14 +83,10 @@ public class AlarmUtils {
                 Log.e(LOG_TAG, "Alarms: failed to cancel alarm " + alarmId, t);
             }
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + delayMs, pendingIntent);
+            if (useAlarmClock) {
+                alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(rtc + delayMs, null), pendingIntent);
             } else {
-                if (useAlarmClock) {
-                    alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(rtc + delayMs, null), pendingIntent);
-                } else {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + delayMs, pendingIntent);
-                }
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapsed + delayMs, pendingIntent);
             }
             return true;
         } catch (Throwable t) {

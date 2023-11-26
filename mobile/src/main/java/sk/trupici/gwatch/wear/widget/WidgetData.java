@@ -22,7 +22,14 @@ import android.os.BaseBundle;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
+import androidx.annotation.NonNull;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
+
+import javax.annotation.Nullable;
 
 import sk.trupici.gwatch.wear.common.data.Trend;
 
@@ -38,18 +45,18 @@ public class WidgetData implements Serializable {
     public static final String KEY_GLUCOSE_DELTA = "glucoseDelta";
     /** time elapsed from the glucose sample timestamp in seconds */
     public static final String KEY_TIME_DELTA = "timeDelta";
-    /** time delta from the previous glucose sample in minutes */
-    public static final String KEY_SAMPLE_TIME_DELTA = "sampleTimeDelta";
     /** trend received from data source packet */
     public static final String KEY_TREND = "trend";
 
-    private String source;
-    private int glucose;
-    private long timestamp;
-    private int glucoseDelta;
-    private int timeDelta;
-    private int sampleTimeDelta;
-    private Trend trend;
+    private String source;  // BG source
+    private int glucose;    // BG value, 0 in case of config or time update
+    private long timestamp; // BG sample time; NOT DISPLAYED
+    private int glucoseDelta; // calculated from glucose data
+    private int timeDelta;  // [min], calculated on every update
+    private Trend trend;   // calculated from glucose data if not received
+
+    public WidgetData() {
+    }
 
     public static WidgetData fromBundle(BaseBundle bundle) {
         WidgetData data = new WidgetData();
@@ -58,12 +65,29 @@ public class WidgetData implements Serializable {
         data.setGlucose(bundle.getInt(KEY_GLUCOSE, 0));
         data.setGlucoseDelta(bundle.getInt(KEY_GLUCOSE_DELTA, 0));
         data.setTimeDelta(bundle.getInt(KEY_TIME_DELTA, 0));
-        data.setSampleTimeDelta(bundle.getInt(KEY_SAMPLE_TIME_DELTA, 0));
         data.setTrend(Trend.valueOf(bundle.getInt(KEY_TREND)));
         return data;
     }
 
-    public WidgetData() {
+    @NonNull
+    public static WidgetData fromJsonString(String jsonString) {
+        WidgetData data = new WidgetData();
+        if (jsonString == null) {
+            return data;
+        }
+
+        try {
+            JSONObject jsonObj = new JSONObject(jsonString);
+            data.setSource(jsonObj.optString(KEY_SOURCE, null));
+            data.setTimestamp(jsonObj.optLong(KEY_TIMESTAMP, 0L));
+            data.setGlucose(jsonObj.optInt(KEY_GLUCOSE, 0));
+            data.setGlucoseDelta(jsonObj.optInt(KEY_GLUCOSE_DELTA, 0));
+            data.setTimeDelta(jsonObj.optInt(KEY_TIME_DELTA, 0));
+            data.setTrend(Trend.valueOf(jsonObj.optInt(KEY_TREND, Trend.UNKNOWN.ordinal())));
+            return data;
+        } catch (JSONException e) {
+            return new WidgetData();
+        }
     }
 
     public WidgetData(WidgetData widgetData) {
@@ -72,7 +96,6 @@ public class WidgetData implements Serializable {
         this.glucose = widgetData.getGlucose();
         this.glucoseDelta = widgetData.getGlucoseDelta();
         this.timeDelta = widgetData.getTimeDelta();
-        this.sampleTimeDelta = widgetData.getSampleTimeDelta();
         this.trend = widgetData.getTrend();
     }
 
@@ -83,10 +106,25 @@ public class WidgetData implements Serializable {
         bundle.putInt(KEY_GLUCOSE, glucose);
         bundle.putInt(KEY_GLUCOSE_DELTA, glucoseDelta);
         bundle.putInt(KEY_TIME_DELTA, timeDelta);
-        bundle.putInt(KEY_SAMPLE_TIME_DELTA, sampleTimeDelta);
         bundle.putInt(KEY_TREND, (trend == null ? 0 : trend.ordinal()));
         bundle.putString("action", action);
         return bundle;
+    }
+
+    @Nullable
+    public String toJsonString() {
+        try {
+            return new JSONObject()
+                    .put(KEY_SOURCE, source)
+                    .put(KEY_TIMESTAMP, timestamp)
+                    .put(KEY_GLUCOSE, glucose)
+                    .put(KEY_GLUCOSE_DELTA, glucoseDelta)
+                    .put(KEY_TIME_DELTA, timeDelta)
+                    .put(KEY_TREND, (trend == null ? 0 : trend.ordinal()))
+                    .toString();
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     public Bundle toBundle(String action) {
@@ -99,21 +137,19 @@ public class WidgetData implements Serializable {
         this.glucose = 0;
         this.glucoseDelta = 0;
         this.timeDelta = 0;
-        this.sampleTimeDelta = 0;
         this.trend = null;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return new StringBuilder().append("{")
-                .append("src: ").append(source).append(",")
-                .append("ts: ").append(timestamp).append(",")
-                .append("val: ").append(glucose).append(",")
-                .append("dVal: ").append(glucoseDelta).append(",")
-                .append("dTime: ").append(timeDelta).append(",")
-                .append("dSample: ").append(sampleTimeDelta).append(",")
-                .append("trend: ").append(trend).append("}")
-                .toString();
+        return "{" +
+                "src: " + source + "," +
+                "ts: " + timestamp + "," +
+                "val: " + glucose + "," +
+                "dVal: " + glucoseDelta + "," +
+                "dTime: " + timeDelta + "," +
+                "trend: " + trend + "}";
     }
 
     public String getSource() {
@@ -154,14 +190,6 @@ public class WidgetData implements Serializable {
 
     public void setTimeDelta(int timeDelta) {
         this.timeDelta = timeDelta;
-    }
-
-    public int getSampleTimeDelta() {
-        return sampleTimeDelta;
-    }
-
-    public void setSampleTimeDelta(int sampleTimeDelta) {
-        this.sampleTimeDelta = sampleTimeDelta;
     }
 
     public Trend getTrend() {

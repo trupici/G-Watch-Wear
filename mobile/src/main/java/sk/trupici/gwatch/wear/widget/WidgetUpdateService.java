@@ -54,6 +54,7 @@ import sk.trupici.gwatch.wear.common.util.BgUtils;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
 import sk.trupici.gwatch.wear.common.util.StringUtils;
 import sk.trupici.gwatch.wear.util.AndroidUtils;
+import sk.trupici.gwatch.wear.util.DelayedWorker;
 import sk.trupici.gwatch.wear.util.DexcomUtils;
 import sk.trupici.gwatch.wear.view.MainActivity;
 
@@ -62,7 +63,14 @@ public class WidgetUpdateService extends JobService {
 
     private static final String LOG_TAG = WidgetUpdateService.class.getSimpleName();
 
+    private static final String KEY_GRAPH_DATA = sk.trupici.gwatch.wear.util.PreferenceUtils.SESSION_DATA_PREFIX + "widget_graph_data";
+    private static final String KEY_GRAPH_LAST_UPDATE = sk.trupici.gwatch.wear.util.PreferenceUtils.SESSION_DATA_PREFIX + "widget_graph_last_update";
+    private static final String KEY_GRAPH_REFRESH_RATE = sk.trupici.gwatch.wear.util.PreferenceUtils.SESSION_DATA_PREFIX + "widget_graph_refresh_date";
+    private static final String KEY_LAST_WIDGET_DATA = sk.trupici.gwatch.wear.util.PreferenceUtils.SESSION_DATA_PREFIX + "widget_last_data";
+
     public static final int WIDGET_JOB_ID = 8182;
+
+    private static final String NO_DATA_TEXT = "--";
 
     private static final int GRAPH_MIN_VALUE = 40;
     private static final int GRAPH_MAX_VALUE = 400;
@@ -82,18 +90,57 @@ public class WidgetUpdateService extends JobService {
     private static final float DEF_DOT_PADDING = 1.5f;
 
     private static final int GRAPH_DATA_LEN = 48;
-    private static int[] graphData = new int[GRAPH_DATA_LEN];
-    private static long lastGraphUpdateMin = 0;
+    private int[] graphData = new int[GRAPH_DATA_LEN];
+    private long lastGraphUpdateMin = 0;
 
-    private static final int DEF_REFRESH_RATE_MIN = 5;
-    private static final int HIGH_REFRESH_RATE_MIN = 1;
-    private static int lastRefreshRate = DEF_REFRESH_RATE_MIN;
+    private final int DEF_REFRESH_RATE_MIN = 5;
+    private final int HIGH_REFRESH_RATE_MIN = 1;
+    private int lastRefreshRate = DEF_REFRESH_RATE_MIN;
 
-    private static WidgetData lastWidgetData = new WidgetData();
+    private WidgetData lastWidgetData = new WidgetData();
 
+
+    /** Initialize service, schedule the first update */
+    public static void init(Context context) {
+        Log.i(LOG_TAG, WidgetUpdateService.class.getSimpleName() + " initialization");
+        DelayedWorker.schedule(context);
+        WidgetUpdateService.scheduleTimeUpdate(context, 100);
+    }
+
+    @Override
+    public void onCreate() {
+        Log.i(LOG_TAG, getClass().getSimpleName() + " onCreate");
+        super.onCreate();
+
+        // restore state to recover from forcible process sleep
+        Context context = getApplicationContext();
+        graphData = PreferenceUtils.getIntArrayValue(context, KEY_GRAPH_DATA);
+        if (graphData == null || graphData.length != GRAPH_DATA_LEN) {
+            Log.i(LOG_TAG, getClass().getSimpleName() + " initializing graph data");
+            graphData = new int[GRAPH_DATA_LEN];
+        }
+        lastGraphUpdateMin = PreferenceUtils.getLongValue(context, KEY_GRAPH_LAST_UPDATE, 0);
+        lastRefreshRate = PreferenceUtils.getIntValue(context, KEY_GRAPH_REFRESH_RATE, DEF_REFRESH_RATE_MIN);
+        lastWidgetData = WidgetData.fromJsonString(PreferenceUtils.getStringValue(context, KEY_LAST_WIDGET_DATA, null));
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(LOG_TAG, getClass().getSimpleName() + " onDestroy");
+
+        // save state to be able to recover from forcible process sleep
+        Context context = getApplicationContext();
+        PreferenceUtils.setIntArrayValue(context, KEY_GRAPH_DATA, graphData);
+        PreferenceUtils.setLongValue(context, KEY_GRAPH_LAST_UPDATE, lastGraphUpdateMin);
+        PreferenceUtils.setIntValue(context, KEY_GRAPH_REFRESH_RATE, lastRefreshRate);
+        PreferenceUtils.setStringValue(context, KEY_LAST_WIDGET_DATA, lastWidgetData == null ? null : lastWidgetData.toJsonString());
+
+        super.onDestroy();
+    }
 
     @Override
     public boolean onStartJob(JobParameters params) {
+        Log.i(LOG_TAG, getClass().getSimpleName() + " onStartJob");
 
         Context context = getApplicationContext();
 
@@ -108,33 +155,33 @@ public class WidgetUpdateService extends JobService {
 
         WidgetData widgetData = WidgetData.fromBundle(params.getExtras());
         String action = params.getExtras().getString("action");
+        Log.i(LOG_TAG, getClass().getSimpleName() + " action requested: " + action);
 
-        updateWidget(appWidgetManager, appWidgetIds, widgetData, action);
+        updateRefreshRate(context);
 
-        if (action != null) {
-            scheduleTimeUpdate(context, widgetData);
-        }
-        return false;
+        setGlucoseDelta(widgetData);
+        setTimeDelta(widgetData);
+        updateGraphData(widgetData);
+
+        lastWidgetData = getDataToDraw(widgetData);
+        updateWidget(appWidgetManager, appWidgetIds, lastWidgetData);
+
+        scheduleTimeUpdate(context, MINUTE_IN_MS); // delay 1 minute
+
+        return true; // keep service running as long as possible
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
+        Log.i(LOG_TAG, getClass().getSimpleName() + " onStopJob");
+
         return true;
     }
 
-    private void updateWidget(AppWidgetManager appWidgetManager, int[] appWidgetIds, WidgetData widgetData, String action) {
+    private void updateWidget(AppWidgetManager appWidgetManager, int[] appWidgetIds, WidgetData widgetData) {
+            Log.i(GWatchApplication.LOG_TAG, getClass().getSimpleName() + " updateWidget: " + widgetData);
+
         Context context = getApplicationContext();
-
-        if (BuildConfig.DEBUG) {
-            Log.d(GWatchApplication.LOG_TAG, "" + action + ": " + widgetData);
-        }
-
-        if (!"glucose".equals(action)) {
-            updateRefreshRate(context);
-            updateTimeDelta(widgetData);
-            updateGraphData(widgetData, false);
-        }
-
         String sourcePackage = getSourceAppPackageToLaunch(context);
 
         for (int appWidgetId : appWidgetIds) {
@@ -153,18 +200,7 @@ public class WidgetUpdateService extends JobService {
         }
     }
 
-    private void scheduleTimeUpdate(Context context, WidgetData widgetData) {
-        PersistableBundle bundle = widgetData.toPersistableBundle("time");
-
-        JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(WIDGET_JOB_ID, new ComponentName(context, getClass()))
-                .setExtras(bundle)
-                .setMinimumLatency(MINUTE_IN_MS); // delay 1 min
-        JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-        jobScheduler.schedule(jobInfoBuilder.build());
-    }
-
-    private static boolean updateRefreshRate(Context context) {
+    private boolean updateRefreshRate(Context context) {
         int refreshRate = getConfiguredRefreshRate(context);
         if (refreshRate != lastRefreshRate) {
             Arrays.fill(graphData, 0);
@@ -174,37 +210,75 @@ public class WidgetUpdateService extends JobService {
         return false;
     }
 
-    private static void updateTimeDelta(WidgetData widgetData) {
+    private void setTimeDelta(WidgetData widgetData) {
         if (BuildConfig.DEBUG) {
-            Log.d(GWatchApplication.LOG_TAG, "updateTimeDelta");
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " updateTimeDelta");
         }
+
         long now = System.currentTimeMillis();
-        long timestamp = widgetData.getTimestamp();
-        if (timestamp != 0 && now > timestamp) {
-            int delta = (int) ((now - timestamp) / MINUTE_IN_MS); // minutes
-            if (delta > 24 * 60) { // more than 1 day -> reset
-                widgetData.reset();
+
+        if (widgetData.getTimestamp() == 0L) {
+            if (lastWidgetData.getTimestamp() == 0L) {
+                // in case of no timestamp info display 0
+                widgetData.setTimeDelta(0);
             } else {
+                // in case of no timestamp use current time
+                int delta = (int) ((now - lastWidgetData.getTimestamp()) / MINUTE_IN_MS); // minutes
                 widgetData.setTimeDelta(delta);
             }
+        } else {
+            // calculate current delta
+            int delta = (int) ((now - widgetData.getTimestamp()) / MINUTE_IN_MS); // minutes
+            widgetData.setTimeDelta(delta);
+        }
+
+        if (widgetData.getTimeDelta() > 24 * 60) { // more than 1 day -> reset
+            widgetData.reset();
         }
     }
 
-    private static void updateRemoteViews(Context context, AppWidgetManager appWidgetManager, RemoteViews views, int widgetId, WidgetData widgetData) {
+    private void setGlucoseDelta(WidgetData widgetData) {
         if (BuildConfig.DEBUG) {
-            Log.d(GWatchApplication.LOG_TAG, "updateRemoteViews: " + views.getPackage());
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " setGlucoseData");
         }
 
-        if (widgetData == null) {
-            Log.w(GWatchApplication.LOG_TAG, "updateRemoteViews: null data");
-            widgetData = new WidgetData();
+        // set glucose delta to be displayed
+        if (lastWidgetData.getGlucose() == 0) {
+            // in case of no previous data display 0
+            widgetData.setGlucoseDelta(0);
+        } else if (widgetData.getGlucose() == 0 || widgetData.getTimestamp() < lastWidgetData.getTimestamp()) {
+            // in case of no BG data or old data use the previous value
+            widgetData.setGlucoseDelta(lastWidgetData.getGlucoseDelta());
+        } else {
+            // calculate current delta
+            widgetData.setGlucoseDelta(widgetData.getGlucose() - lastWidgetData.getGlucose());
+        }
+    }
+
+    private WidgetData getDataToDraw(WidgetData widgetData) {
+        if (BuildConfig.DEBUG) {
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " getDataToDraw");
+        }
+        if (widgetData.getGlucose() == 0 || widgetData.getTimestamp() < lastWidgetData.getTimestamp()) {
+            // in case of no BG data or old data use the previous value
+            WidgetData dataToDraw = new WidgetData(lastWidgetData);
+            dataToDraw.setTimeDelta(widgetData.getTimeDelta());
+            dataToDraw.setGlucoseDelta(widgetData.getGlucoseDelta());
+            return dataToDraw;
+        }
+        return widgetData;
+    }
+
+    private void updateRemoteViews(Context context, AppWidgetManager appWidgetManager, RemoteViews views, int widgetId, WidgetData widgetData) {
+        if (BuildConfig.DEBUG) {
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " updateRemoteViews: " + views.getPackage());
         }
 
         int color = PreferenceUtils.getIntValue(context, "pref_widget_background_color", ContextCompat.getColor(context, R.color.def_widget_graph_bkg));
         views.setInt(R.id.widget_background, "setBackgroundColor", color);
 
         int timeDelta = widgetData.getTimeDelta();
-        String timeDeltaStr = timeDelta > 60 ? String.format("%d hr %d min", timeDelta/60, timeDelta%60) : String.format("%d min", timeDelta);
+        final String timeDeltaStr = widgetData.getTimeDelta() > 60 ? String.format("%d hr %d min", timeDelta/60, timeDelta%60) : String.format("%d min", timeDelta);
         views.setTextViewText(R.id.widget_time_delta, timeDeltaStr);
         views.setTextColor(R.id.widget_time_delta, getTimeDeltaColor(context, widgetData.getTimeDelta()));
 
@@ -212,8 +286,23 @@ public class WidgetUpdateService extends JobService {
         color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_source", ContextCompat.getColor(context, R.color.def_widget_text));
         views.setTextColor(R.id.widget_source, color);
 
-        if (widgetData.getGlucose() != 0) {
+        if (widgetData.getGlucose() == 0) {
+            int textColor = ContextCompat.getColor(context, R.color.def_widget_text);
+            views.setTextViewText(R.id.widget_glucose, NO_DATA_TEXT);
+            views.setTextColor(R.id.widget_glucose, textColor);
 
+            views.setTextViewText(R.id.widget_glucose_delta, null);
+            views.setTextColor(R.id.widget_glucose_delta, textColor);
+
+            views.setTextViewText(R.id.widget_units, null);
+            views.setTextColor(R.id.widget_units, textColor);
+
+            views.setTextViewText(R.id.widget_units, null);
+            views.setTextColor(R.id.widget_units, textColor);
+
+            views.setTextViewText(R.id.widget_trend, null);
+            views.setTextColor(R.id.widget_trend, Color.TRANSPARENT);
+        } else {
             int colorByGlucose = getColorByGlucose(context, widgetData.getGlucose());
 
             boolean isUnitConv = PreferenceUtils.isConfigured(context, "cfg_glucose_units_conversion", false);
@@ -229,29 +318,29 @@ public class WidgetUpdateService extends JobService {
 
             Trend trend = widgetData.getTrend();
             if (trend == Trend.UNKNOWN) {
-                trend = BgUtils.calcTrend(widgetData.getGlucoseDelta(), widgetData.getSampleTimeDelta());
+                trend = BgUtils.calcTrend(widgetData.getGlucoseDelta(), widgetData.getTimeDelta());
                 if (BuildConfig.DEBUG) {
-                    Log.i(LOG_TAG, "getTrendArrow: calculated trend: (bgd: "
-                            + widgetData.getGlucoseDelta() + ", std: " + widgetData.getSampleTimeDelta() + ") "
+                    Log.i(LOG_TAG, WidgetUpdateService.class.getSimpleName() + " getTrendArrow: calculated trend: (bgd: "
+                            + widgetData.getGlucoseDelta() + ", std: " + widgetData.getTimeDelta() + ") "
                             + trend);
                 }
             }
             char arrow = BgUtils.getTrendChar(trend);
             views.setTextViewText(R.id.widget_trend, ""+arrow);
             views.setTextColor(R.id.widget_trend, getTrendColorId(context, trend));
-
-            views.setImageViewBitmap(R.id.widget_background, drawChart(context, appWidgetManager, widgetId));
         }
+        views.setImageViewBitmap(R.id.widget_background, drawChart(context, appWidgetManager, widgetId));
+
         if (BuildConfig.DEBUG) {
-            Log.v(GWatchApplication.LOG_TAG, Arrays.toString(graphData));
+            Log.v(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " " + Arrays.toString(graphData));
         }
     }
 
-    private static String getValueStrInUnits(int value, boolean isUnitConv) {
+    private String getValueStrInUnits(int value, boolean isUnitConv) {
         return isUnitConv ? BgUtils.convertGlucoseToMmolLStr(value) : String.valueOf(value);
     }
 
-    private static String getDeltaStrInUnits(int value, boolean isUnitConv) {
+    private String getDeltaStrInUnits(int value, boolean isUnitConv) {
         StringBuilder builder = new StringBuilder();
         builder.append(value < 0 ? StringUtils.EMPTY_STRING : "+");
         if (isUnitConv) {
@@ -262,7 +351,7 @@ public class WidgetUpdateService extends JobService {
         return builder.toString();
     }
 
-    private static int getColorByGlucose(Context context, int glucose) {
+    private int getColorByGlucose(Context context, int glucose) {
         int color;
         if (glucose <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hypo", 70)) {
             color = PreferenceUtils.getIntValue(context, "pref_widget_text_color_hypo", ContextCompat.getColor(context, R.color.def_bg_hypo_color));
@@ -278,7 +367,7 @@ public class WidgetUpdateService extends JobService {
         return color;
     }
 
-    private static int getTimeDeltaColor(Context context, int delta) {
+    private int getTimeDeltaColor(Context context, int delta) {
         int color;
         int missedThreshold = Math.round(PreferenceUtils.getStringValueAsInt(context, "cfg_status_panel_no_data_time", 360)/60f);
         if (delta > missedThreshold) {
@@ -289,7 +378,7 @@ public class WidgetUpdateService extends JobService {
         return color;
     }
 
-    private static int getTrendColorId(Context context, Trend trend) {
+    private int getTrendColorId(Context context, Trend trend) {
         switch (trend) {
             case UP_FAST:
             case UP:
@@ -349,22 +438,22 @@ public class WidgetUpdateService extends JobService {
     ///////////////////////////////////////////////////////////////////////////
     // Graph implementation
 
-    private static void updateGraphData(WidgetData widgetData, boolean isNewData) {
+    private void updateGraphData(WidgetData widgetData) {
         if (BuildConfig.DEBUG) {
-            Log.d(GWatchApplication.LOG_TAG, "updateGraphData: " + widgetData.toString());
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " updateGraphData: " + widgetData.toString());
         }
 
-        final long now = System.currentTimeMillis() / (long)MINUTE_IN_MS; // minutes
+        final long nowMs = System.currentTimeMillis();
+        final long now = nowMs / (long)MINUTE_IN_MS; // minutes
         if (now < 0) {
-            Log.e(GWatchApplication.LOG_TAG, "now is negative: " + now);
+            Log.e(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " now is negative: " + now);
             return;
         }
 
-        int refreshRateMin = getConfiguredRefreshRate(GWatchApplication.getAppContext());
-
+        // shift graph data in time if needed
         if (lastGraphUpdateMin != 0) {
             // shift data left
-            int roll = (int) ((now - lastGraphUpdateMin) / refreshRateMin);
+            int roll = (int) ((now - lastGraphUpdateMin) / lastRefreshRate);
             if (roll > 0) {
                 lastGraphUpdateMin = now;
                 if (roll >= GRAPH_DATA_LEN) {
@@ -378,9 +467,8 @@ public class WidgetUpdateService extends JobService {
         }
 
         // set new data
-        if (isNewData) {
-            long tsData = widgetData.getTimestamp() / MINUTE_IN_MS;
-            int diff = (int) Math.round((now - tsData)/(double)refreshRateMin);
+        if (widgetData.getGlucose() > 0) {
+            int diff = (int) Math.round((nowMs - widgetData.getTimestamp())/(double)(lastRefreshRate * MINUTE_IN_MS));
             if (0 <= diff && diff < GRAPH_DATA_LEN) {
                 int newValue = widgetData.getGlucose();
                 int idx = GRAPH_DATA_LEN - 1 - diff;
@@ -391,12 +479,12 @@ public class WidgetUpdateService extends JobService {
         }
     }
 
-    private static int getConfiguredRefreshRate(Context context) {
+    private int getConfiguredRefreshRate(Context context) {
         boolean isHighRefreshRate = PreferenceUtils.isConfigured(context, "pref_widget_graph_1min_update", false);
         return isHighRefreshRate ? HIGH_REFRESH_RATE_MIN : DEF_REFRESH_RATE_MIN;
     }
 
-    private static Bitmap drawChart(Context context, AppWidgetManager appWidgetManager, int widgetId) {
+    private Bitmap drawChart(Context context, AppWidgetManager appWidgetManager, int widgetId) {
         int widgetWidth = appWidgetManager.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH);
         int widgetHeight = appWidgetManager.getAppWidgetOptions(widgetId).getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
         if (BuildConfig.DEBUG) {
@@ -420,7 +508,7 @@ public class WidgetUpdateService extends JobService {
         width -= widgetLeftPadding + widgetRightPadding;
         height -= widgetTopPadding + widgetBottomPadding;
         if (BuildConfig.DEBUG) {
-            Log.d(GWatchApplication.LOG_TAG, "Paint size: " + width + " x " + height);
+            Log.d(GWatchApplication.LOG_TAG, "paint size: " + width + " x " + height);
         }
         float heightScale = height / GRAPH_VALUE_INT;
 
@@ -461,12 +549,12 @@ public class WidgetUpdateService extends JobService {
         return bitmap;
     }
 
-    private static int dpToPx(Context context, float dp) {
+    private int dpToPx(Context context, float dp) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return (int) (dp * (metrics.densityDpi/160f));
     }
 
-    private static int getGraphPaintColor(Context context, int value) {
+    private int getGraphPaintColor(Context context, int value) {
         int color;
         if (value <= PreferenceUtils.getStringValueAsInt(context, "cfg_glucose_level_hypo", 70)) {
             color = PreferenceUtils.getIntValue(context, "pref_widget_graph_color_hypo", ContextCompat.getColor(context, R.color.def_bg_hypo_color));
@@ -492,7 +580,7 @@ public class WidgetUpdateService extends JobService {
 
         if (packet instanceof GlucosePacketBase) {
             GlucosePacketBase gp = (GlucosePacketBase) packet;
-            if (gp.getGlucoseValue() == 0 || gp.getTimestamp() <= 0 || gp.getTimestamp() == lastWidgetData.getTimestamp()) {
+            if (gp.getGlucoseValue() == 0 || gp.getTimestamp() <= 0 /*|| gp.getTimestamp() == lastWidgetData.getTimestamp()*/) {
                 // this usually happens in case of complex source packet, e.g. from AAPS
                 // the BG sample is the same but additional data is new
                 // in this case no widget refresh is needed
@@ -503,37 +591,16 @@ public class WidgetUpdateService extends JobService {
             widgetData.setSource(gp.getSource());
             widgetData.setTimestamp(gp.getTimestamp());
             widgetData.setGlucose(gp.getGlucoseValue());
-            widgetData.setTimeDelta(0);
             widgetData.setTrend(packet instanceof AAPSPacket
                     ? BgUtils.slopeArrowToTrend(((AAPSPacket)packet).getSlopeArrow())
                     : ((GlucosePacket)packet).getTrend());
 
-            if (lastWidgetData.getTimestamp() != 0 && lastWidgetData.getTimestamp() > widgetData.getTimestamp()) {
-                // in case of old value, do not update current status, just update graph data
-                updateGraphData(widgetData, true);
-                return;
-            }
-            widgetData.setGlucoseDelta(lastWidgetData.getGlucose() == 0
-                    ? 0
-                    : widgetData.getGlucose() - lastWidgetData.getGlucose());
-
-            int delta = 0;
-            if (lastWidgetData.getTimestamp() != 0 && widgetData.getTimestamp() > lastWidgetData.getTimestamp()) {
-                delta = (int)(widgetData.getTimestamp() - lastWidgetData.getTimestamp()) / 1000; // delta in seconds
-                delta = (int)Math.round((double)delta/60f);
-            }
-            widgetData.setSampleTimeDelta(delta == 0 ? 1 : delta); // can't be 0
-
-            updateTimeDelta(widgetData);
-            updateGraphData(widgetData, true);
-
-            lastWidgetData = new WidgetData(widgetData);
             bundle = widgetData.toPersistableBundle("glucose");
 
         } else if (packet instanceof ConfigPacket) {
-            bundle = lastWidgetData.toPersistableBundle("config");
+            bundle = new WidgetData().toPersistableBundle("config");
             if (BuildConfig.DEBUG) {
-                Log.i(GWatchApplication.LOG_TAG, "Config packet received. Sending data: " + lastWidgetData);
+                Log.i(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " config packet received");
             }
         }
 
@@ -543,9 +610,21 @@ public class WidgetUpdateService extends JobService {
             JobInfo jobInfo = new JobInfo.Builder(WidgetUpdateService.WIDGET_JOB_ID, componentName)
                     .setExtras(bundle)
                     .setOverrideDeadline(1000) // max delay 1s
+                    .setPersisted(true)
                     .build();
             JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(jobInfo);
         }
+    }
+
+    public static void scheduleTimeUpdate(Context context, long delayMs) {
+        PersistableBundle bundle = new WidgetData().toPersistableBundle("time");
+
+        JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(WIDGET_JOB_ID, new ComponentName(context, WidgetUpdateService.class))
+                .setExtras(bundle)
+                .setMinimumLatency(delayMs);
+        JobScheduler jobScheduler = (JobScheduler)context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        jobScheduler.schedule(jobInfoBuilder.build());
     }
 }

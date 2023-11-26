@@ -52,6 +52,8 @@ public class PreferenceUtils {
 
     public static final String DUMMY_KEY_PREFIX = "dummy";
 
+    public static final String SESSION_DATA_PREFIX = "session_";
+
     public static Object getDefaultValue(Preference pref) {
         try {
             Field field = Preference.class.getDeclaredField("mDefaultValue");

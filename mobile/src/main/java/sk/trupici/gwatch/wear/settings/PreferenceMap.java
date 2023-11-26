@@ -27,7 +27,8 @@ public class PreferenceMap {
 
     public final static Map<String, ConfigData> data = new HashMap<String, ConfigData>() {{
         // cfg_... simple configuration / direct mapping
-        // prefs_... require some logic to get/create configuration
+        // pref_... require some logic to get/create configuration
+        // session_... session data, ignored by preferences / settings framework
 
         // glucose levels
         put("cfg_glucose_level_hypo", new ConfigData(TAG_GL_THRESHOLD_HYPO, ConfigType.BYTE));

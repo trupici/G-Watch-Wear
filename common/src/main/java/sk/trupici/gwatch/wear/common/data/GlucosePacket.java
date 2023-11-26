@@ -70,7 +70,7 @@ public class GlucosePacket extends GlucosePacketBase {
     }
 
     public static GlucosePacket of(byte[] data) {
-        if (data.length < PACKET_HEADER_SIZE) {
+        if (data == null || data.length < PACKET_HEADER_SIZE) {
             return null;
         }
 

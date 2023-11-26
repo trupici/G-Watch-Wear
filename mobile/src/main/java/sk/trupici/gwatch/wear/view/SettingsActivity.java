@@ -331,7 +331,7 @@ public class SettingsActivity extends AppCompatActivity implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(LOG_TAG, "onSharedPreferenceChanged: " + key);
-        if (key == null) {
+        if (key == null || key.startsWith(PreferenceUtils.SESSION_DATA_PREFIX)) {
             return;
         }
         Preference pref = findPreference(key);

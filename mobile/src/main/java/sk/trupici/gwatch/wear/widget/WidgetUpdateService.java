@@ -161,6 +161,7 @@ public class WidgetUpdateService extends JobService {
 
         setGlucoseDelta(widgetData);
         setTimeDelta(widgetData);
+        setGlucoseTrend(widgetData);
         updateGraphData(widgetData);
 
         lastWidgetData = getDataToDraw(widgetData);
@@ -255,6 +256,39 @@ public class WidgetUpdateService extends JobService {
         }
     }
 
+    private void setGlucoseTrend(WidgetData widgetData) {
+        if (BuildConfig.DEBUG) {
+            Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " setGlucoseTrend");
+        }
+
+        if (widgetData.getTrend() != null && widgetData.getTrend() != Trend.UNKNOWN) {
+            // valid trend is already set
+            return;
+        }
+
+        if (widgetData.getGlucose() == 0 || widgetData.getTimestamp() < lastWidgetData.getTimestamp()) {
+            // in case of no BG data or old data display the previous value
+            widgetData.setTrend(lastWidgetData.getTrend());
+        } else if (widgetData.getTimestamp() == lastWidgetData.getTimestamp() && widgetData.getGlucose() == lastWidgetData.getGlucose()) {
+            // in case of the same BG data display previous value
+            widgetData.setTrend(lastWidgetData.getTrend());
+        } else if (lastWidgetData.getTimestamp() != 0L && lastWidgetData.getGlucose() != 0) {
+            // calculate the trend from deltas if possible
+            int delta = widgetData.getTimeDelta();
+            if (delta == 0) {
+                // try to calculate the more exact time delta (delta=0 hides trend)
+                delta = (int)Math.round((widgetData.getTimestamp() - lastWidgetData.getTimestamp()) / (double)MINUTE_IN_MS);
+            }
+            Trend trend = BgUtils.calcTrend(widgetData.getGlucoseDelta(), delta);
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, WidgetUpdateService.class.getSimpleName() + " calculated trend: (dVal: "
+                        + widgetData.getGlucoseDelta() + ", dTime: " + widgetData.getTimeDelta() + ") "
+                        + trend);
+            }
+            widgetData.setTrend(trend);
+        }
+    }
+
     private WidgetData getDataToDraw(WidgetData widgetData) {
         if (BuildConfig.DEBUG) {
             Log.d(GWatchApplication.LOG_TAG, WidgetUpdateService.class.getSimpleName() + " getDataToDraw");
@@ -263,7 +297,6 @@ public class WidgetUpdateService extends JobService {
             // in case of no BG data or old data use the previous value
             WidgetData dataToDraw = new WidgetData(lastWidgetData);
             dataToDraw.setTimeDelta(widgetData.getTimeDelta());
-            dataToDraw.setGlucoseDelta(widgetData.getGlucoseDelta());
             return dataToDraw;
         }
         return widgetData;
@@ -317,14 +350,6 @@ public class WidgetUpdateService extends JobService {
             views.setTextColor(R.id.widget_units, colorByGlucose);
 
             Trend trend = widgetData.getTrend();
-            if (trend == Trend.UNKNOWN) {
-                trend = BgUtils.calcTrend(widgetData.getGlucoseDelta(), widgetData.getTimeDelta());
-                if (BuildConfig.DEBUG) {
-                    Log.i(LOG_TAG, WidgetUpdateService.class.getSimpleName() + " getTrendArrow: calculated trend: (bgd: "
-                            + widgetData.getGlucoseDelta() + ", std: " + widgetData.getTimeDelta() + ") "
-                            + trend);
-                }
-            }
             char arrow = BgUtils.getTrendChar(trend);
             views.setTextViewText(R.id.widget_trend, ""+arrow);
             views.setTextColor(R.id.widget_trend, getTrendColorId(context, trend));
@@ -379,6 +404,9 @@ public class WidgetUpdateService extends JobService {
     }
 
     private int getTrendColorId(Context context, Trend trend) {
+        if (trend == null) {
+            return Color.TRANSPARENT;
+        }
         switch (trend) {
             case UP_FAST:
             case UP:

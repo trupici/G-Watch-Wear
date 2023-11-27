@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
@@ -48,6 +50,8 @@ public class BgDataProviderService extends ComplicationProviderService {
     public final static String PREF_VALUE = "provider_bg_value";
     public final static String PREF_LAST_UPDATE = "provider_bg_ts";
     public final static String PREF_COMPLICATION_IDS = "provider_ids";
+
+    public static final String PREF_SWAP_COMPLICATION_TEXT = "provider_bg_swap_complication_text";
 
     @Override
     public void onComplicationActivated(int complicationId, int type, ComplicationManager manager) {
@@ -124,16 +128,27 @@ public class BgDataProviderService extends ComplicationProviderService {
         } else if (type == ComplicationData.TYPE_SHORT_TEXT) {
             builder = new ComplicationData.Builder(type)
                     .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
-                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId))
-                    .setShortText(ComplicationText.plainText(text))
-                    .setShortTitle(ComplicationText.plainText(title));
-
+                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId));
+            boolean swapText = prefs.getBoolean(PREF_SWAP_COMPLICATION_TEXT, getResources().getBoolean(R.bool.def_bg_complication_swap_text));
+            if (swapText) {
+                builder.setShortText(ComplicationText.plainText(title));
+                builder.setShortTitle(ComplicationText.plainText(text));
+            } else {
+                builder.setShortText(ComplicationText.plainText(text));
+                builder.setShortTitle(ComplicationText.plainText(title));
+            }
         } else {//if (type == ComplicationData.TYPE_LONG_TEXT) {
             builder = new ComplicationData.Builder(type)
                     .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
-                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId))
-                    .setLongText(ComplicationText.plainText(text))
-                    .setLongTitle(ComplicationText.plainText(title));
+                    .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId));
+            boolean swapText = prefs.getBoolean(PREF_SWAP_COMPLICATION_TEXT, getResources().getBoolean(R.bool.def_bg_complication_swap_text));
+            if (swapText) {
+                builder.setShortText(ComplicationText.plainText(title));
+                builder.setShortTitle(ComplicationText.plainText(text));
+            } else {
+                builder.setShortText(ComplicationText.plainText(text));
+                builder.setShortTitle(ComplicationText.plainText(title));
+            }
         }
         manager.updateComplicationData(complicationId, builder.build());
     }

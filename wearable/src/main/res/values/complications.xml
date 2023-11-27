@@ -21,4 +21,5 @@
     <color name="def_compl_background_color">#00000000</color>
     <color name="def_compl_data_color">#FFFCFCFC</color>
 
+    <bool name="def_bg_complication_swap_text">false</bool>
 </resources>

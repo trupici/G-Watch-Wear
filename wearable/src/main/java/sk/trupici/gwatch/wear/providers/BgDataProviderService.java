@@ -143,11 +143,11 @@ public class BgDataProviderService extends ComplicationProviderService {
                     .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId));
             boolean swapText = prefs.getBoolean(PREF_SWAP_COMPLICATION_TEXT, getResources().getBoolean(R.bool.def_bg_complication_swap_text));
             if (swapText) {
-                builder.setShortText(ComplicationText.plainText(title));
-                builder.setShortTitle(ComplicationText.plainText(text));
+                builder.setLongText(ComplicationText.plainText(title));
+                builder.setLongTitle(ComplicationText.plainText(text));
             } else {
-                builder.setShortText(ComplicationText.plainText(text));
-                builder.setShortTitle(ComplicationText.plainText(title));
+                builder.setLongText(ComplicationText.plainText(text));
+                builder.setLongTitle(ComplicationText.plainText(title));
             }
         }
         manager.updateComplicationData(complicationId, builder.build());

@@ -65,7 +65,11 @@ public class NotificationService extends Service {
         Intent startIntent = new Intent(context, NotificationService.class);
         startIntent.setAction(ACTION_START);
 
-        ContextCompat.startForegroundService(context, startIntent);
+        try {
+            ContextCompat.startForegroundService(context, startIntent);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to start notification service", e);
+        }
     }
 
     public static void updateBgData(Context context, GlucosePacket packet) {

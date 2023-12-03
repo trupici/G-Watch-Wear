@@ -16,6 +16,9 @@
 
 package sk.trupici.gwatch.wear.watchface;
 
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
+import static sk.trupici.gwatch.wear.common.util.CommonConstants.SECOND_IN_MILLIS;
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,14 +41,15 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.preference.PreferenceManager;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
 import sk.trupici.gwatch.wear.common.util.PreferenceUtils;
@@ -57,9 +61,6 @@ import sk.trupici.gwatch.wear.config.WatchfaceConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationConfig;
 import sk.trupici.gwatch.wear.config.complications.ComplicationId;
 import sk.trupici.gwatch.wear.util.CommonConstants;
-
-import static sk.trupici.gwatch.wear.common.util.CommonConstants.MINUTE_IN_MILLIS;
-import static sk.trupici.gwatch.wear.common.util.CommonConstants.SECOND_IN_MILLIS;
 
 /**
  * Watch face parent base class with common functionality
@@ -271,7 +272,9 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
 
             super.onSurfaceChanged(holder, format, width, height);
 
-            adjustSize(width, height);
+            if (width > 0 && height > 0) {
+                adjustSize(width, height);
+            }
         }
 
         protected void adjustSize(int width, int height) {
@@ -345,7 +348,9 @@ public abstract class WatchfaceServiceBase extends CanvasWatchFaceService {
                 bgAlarmController.onConfigChanged(context, sharedPrefs);
 
                 Rect surfaceRect = getSurfaceHolder().getSurfaceFrame();
-                adjustSize(surfaceRect.width(), surfaceRect.height());
+                if (surfaceRect.width() > 0 && surfaceRect.height() > 0) {
+                    adjustSize(surfaceRect.width(), surfaceRect.height());
+                }
             }
 
             /* Check and trigger whether or not timer should be running (only in active mode). */

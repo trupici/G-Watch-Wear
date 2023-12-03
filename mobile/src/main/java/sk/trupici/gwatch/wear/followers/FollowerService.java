@@ -78,6 +78,8 @@ public abstract class FollowerService extends Worker {
     protected static final long MISSED_SAMPLE_PERIOD_MS = 60000; // 1min
     protected static final long DEF_SAMPLE_LATENCY_MS = 15000; // 15s
 
+    private static final long MIN_DELAY_BETWEEN_REQUESTS = 15000; // 15s
+
     private static OkHttpClient httpClient;
     private static Long lastSampleTime;
 
@@ -277,19 +279,109 @@ public abstract class FollowerService extends Worker {
      * @return delay in milliseconds (from now) when to request next value from NS server
      */
     private long getNextRequestDelay(GlucosePacket packet, long processingTime) {
+        /*
+            Period: S2-S1
+            S2R = sample-to-request delay, < period
+            R time = processingTime
+
+            ideal:
+            |---|-------|---|--
+            S1 S2R      S2 S2R
+                R1          R2
+            Delay:   period
+            R1 time: = S1 + S2R
+            R2 time: R1 + delay = R1 + period = (S1 + S2R) + period
+
+
+            usual (adaptation needed):
+
+            alt a) request too late
+            |---|--|-----|---|--
+            S1 S2R       S2 S2R
+                   R1        R2
+
+            Delay:   period - (R1 - (S1 + S2R)) = period - R1 + (S1 + S2R)
+            R2 time: R1 + delay = R1 + period - R1 + (S1 + S2R) = period + (S1 + S2R)
+
+
+            alt b) request too soon
+            |-|--|-------|---|--
+            S1  S2R      S2 S2R
+              R1             R2
+
+            Delay:   period + ((S1 + S2R) - R1) = period + (S1 + S2R) - R1
+            R2 time: R1 + delay = R1 + period + (S1 + S2R) - R1 = period + (S1 + S2R)
+
+
+            alt c) delayed delivery (fast sampling)
+            |---|-------|---|-|-|-----|---|--
+            S1 S2R      S2    DD      S3 S2R
+                R1          R2  R3        R4
+
+            DD = delayed delivery
+            R2-R1 delay: period
+            R3-R2 delay: fast sampling delay
+            R4-R3 delay: period - (R3 - R2) = period - fast sampling delay
+            R2 time: R1 + delay = R1 + period
+            R3 time: R2 + fast sampling delay
+            R4 time: R3 + delay =  R3 + period - (R3 - R2) = R2 + period (time when S2 is received)
+
+
+            alt d) missed sample (fast sampling)
+            |---|-------|---|--|--|--|-|-|--|-------|---|--
+            S1 S2R                     S2  S2R      S3 S2R
+                R1          R2 R3 R4 R5  R6 R7         R8
+
+            R2-R1 delay: period
+            R3-R2 = R4-R3 = R5-R4 = R6-R5 = R7-R6 delay: fast sampling delay
+            R8-R7 delay: period
+            R2 time: R1 + delay = R1 + period
+            R3 time: R2 + fast sampling delay
+            R4 time: R3 + fast sampling delay
+            R5 time: R4 + fast sampling delay
+            R6 time: R5 + fast sampling delay
+            R7 time: R6 + fast sampling delay [usually R2 + period] (time when S2 is received)
+            R8 time: period + (S2 + S2R)
+
+
+            alt e) missed sample (no fast sampling)
+            |---|-------|---|-------|---|--|--
+            S1 S2R                  S2  S2R
+                R1          R2          R3
+
+            R2-R1 delay: period
+            R3-R2 delay: period
+            R2 time: R1 + period
+            R3 time: R2 + period (time when S2 is received)
+
+        */
+        long delay = 0L;
         Long sampleTime = (packet != null) ? Long.valueOf(packet.getTimestamp()) : getLastSampleTime();
         if (sampleTime != null && sampleTime < processingTime) {
             // received sample with valid timestamp
             if (processingTime - sampleTime > getSamplePeriodMs() + getSampleToRequestDelay()) {
-                // sample is old - use fast sampling to get the next value
-                // if sample is not too old and fast sampling is configured
+                // sample is old - use fast sampling if possible
                 if (getMissedSamplePeriodMs() > 0 && processingTime - sampleTime < 2 * getSamplePeriodMs() + getSampleToRequestDelay()) {
-                    return getMissedSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
+                    // fast sampling is enabled and sample is not too old - use fast sampling
+                    delay = getMissedSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
+                } else {
+                    // use default period otherwise
+                    delay = getSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
                 }
+            } else {
+                // time is in valid range <sampleTime, sampleTime + period + sample-to-request delay>
+                //
+                // request time adaptation:
+                // use default period + sample-to-request delay from the last sample time
+                delay = sampleTime + getSamplePeriodMs() + getSampleToRequestDelay() - System.currentTimeMillis();
             }
+        } else {
+            // no valid sample timestamp available - use default period
+            delay = getSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
         }
-        // use default period
-        return getSamplePeriodMs() - (System.currentTimeMillis() - processingTime);
+
+        // check and set minimal request delay
+        return Math.max(delay, MIN_DELAY_BETWEEN_REQUESTS);
     }
     /**
      * Returns a {@code OkHttpClient} instance to use for NS server requests.

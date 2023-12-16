@@ -32,8 +32,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import sk.trupici.gwatch.wear.BuildConfig;
 import sk.trupici.gwatch.wear.R;
@@ -127,7 +125,7 @@ public class BgDataProviderService extends ComplicationProviderService {
             builder = new ComplicationData.Builder(ComplicationData.TYPE_NO_DATA);
         } else if (type == ComplicationData.TYPE_SHORT_TEXT) {
             builder = new ComplicationData.Builder(type)
-                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
+                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch_smile))
                     .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId));
             boolean swapText = prefs.getBoolean(PREF_SWAP_COMPLICATION_TEXT, getResources().getBoolean(R.bool.def_bg_complication_swap_text));
             if (swapText) {
@@ -139,7 +137,7 @@ public class BgDataProviderService extends ComplicationProviderService {
             }
         } else {//if (type == ComplicationData.TYPE_LONG_TEXT) {
             builder = new ComplicationData.Builder(type)
-                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch))
+                    .setIcon(Icon.createWithResource(this, R.mipmap.ic_gwatch_smile))
                     .setTapAction(createOnTapEvent(this, new ComponentName(this, getClass()), complicationId));
             boolean swapText = prefs.getBoolean(PREF_SWAP_COMPLICATION_TEXT, getResources().getBoolean(R.bool.def_bg_complication_swap_text));
             if (swapText) {

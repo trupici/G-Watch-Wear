@@ -39,6 +39,7 @@
         android:allowBackup="true"
         android:fullBackupOnly="true"
         android:icon="@mipmap/ic_gwatch"
+        android:roundIcon="@mipmap/ic_gwatch_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
@@ -164,7 +165,7 @@
 
         <!-- BG provider -->
         <service android:name=".providers.BgDataProviderService" android:exported="true"
-            android:roundIcon="@mipmap/ic_gwatch"
+            android:roundIcon="@mipmap/ic_gwatch_smile"
             android:label="@string/provider_name"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
             <intent-filter>

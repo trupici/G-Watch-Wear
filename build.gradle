@@ -6,8 +6,8 @@ buildscript {
         maven { url "https://maven.localazy.com/repository/release/" }
      }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
-        classpath "com.localazy:gradle:1.5.4"
+        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath "com.localazy:gradle:2.0.0"
     }
 }
 

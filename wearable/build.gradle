@@ -5,6 +5,17 @@ plugins {
 def buildProperties = new Properties()
 buildProperties.load(new FileInputStream(rootProject.file("local.properties")))
 
+apply plugin: 'com.localazy.gradle.data'
+localazy {
+    copyFrom project(":mobile")
+    upload {
+        ignoreMissingDefault true
+        deprecateMissing false
+        defaultLang "en"
+        showUploadAll true
+    }
+}
+
 android {
     signingConfigs {
         release {
@@ -32,6 +43,14 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    lintOptions {
+        disable 'ExtraTranslation'
+        disable 'MissingDefaultResource'
+        abortOnError true
+    }
+
+    namespace 'sk.trupici.gwatch.wear'
 }
 
 dependencies {
@@ -59,13 +78,3 @@ dependencies {
 
 
 apply plugin: 'com.localazy.gradle'
-
-localazy {
-    copyFrom project(":mobile")
-    upload {
-        ignoreMissingDefault true
-        deprecateMissing false
-        defaultLang "en"
-        showUploadAll true
-    }
-}

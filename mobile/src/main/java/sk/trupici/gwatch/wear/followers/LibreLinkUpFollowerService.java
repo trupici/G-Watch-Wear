@@ -28,6 +28,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,8 +70,6 @@ public class LibreLinkUpFollowerService extends FollowerService {
     private static final String LLU_SERVER_URL = "https://api.libreview.io";
     private static final String LLU_SERVER_URL_PATTERN = "https://api-%s.libreview.io";
 
-    public static final String USER_AGENT = "LibreLinkUp/4.7.0 CFNetwork/711.2.23 Darwin/14.0.0";
-
     private static final int DEF_LLU_SAMPLE_LATENCY_MS = 15;
     private static final int DEF_LLU_SAMPLE_PERIOD_MS = 60000;
     private static final int DEF_LLU_MISSED_SAMPLE_PERIOD_MS = 0; // disable missed sample feature
@@ -79,6 +79,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
     private static String serverUrl;
     private static String token;
     private static String connectionId;
+    private static String accountId;
 
     public LibreLinkUpFollowerService(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -89,6 +90,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
         connectionId = null;
         token = null;
         serverUrl = null;
+        accountId = null;
         sampleToRequestDelay = PreferenceUtils.getStringValueAsInt(GWatchApplication.getAppContext(), PREF_LLU_REQUEST_LATENCY, DEF_LLU_SAMPLE_LATENCY_MS) * 1000L;
     }
 
@@ -156,11 +158,10 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
     private Request.Builder createRequestBuilder() {
         return new Request.Builder()
-                .addHeader("User-Agent", USER_AGENT)
-                .addHeader("product", "llu.ios")
-                .addHeader("version", "4.7.0")
+                .addHeader("product", "llu.android")
+                .addHeader("version", "4.12.0")
                 .addHeader("Accept", "application/json")
-                .addHeader("Pragma", "no-cache")
+                .addHeader("Cache-Control", "no-cache")
                 ;
     }
 
@@ -202,6 +203,8 @@ public class LibreLinkUpFollowerService extends FollowerService {
                 }
                 if (token != null) {
                     UiUtils.showMessage(context, context.getString(R.string.status_ok));
+                    String userId = extractUserId(receivedData);
+                    accountId = encodeToAccountId(userId);
                     return token;
                 }
                 Log.e(LOG_TAG, getClass().getSimpleName() + " failed");
@@ -231,6 +234,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
             request = createRequestBuilder()
                     .addHeader("Authorization", "Bearer " + token)
+                    .addHeader("Account-Id", StringUtils.notNullString(accountId))
                     .url(url)
                     .build();
         } catch (Exception e) {
@@ -278,6 +282,7 @@ public class LibreLinkUpFollowerService extends FollowerService {
 
             request = createRequestBuilder()
                     .addHeader("Authorization", "Bearer " + token)
+                    .addHeader("Account-Id", StringUtils.notNullString(accountId))
                     .url(url)
                     .build();
         } catch (Exception e) {
@@ -466,6 +471,39 @@ public class LibreLinkUpFollowerService extends FollowerService {
             Log.e(LOG_TAG, "Patient data not received: " + rsp);
         }
         return null;
+    }
+    private String extractUserId(String rsp) {
+        try {
+            if (rsp != null && rsp.length() > 0) {
+                JSONObject obj = new JSONObject(rsp);
+                JSONObject data = obj.optJSONObject("data");
+                if (data != null) {
+                    JSONObject user = data.optJSONObject("user");
+                    if (user != null) {
+                        String id = user.optString("id");
+                        if (BuildConfig.DEBUG) {
+                            Log.i(LOG_TAG, "User id received: " + id);
+                        }
+                        return id;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.toString(), e);
+        }
+        if (BuildConfig.DEBUG) {
+            Log.e(LOG_TAG, "User id not received: " + rsp);
+        }
+        return null;
+    }
+
+    private String encodeToAccountId(String userId) {
+        try {
+            return StringUtils.toHexString(MessageDigest.getInstance("SHA-256").digest(userId.getBytes(StandardCharsets.UTF_8)));
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to encode user id", e);
+            return null;
+        }
     }
 
     /**
